@@ -20,7 +20,7 @@ class DbFilter(object):
     """
     def __init__(self, input_db, output_db, args):
         self.input_db = input_db
-        self.output_db = output_file
+        self.output_db = output_db
         self.args = args
         self.setup()
 
