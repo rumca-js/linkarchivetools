@@ -148,13 +148,14 @@ class RowHandler(object):
 
 
 class DbAnalyzer(object):
-    def __init__(self, parser):
+    def __init__(self, input_db, parser=None):
         self.parser = parser
         self.result = None
         self.engine = None
+        self.input_db = input_db
 
     def print_summary(self, print_columns=False):
-        db = self.parser.args.db
+        db = self.input_db
 
         if not os.path.isfile(db):
             print("File does not exist:{}".format(db))
@@ -167,13 +168,13 @@ class DbAnalyzer(object):
 
     def search(self):
         if self.is_db_scan():
-            file = self.parser.args.db
+            file = self.input_db
             if not os.path.isfile(file):
                 print("File does not exist:{}".format(file))
                 return
 
             print("Creating engine")
-            self.engine = create_engine("sqlite:///" + self.parser.args.db)
+            self.engine = create_engine("sqlite:///" + self.input_db)
             print("Creating engine DONE")
 
             with self.engine.connect() as connection:
@@ -249,7 +250,7 @@ def main():
 
     start_time = time.time()
 
-    m = DbAnalyzer(p)
+    m = DbAnalyzer(input_db = p.args.db, parser=p)
     if p.args.summary:
         m.print_summary(p.args.columns)
     else:

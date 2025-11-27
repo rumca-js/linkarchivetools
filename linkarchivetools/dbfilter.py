@@ -18,25 +18,25 @@ class DbFilter(object):
     """
     Filter class
     """
-    def __init__(self, input_file, output_file, args):
-        self.input_file = input_file
-        self.output_file = output_file
+    def __init__(self, input_db, output_db, args):
+        self.input_db = input_db
+        self.output_db = output_file
         self.args = args
         self.setup()
 
     def setup(self):
-        path = Path(self.input_file)
+        path = Path(self.input_db)
         if not path.exists():
             print("File {} does not exist".format(path))
             return
 
-        new_path = Path(self.output_file)
+        new_path = Path(self.output_db)
         if new_path.exists():
             new_path.unlink()
 
-        shutil.copy(self.input_file, self.output_file)
+        shutil.copy(self.input_db, self.output_db)
 
-        self.engine = create_engine(f"sqlite:///{self.output_file}")
+        self.engine = create_engine(f"sqlite:///{self.output_db}")
         self.connection = self.engine.connect()
 
     def close(self):

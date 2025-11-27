@@ -14,8 +14,8 @@ from utils.reflected import *
 
 class Db2JSON(object):
 
-    def __init__(self, input_file, output_dir, args):
-        self.input_file = input_file
+    def __init__(self, input_db, output_dir, args):
+        self.input_db = input_db
         self.output_dir = output_dir
         self.args = args
 
@@ -31,7 +31,7 @@ class Db2JSON(object):
         self.setup()
 
     def setup(self):
-        path = Path(self.input_file)
+        path = Path(self.input_db)
         if not path.exists():
             print("File {} does not exist".format(path))
             return
@@ -42,7 +42,7 @@ class Db2JSON(object):
                 shutil.rmtree(new_path)
             new_path.mkdir()
 
-        self.engine = create_engine(f"sqlite:///{self.input_file}")
+        self.engine = create_engine(f"sqlite:///{self.input_db}")
 
     def write(self, entry):
         """Write entries to the specified directory, 1000 per file."""
@@ -166,7 +166,7 @@ def parse():
 def main():
     parser, args = parse()
 
-    f = Db2JSON(input_file = args.db, output_dir=args.output_dir, args=args)
+    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, args=args)
     f.convert()
     f.close()
 

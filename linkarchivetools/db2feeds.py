@@ -16,20 +16,20 @@ class Db2Feeds(object):
     """
     Converter DB -> feeds.
     """
-    def __init__(self,input_database=None, verbose = True, remote_server="", output_file=None, output_format=None):
-        self.input_database = input_database
+    def __init__(self,input_db=None, verbose = True, remote_server="", output_db=None, output_format=None):
+        self.input_db = input_db
         self.verbose = verbose
         self.remote_server = remote_server
 
-        self.output_file = output_file
+        self.output_db = output_file
         self.output_format = output_format
 
-        if self.output_file:
+        if self.output_db:
             self.output_format = "SQLITE"
-        self.make_output_file()
+        self.make_output_db()
 
     def process(self):
-        self.engine = create_engine(f"sqlite:///{self.input_database}")
+        self.engine = create_engine(f"sqlite:///{self.input_db}")
         with self.engine.connect() as connection:
             self.connection = connection
             if self.new_engine:
@@ -39,19 +39,19 @@ class Db2Feeds(object):
             else:
                 self.read()
 
-    def make_output_file(self):
+    def make_output_db(self):
         if self.output_format != "SQLITE":
             self.new_engine = None
             self.new_connection = None
             return
 
-        new_path = Path(self.output_file)
+        new_path = Path(self.output_db)
         if new_path.exists():
             new_path.unlink()
 
-        shutil.copy(self.input_database, self.output_file)
+        shutil.copy(self.input_db, self.output_db)
 
-        self.new_engine = create_engine(f"sqlite:///{self.output_file}")
+        self.new_engine = create_engine(f"sqlite:///{self.output_db}")
 
     def read(self):
         self.truncate_tables()
@@ -183,7 +183,7 @@ def main():
         print("File {} does not exist".format(path))
         return
 
-    reader = Db2Feeds(input_database = args.db, remote_server=args.crawling_server, output_file=args.output_db, output_format=args.output_format)
+    reader = Db2Feeds(input_db = args.db, remote_server=args.crawling_server, output_db=args.output_db, output_format=args.output_format)
     reader.process()
 
 main()
