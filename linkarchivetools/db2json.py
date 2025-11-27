@@ -14,7 +14,7 @@ from utils.reflected import *
 
 class Db2JSON(object):
 
-    def __init__(self, input_db, output_dir, format=None, rows=None):
+    def __init__(self, input_db, output_dir, format=None, rows=1000):
         self.input_db = input_db
         self.output_dir = output_dir
 
