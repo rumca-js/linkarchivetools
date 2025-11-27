@@ -27,18 +27,14 @@ from utils.reflected import  (
 )
 
 
-def print_summary(db, print_columns=False):
-    if not os.path.isfile(db):
-        print("File does not exist:{}".format(db))
-        return
-
-    engine = create_engine("sqlite:///" + db)
-    with engine.connect() as connection:
-        r = ReflectedEntryTable(engine, connection)
-        r.print_summary(print_columns)
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
-class SearchInterface(object):
+class RowHandler(object):
 
     def __init__(self, parser=None, engine=None, connection=None):
         self.parser = parser
@@ -131,12 +127,6 @@ class SearchInterface(object):
     def get_time_diff(self):
         return time.time() - self.start_time
 
-    def print_time_diff(self):
-        elapsed_time_seconds = time.time() - self.start_time
-        elapsed_minutes = int(elapsed_time_seconds // 60)
-        elapsed_seconds = int(elapsed_time_seconds % 60)
-        print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
-
     def handle_row(self, row):
         """
         Row is to be expected a 'dict', eg. row["link"]
@@ -163,7 +153,19 @@ class DbAnalyzer(object):
         self.result = None
         self.engine = None
 
-    def process(self):
+    def print_summary(self, print_columns=False):
+        db = self.parser.args.db
+
+        if not os.path.isfile(db):
+            print("File does not exist:{}".format(db))
+            return
+
+        self.engine = create_engine("sqlite:///" + db)
+        with self.engine.connect() as connection:
+            r = ReflectedEntryTable(self.engine, connection)
+            r.print_summary(print_columns)
+
+    def search(self):
         if self.is_db_scan():
             file = self.parser.args.db
             if not os.path.isfile(file):
@@ -177,7 +179,7 @@ class DbAnalyzer(object):
             with self.engine.connect() as connection:
                 self.connection = connection
 
-                row_handler = SearchInterface(self.parser, self.engine, self.connection)
+                row_handler = RowHandler(self.parser, self.engine, self.connection)
 
                 print("Starting alchemy")
                 searcher = AlchemySearch(self.engine,
@@ -245,11 +247,15 @@ def main():
         print("Could not parse options")
         return
 
+    start_time = time.time()
+
+    m = DbAnalyzer(p)
     if p.args.summary:
-        print_summary(p.args.db, p.args.columns)
+        m.print_summary(p.args.columns)
     else:
-        m = DbAnalyzer(p)
-        m.process()
+        m.search()
+
+    print_time_diff(start_time)
 
 
 if __name__ == "__main__":

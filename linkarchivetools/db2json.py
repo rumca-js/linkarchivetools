@@ -14,10 +14,9 @@ from utils.reflected import *
 
 class Db2JSON(object):
 
-    def __init__(self, dir, args, engine, connection=None):
-        self.engine = engine
-        self.connection = connection
-        self.dir = dir
+    def __init__(self, input_file, output_dir, args):
+        self.input_file = input_file
+        self.output_dir = output_dir
         self.args = args
 
         self.file_index = 0
@@ -29,10 +28,26 @@ class Db2JSON(object):
         self.processed = 0
         self.all = 0
 
+        self.setup()
+
+    def setup(self):
+        path = Path(self.input_file)
+        if not path.exists():
+            print("File {} does not exist".format(path))
+            return
+
+        if self.output_dir and self.output_dir != ".":
+            new_path = Path(self.output_dir)
+            if new_path.exists():
+                shutil.rmtree(new_path)
+            new_path.mkdir()
+
+        self.engine = create_engine(f"sqlite:///{self.input_file}")
+
     def write(self, entry):
         """Write entries to the specified directory, 1000 per file."""
         if self.handle == None:
-            file_path = self.get_file_path()
+            file_path = str(self.get_file_path())
             self.handle = open(file_path, 'w')
 
         row = self.get_entry_json_data(entry)
@@ -48,7 +63,7 @@ class Db2JSON(object):
             self.entry_index = 0
             self.finish_stream()
 
-            file_path = self.get_file_path()
+            file_path = str(self.get_file_path())
             self.handle = open(file_path, 'w')
 
     def get_entry_json_data(self, entry):
@@ -102,7 +117,11 @@ class Db2JSON(object):
         return row
 
     def get_file_path(self):
-        return "{}_{}.json".format(self.args.format, str(self.file_index))
+        filename = "{}_{}.json".format(self.args.format, str(self.file_index))
+        if self.output_dir and self.output_dir != ".":
+            return Path(self.output_dir) / filename
+        else:
+            return Path(filename)
 
     def close(self):
         if self.handle:
@@ -121,10 +140,20 @@ class Db2JSON(object):
         self.handle.close()
         self.rows = []
 
+    def convert(self):
+        with self.engine.connect() as connection:
+            self.connection = connection
+            table = ReflectedEntryTable(self.engine, connection)
+
+            for entry in table.get_entries():
+                #print(entry)
+                self.write(entry)
+
 
 def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
+    parser.add_argument("--output-dir", default="json", help="Output directory")
     parser.add_argument("--rows", default=1000, action="store_true", help="Number of rows per file")
     parser.add_argument("-f","--format", default="entries", help="file name format")
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
@@ -137,24 +166,8 @@ def parse():
 def main():
     parser, args = parse()
 
-    path = Path(args.db)
-    if not path.exists():
-        print("File {} does not exist".format(path))
-        return
-
-    engine = create_engine(f"sqlite:///{args.db}")
-    with engine.connect() as connection:
-        table = ReflectedEntryTable(engine, connection)
-
-        new_path = Path("data") / "top"
-        if new_path.exists():
-            shutil.rmtree(new_path)
-
-        f = Db2JSON(new_path, args, engine, connection)
-        for entry in table.get_entries():
-            #print(entry)
-            f.write(entry)
-
-        f.close()
+    f = Db2JSON(input_file = args.db, output_dir=args.output_dir, args=args)
+    f.convert()
+    f.close()
 
 main()

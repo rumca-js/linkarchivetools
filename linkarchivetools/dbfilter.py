@@ -18,10 +18,31 @@ class DbFilter(object):
     """
     Filter class
     """
-    def __init__(self, engine, connection, args):
-        self.engine = engine
-        self.connection = connection
+    def __init__(self, input_file, output_file, args):
+        self.input_file = input_file
+        self.output_file = output_file
         self.args = args
+        self.setup()
+
+    def setup(self):
+        path = Path(self.input_file)
+        if not path.exists():
+            print("File {} does not exist".format(path))
+            return
+
+        new_path = Path(self.output_file)
+        if new_path.exists():
+            new_path.unlink()
+
+        shutil.copy(self.input_file, self.output_file)
+
+        self.engine = create_engine(f"sqlite:///{self.output_file}")
+        self.connection = self.engine.connect()
+
+    def close(self):
+        if self.connection:
+            self.connection.close()
+            self.connection = None
 
     def truncate(self):
         table = ReflectedEntryTable(self.engine, self.connection)
@@ -69,7 +90,7 @@ class DbFilter(object):
 def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
-    parser.add_argument("--new-db", default="new.db", help="DB to be produced")
+    parser.add_argument("--output-db", default="new.db", help="DB to be created")
     parser.add_argument("--bookmarked", action="store_true", help="export bookmarks")
     parser.add_argument("--votes", action="store_true", help="export if votes is > 0")
     parser.add_argument("--clean", action="store_true", help="cleans db from tables")
@@ -84,26 +105,13 @@ def main():
     start_time = time.time()
     parser, args = parse()
 
-    path = Path(args.db)
-    if not path.exists():
-        print("File {} does not exist".format(path))
-        return
-
-    new_path = Path(args.new_db)
-    if new_path.exists():
-        new_path.unlink()
-
-    shutil.copy(args.db, args.new_db)
-
-    engine = create_engine(f"sqlite:///{args.new_db}")
-
-    with engine.connect() as connection:
-        thefilter = DbFilter(engine=engine, connection=connection, args=args)
-        thefilter.truncate()
-        if self.args.bookmarks:
-            thefilter.filter_bookmarks()
-        if self.args.votes:
-            thefilter.filter_votes()
+    thefilter = DbFilter(args.db, args.output_db, args=args)
+    thefilter.truncate()
+    if args.bookmarked:
+        thefilter.filter_bookmarks()
+    if args.votes:
+        thefilter.filter_votes()
+    thefilter.close()
 
     end_time = time.time()
     print(f"Done in {end_time}")

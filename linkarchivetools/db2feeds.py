@@ -24,6 +24,8 @@ class Db2Feeds(object):
         self.output_file = output_file
         self.output_format = output_format
 
+        if self.output_file:
+            self.output_format = "SQLITE"
         self.make_output_file()
 
     def process(self):
@@ -91,7 +93,7 @@ class Db2Feeds(object):
                 self.print_data(data)
 
                 if new_table:
-                    self.copy_entry(new_table, data):
+                    self.copy_entry(new_table, data)
 
     def copy_entry(self, table, data):
         """
@@ -131,7 +133,7 @@ class Db2Feeds(object):
           "readlater",
           "searchview",
           "socialdata",
-          "blockentry",
+          #"blockentry",
           "blockentrylist",
           "usercomments",
           "userbookmarks",
@@ -139,6 +141,7 @@ class Db2Feeds(object):
           "userentrytransitionhistory",
           "userentryvisithistory",
         ]
+        return table_names
 
     def print_data(self, data):
         """
@@ -163,7 +166,7 @@ class Db2Feeds(object):
 def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
-    parser.add_argument("--output-file", help="File to be created")
+    parser.add_argument("--output-db", help="File to be created")
     parser.add_argument("--output-format", default="LINES", help="format of display. LINES, JSON, SQLITE")
     parser.add_argument("--crawling-server", default="", help="Remote crawling server")
     
@@ -180,7 +183,7 @@ def main():
         print("File {} does not exist".format(path))
         return
 
-    reader = Db2Feeds(input_database = args.db, remote_server=args.crawling_server, output_file=args.output_file, output_format=args.output_format)
+    reader = Db2Feeds(input_database = args.db, remote_server=args.crawling_server, output_file=args.output_db, output_format=args.output_format)
     reader.process()
 
 main()
