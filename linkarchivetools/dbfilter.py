@@ -22,6 +22,8 @@ class DbFilter(object):
         self.input_db = input_db
         self.output_db = output_db
         self.args = args
+        self.engine = None
+        self.connection = None
         self.setup()
 
     def setup(self):
