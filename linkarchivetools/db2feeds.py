@@ -25,10 +25,14 @@ class Db2Feeds(object):
         remote_server="",
         output_db=None,
         output_format=None,
+        read_internet_links=False,
+        update_rss=False,
     ):
         self.input_db = input_db
         self.verbose = verbose
         self.remote_server = remote_server
+        self.update_rss = update_rss
+        self.read_internet_links = read_internet_links
 
         self.output_db = output_file
         self.output_format = output_format
@@ -73,8 +77,8 @@ class Db2Feeds(object):
             new_table.vacuum()
 
         for entry in table.get_entries_good():
-            if self.remote_server:
-                url = RemoteUrl(remote_server=remote_server, url=entry.link)
+            if self.read_internet_links and self.remote_server:
+                url = RemoteUrl(remote_server=self.remote_server, url=entry.link)
                 feeds = url.get_feeds()
                 if len(feeds) == 0:
                     url.get_response()
@@ -84,20 +88,30 @@ class Db2Feeds(object):
             feeds = url.get_feeds()
 
             for feed in feeds:
+
                 data = {}
                 data["link"] = feed
                 data["title"] = entry.title
                 data["page_rating_votes"] = entry.page_rating_votes
+                data["manual_status_code"] = entry.manual_status_code
 
                 # not null requirement
                 data["source_url"] = ""
                 data["permanent"] = False
                 data["bookmarked"] = False
-                data["status_code"] = 0
+                data["status_code"] = entry.status_code
                 data["contents_type"] = 0
                 data["page_rating_contents"] = 0
                 data["page_rating_visits"] = 0
                 data["page_rating"] = 0
+
+                if self.update_rss and self.remote_server:
+                    url_feed = RemoteUrl(remote_server=self.remote_server, url=feed)
+                    url_feed.get_response()
+
+                    data["title"] = url_feed.get_title()
+                    data["description"] = url_feed.get_description()
+                    data["status_code"] = url_feed.get_status_code()
 
                 self.print_data(data)
 
@@ -178,6 +192,8 @@ def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
     parser.add_argument("--output-db", help="File to be created")
+    parser.add_argument("--update-rss",action="store_true" help="Reads RSS to check it's title and properties")
+    parser.add_argument("--read-internet-links",action="store_true" help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
     parser.add_argument(
         "--output-format",
         default="LINES",
