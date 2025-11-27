@@ -14,10 +14,12 @@ from utils.reflected import *
 
 class Db2JSON(object):
 
-    def __init__(self, input_db, output_dir, args):
+    def __init__(self, input_db, output_dir, format=None, rows=None):
         self.input_db = input_db
         self.output_dir = output_dir
-        self.args = args
+
+        self.format=format
+        self.rows=rows
 
         self.file_index = 0
         self.entry_index = 0
@@ -58,7 +60,7 @@ class Db2JSON(object):
 
         sys.stdout.write(f"{self.file_index}/{self.entry_index:04d}\r")
 
-        if self.entry_index == self.args.rows:
+        if self.entry_index == self.rows:
             self.file_index += 1
             self.entry_index = 0
             self.finish_stream()
@@ -117,7 +119,7 @@ class Db2JSON(object):
         return row
 
     def get_file_path(self):
-        filename = "{}_{}.json".format(self.args.format, str(self.file_index))
+        filename = "{}_{}.json".format(self.format, str(self.file_index))
         if self.output_dir and self.output_dir != ".":
             return Path(self.output_dir) / filename
         else:
@@ -166,7 +168,7 @@ def parse():
 def main():
     parser, args = parse()
 
-    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, args=args)
+    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, format=args.format, rows=args.rows)
     f.convert()
     f.close()
 
