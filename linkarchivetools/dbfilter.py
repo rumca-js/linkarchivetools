@@ -2,6 +2,7 @@
 Filters out redundant things from database.
 Normally for views, analysis you do not need no temporary tables.
 """
+
 import os
 import sys
 import json
@@ -18,6 +19,7 @@ class DbFilter(object):
     """
     Filter class
     """
+
     def __init__(self, input_db, output_db):
         self.input_db = input_db
         self.output_db = output_db
@@ -101,7 +103,7 @@ def parse():
     parser.add_argument("--votes", action="store_true", help="export if votes is > 0")
     parser.add_argument("--clean", action="store_true", help="cleans db from tables")
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
-    
+
     args = parser.parse_args()
 
     return parser, args

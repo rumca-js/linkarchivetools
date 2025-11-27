@@ -123,7 +123,9 @@ class Parser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data converter program")
         self.parser.add_argument("--dir", help="Directory to be scanned")
-        self.parser.add_argument("--db",default="converted.sqlite", help="Database output file")
+        self.parser.add_argument(
+            "--db", default="converted.sqlite", help="Database output file"
+        )
         self.parser.add_argument(
             "--preserve-id", action="store_true", help="Preserves ID of objects"
         )

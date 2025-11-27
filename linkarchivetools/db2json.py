@@ -1,6 +1,7 @@
 """
 Converts database to JSON.
 """
+
 import os
 import sys
 import json
@@ -18,8 +19,8 @@ class Db2JSON(object):
         self.input_db = input_db
         self.output_dir = output_dir
 
-        self.format=format
-        self.rows_max=rows_max
+        self.format = format
+        self.rows_max = rows_max
 
         self.file_index = 0
         self.entry_index = 0
@@ -50,7 +51,7 @@ class Db2JSON(object):
         """Write entries to the specified directory, 1000 per file."""
         if self.handle == None:
             file_path = str(self.get_file_path())
-            self.handle = open(file_path, 'w')
+            self.handle = open(file_path, "w")
 
         row = self.get_entry_json_data(entry)
 
@@ -66,7 +67,7 @@ class Db2JSON(object):
             self.finish_stream()
 
             file_path = str(self.get_file_path())
-            self.handle = open(file_path, 'w')
+            self.handle = open(file_path, "w")
 
     def get_entry_json_data(self, entry):
         date_published = entry.date_published
@@ -77,27 +78,28 @@ class Db2JSON(object):
         if date_dead_since:
             date_dead_since = date_dead_since.isoformat()
 
-        row = {"link" : entry.link,
-               "description" : entry.description,
-               "author" : entry.author,
-               "album" : entry.album,
-               "bookmarked" : entry.bookmarked,
-               "date_dead_since" : date_dead_since,
-               "date_published" : date_published,
-               "language" : entry.language,
-               "manual_status_code" : entry.manual_status_code,
-               "page_rating" : entry.page_rating,
-               "page_rating_contents" : entry.page_rating_contents,
-               "page_rating_votes" : entry.page_rating_votes,
-               "page_rating_visits" : entry.page_rating_visits,
-               "permanent" : entry.permanent,
-               "source_url" : entry.source_url,
-               "status_code" : entry.status_code,
-               "thumbnail" : entry.thumbnail,
-               "title" : entry.title,
-               "age" : entry.age,
-               "id" : entry.id,
-                }
+        row = {
+            "link": entry.link,
+            "description": entry.description,
+            "author": entry.author,
+            "album": entry.album,
+            "bookmarked": entry.bookmarked,
+            "date_dead_since": date_dead_since,
+            "date_published": date_published,
+            "language": entry.language,
+            "manual_status_code": entry.manual_status_code,
+            "page_rating": entry.page_rating,
+            "page_rating_contents": entry.page_rating_contents,
+            "page_rating_votes": entry.page_rating_votes,
+            "page_rating_visits": entry.page_rating_visits,
+            "permanent": entry.permanent,
+            "source_url": entry.source_url,
+            "status_code": entry.status_code,
+            "thumbnail": entry.thumbnail,
+            "title": entry.title,
+            "age": entry.age,
+            "id": entry.id,
+        }
 
         social_table = ReflectedSocialData(self.engine, self.connection)
         social_data = social_table.get(entry.id)
@@ -148,7 +150,7 @@ class Db2JSON(object):
             table = ReflectedEntryTable(self.engine, connection)
 
             for entry in table.get_entries():
-                #print(entry)
+                # print(entry)
                 self.write(entry)
 
 
@@ -156,10 +158,12 @@ def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
     parser.add_argument("--output-dir", default="json", help="Output directory")
-    parser.add_argument("--rows-max", default=1000, action="store_true", help="Number of rows per file")
-    parser.add_argument("-f","--format", default="entries", help="file name format")
+    parser.add_argument(
+        "--rows-max", default=1000, action="store_true", help="Number of rows per file"
+    )
+    parser.add_argument("-f", "--format", default="entries", help="file name format")
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
-    
+
     args = parser.parse_args()
 
     return parser, args
@@ -168,7 +172,12 @@ def parse():
 def main():
     parser, args = parse()
 
-    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, format=args.format, rows_max=args.rows_max)
+    f = Db2JSON(
+        input_db=args.db,
+        output_dir=args.output_dir,
+        format=args.format,
+        rows_max=args.rows_max,
+    )
     f.convert()
     f.close()
 

@@ -3,6 +3,7 @@ Converts Database to information about RSS feeds.
 
 TODO - copy tags from origin to RSS feeds
 """
+
 import shutil
 import argparse
 from pathlib import Path
@@ -16,7 +17,15 @@ class Db2Feeds(object):
     """
     Converter DB -> feeds.
     """
-    def __init__(self,input_db=None, verbose = True, remote_server="", output_db=None, output_format=None):
+
+    def __init__(
+        self,
+        input_db=None,
+        verbose=True,
+        remote_server="",
+        output_db=None,
+        output_format=None,
+    ):
         self.input_db = input_db
         self.verbose = verbose
         self.remote_server = remote_server
@@ -112,34 +121,34 @@ class Db2Feeds(object):
 
     def get_table_names(self):
         table_names = [
-          "credentials",
-          "sourcecategories",
-          "sourcesubcategories",
-          "sourcedatamodel",
-          "userconfig",
-          "configurationentry",
-          "linkdatamodel",
-          "domains",
-          "usertags",
-          "compactedtags",
-          "usercompactedtags",
-          "entrycompactedtags",
-          "uservotes",
-          "browser",
-          "entryrules",
-          "dataexport",
-          "gateway",
-          "modelfiles",
-          "readlater",
-          "searchview",
-          "socialdata",
-          #"blockentry",
-          "blockentrylist",
-          "usercomments",
-          "userbookmarks",
-          "usersearchhistory",
-          "userentrytransitionhistory",
-          "userentryvisithistory",
+            "credentials",
+            "sourcecategories",
+            "sourcesubcategories",
+            "sourcedatamodel",
+            "userconfig",
+            "configurationentry",
+            "linkdatamodel",
+            "domains",
+            "usertags",
+            "compactedtags",
+            "usercompactedtags",
+            "entrycompactedtags",
+            "uservotes",
+            "browser",
+            "entryrules",
+            "dataexport",
+            "gateway",
+            "modelfiles",
+            "readlater",
+            "searchview",
+            "socialdata",
+            # "blockentry",
+            "blockentrylist",
+            "usercomments",
+            "userbookmarks",
+            "usersearchhistory",
+            "userentrytransitionhistory",
+            "userentryvisithistory",
         ]
         return table_names
 
@@ -154,11 +163,13 @@ class Db2Feeds(object):
         if self.output_format == "LINES" or self.output_format == "SQLITE":
             print(f"[{page_rating_votes}] {link} - {title}")
         elif self.output_format == "JSON":
-            print(f'''
+            print(
+                f"""
             \{ "title" : "{title}",
               "link" : "{link}",
               "page_rating_votes : {page_rating_votes}
-            \}''')
+            \}"""
+            )
         else:
             print("Unsupported output format")
 
@@ -167,9 +178,13 @@ def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
     parser.add_argument("--output-db", help="File to be created")
-    parser.add_argument("--output-format", default="LINES", help="format of display. LINES, JSON, SQLITE")
+    parser.add_argument(
+        "--output-format",
+        default="LINES",
+        help="format of display. LINES, JSON, SQLITE",
+    )
     parser.add_argument("--crawling-server", default="", help="Remote crawling server")
-    
+
     args = parser.parse_args()
 
     return parser, args
@@ -183,7 +198,12 @@ def main():
         print("File {} does not exist".format(path))
         return
 
-    reader = Db2Feeds(input_db = args.db, remote_server=args.crawling_server, output_db=args.output_db, output_format=args.output_format)
+    reader = Db2Feeds(
+        input_db=args.db,
+        remote_server=args.crawling_server,
+        output_db=args.output_db,
+        output_format=args.output_format,
+    )
     reader.process()
 
 

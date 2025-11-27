@@ -12,6 +12,7 @@ TODO
  - Maybe it could produce a chart?
 
 """
+
 import argparse
 import time
 import os
@@ -19,11 +20,15 @@ import json
 from sqlalchemy import create_engine
 
 from .utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
-from .utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
-from .utils.reflected import  (
-   ReflectedEntryTable,
-   ReflectedUserTags,
-   ReflectedSocialData,
+from .utils.alchemysearch import (
+    AlchemySymbolEvaluator,
+    AlchemyEquationEvaluator,
+    AlchemySearch,
+)
+from .utils.reflected import (
+    ReflectedEntryTable,
+    ReflectedUserTags,
+    ReflectedSocialData,
 )
 
 
@@ -100,8 +105,14 @@ class RowHandler(object):
         print(tags)
 
     def print_social(self, social):
-        if social.view_count is not None and social.thumbs_up is not None and social.thumbs_down is not None:
-            print(f"V:{social.view_count} TU:{social.thumbs_up} TD:{social.thumbs_down}")
+        if (
+            social.view_count is not None
+            and social.thumbs_up is not None
+            and social.thumbs_down is not None
+        ):
+            print(
+                f"V:{social.view_count} TU:{social.thumbs_up} TD:{social.thumbs_down}"
+            )
         else:
             if social.view_count:
                 print(f"F:{social.view_count}")
@@ -142,7 +153,11 @@ class RowHandler(object):
     def summary(self):
         if self.parser.args.summary:
             if self.parser.args.verify:
-                print("total:{} good:{} dead:{}".format(self.total_entries, self.good_entries, self.dead_entries))
+                print(
+                    "total:{} good:{} dead:{}".format(
+                        self.total_entries, self.good_entries, self.dead_entries
+                    )
+                )
             else:
                 print("total:{}".format(self.total_entries))
 
@@ -183,11 +198,12 @@ class DbAnalyzer(object):
                 row_handler = RowHandler(self.parser, self.engine, self.connection)
 
                 print("Starting alchemy")
-                searcher = AlchemySearch(self.engine,
-                        self.parser.args.search,
-                        row_handler = row_handler,
-                        args=self.parser.args,
-                        connection=self.connection,
+                searcher = AlchemySearch(
+                    self.engine,
+                    self.parser.args.search,
+                    row_handler=row_handler,
+                    args=self.parser.args,
+                    connection=self.connection,
                 )
                 print("Starting alchemy DONE")
 
@@ -207,26 +223,48 @@ class Parser(object):
         self.parser = argparse.ArgumentParser(description="Data analyzer program")
         self.parser.add_argument("--db", help="DB to be scanned")
 
-        self.parser.add_argument("--search", help="Search, with syntax same as the main program / site.")
-        self.parser.add_argument("--order-by", default="page_rating_votes", help="order by column.")
+        self.parser.add_argument(
+            "--search", help="Search, with syntax same as the main program / site."
+        )
+        self.parser.add_argument(
+            "--order-by", default="page_rating_votes", help="order by column."
+        )
         self.parser.add_argument("--asc", action="store_true", help="order ascending")
         self.parser.add_argument("--desc", action="store_true", help="order descending")
         self.parser.add_argument("--table", default="linkdatamodel", help="Table name")
 
         self.parser.add_argument("--title", action="store_true", help="displays title")
-        self.parser.add_argument("--description", action="store_true", help="displays description")
-        self.parser.add_argument("--status", action="store_true", help="displays status")
+        self.parser.add_argument(
+            "--description", action="store_true", help="displays description"
+        )
+        self.parser.add_argument(
+            "--status", action="store_true", help="displays status"
+        )
         self.parser.add_argument("--tags", action="store_true", help="displays tags")
-        self.parser.add_argument("--social", action="store_true", help="displays social data")
-        self.parser.add_argument("--date-published", action="store_true", help="displays date-published")
-        self.parser.add_argument("--source", action="store_true", help="displays source")
+        self.parser.add_argument(
+            "--social", action="store_true", help="displays social data"
+        )
+        self.parser.add_argument(
+            "--date-published", action="store_true", help="displays date-published"
+        )
+        self.parser.add_argument(
+            "--source", action="store_true", help="displays source"
+        )
 
-        self.parser.add_argument("--summary", action="store_true", help="displays summary of tables")
-        self.parser.add_argument("--columns", action="store_true", help="displays summary of tables column nmaes")
+        self.parser.add_argument(
+            "--summary", action="store_true", help="displays summary of tables"
+        )
+        self.parser.add_argument(
+            "--columns",
+            action="store_true",
+            help="displays summary of tables column nmaes",
+        )
 
-        self.parser.add_argument("-i", "--ignore-case", action="store_true", help="Ignores case")
+        self.parser.add_argument(
+            "-i", "--ignore-case", action="store_true", help="Ignores case"
+        )
         self.parser.add_argument("-v", "--verbosity", help="Verbosity level")
-        
+
         self.args = self.parser.parse_args()
 
         return True
@@ -250,7 +288,7 @@ def main():
 
     start_time = time.time()
 
-    m = DbAnalyzer(input_db = p.args.db, parser=p)
+    m = DbAnalyzer(input_db=p.args.db, parser=p)
     if p.args.summary:
         m.print_summary(p.args.columns)
     else:
