@@ -39,6 +39,11 @@ class DbFilter(object):
         self.engine = create_engine(f"sqlite:///{self.output_db}")
         self.connection = self.engine.connect()
 
+    def is_valid(self) -> bool:
+        if not self.engine:
+            return False
+        return True
+
     def close(self):
         if self.connection:
             self.connection.close()
@@ -106,6 +111,9 @@ def main():
     parser, args = parse()
 
     thefilter = DbFilter(args.db, args.output_db, args=args)
+    if not thefilter.is_valid():
+        return
+
     thefilter.truncate()
     if args.bookmarked:
         thefilter.filter_bookmarks()
