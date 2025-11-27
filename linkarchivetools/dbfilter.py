@@ -124,4 +124,6 @@ def main():
     end_time = time.time()
     print(f"Done in {end_time}")
 
-main()
+
+if __name__ == "__main__":
+    main()

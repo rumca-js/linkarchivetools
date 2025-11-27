@@ -170,4 +170,6 @@ def main():
     f.convert()
     f.close()
 
-main()
+
+if __name__ == "__main__":
+    main()

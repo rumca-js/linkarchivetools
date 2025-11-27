@@ -186,4 +186,6 @@ def main():
     reader = Db2Feeds(input_db = args.db, remote_server=args.crawling_server, output_db=args.output_db, output_format=args.output_format)
     reader.process()
 
-main()
+
+if __name__ == "__main__":
+    main()
