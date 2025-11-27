@@ -9,7 +9,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 
 from webtoolkit import RemoteUrl, BaseUrl
-from utils.reflected import *
+from .utils.reflected import *
 
 
 class Db2Feeds(object):

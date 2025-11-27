@@ -18,9 +18,9 @@ import os
 import json
 from sqlalchemy import create_engine
 
-from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
-from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
-from utils.reflected import  (
+from .utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
+from .utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
+from .utils.reflected import  (
    ReflectedEntryTable,
    ReflectedUserTags,
    ReflectedSocialData,

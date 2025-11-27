@@ -9,7 +9,7 @@ from pathlib import Path
 import argparse
 
 from sqlalchemy import create_engine
-from utils.reflected import *
+from .utils.reflected import *
 
 
 class Db2JSON(object):
