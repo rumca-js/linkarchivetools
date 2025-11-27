@@ -18,10 +18,9 @@ class DbFilter(object):
     """
     Filter class
     """
-    def __init__(self, input_db, output_db, args):
+    def __init__(self, input_db, output_db):
         self.input_db = input_db
         self.output_db = output_db
-        self.args = args
         self.engine = None
         self.connection = None
         self.setup()
@@ -112,7 +111,7 @@ def main():
     start_time = time.time()
     parser, args = parse()
 
-    thefilter = DbFilter(args.db, args.output_db, args=args)
+    thefilter = DbFilter(args.db, args.output_db)
     if not thefilter.is_valid():
         return
 
