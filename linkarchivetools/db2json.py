@@ -14,12 +14,12 @@ from .utils.reflected import *
 
 class Db2JSON(object):
 
-    def __init__(self, input_db, output_dir, format=None, rows=1000):
+    def __init__(self, input_db, output_dir, format=None, rows_max=1000):
         self.input_db = input_db
         self.output_dir = output_dir
 
         self.format=format
-        self.rows=rows
+        self.rows_max=rows_max
 
         self.file_index = 0
         self.entry_index = 0
@@ -60,7 +60,7 @@ class Db2JSON(object):
 
         sys.stdout.write(f"{self.file_index}/{self.entry_index:04d}\r")
 
-        if self.entry_index == self.rows:
+        if self.entry_index == self.rows_max:
             self.file_index += 1
             self.entry_index = 0
             self.finish_stream()
@@ -156,7 +156,7 @@ def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
     parser.add_argument("--output-dir", default="json", help="Output directory")
-    parser.add_argument("--rows", default=1000, action="store_true", help="Number of rows per file")
+    parser.add_argument("--rows-max", default=1000, action="store_true", help="Number of rows per file")
     parser.add_argument("-f","--format", default="entries", help="file name format")
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
     
@@ -168,7 +168,7 @@ def parse():
 def main():
     parser, args = parse()
 
-    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, format=args.format, rows=args.rows)
+    f = Db2JSON(input_db = args.db, output_dir=args.output_dir, format=args.format, rows_max=args.rows_max)
     f.convert()
     f.close()
 
