@@ -1,6 +1,6 @@
 # Link Database Tools
 
-Provides tools that allow to filter databases produced by https://github.com/rumca-js/Django-link-archive.
+Package provides tools that allow to filter databases produced by https://github.com/rumca-js/Django-link-archive.
 
 Can filter or analyze entries from https://github.com/rumca-js/Internet-Places-Database.
 
@@ -11,3 +11,6 @@ Can filter or analyze entries from https://github.com/rumca-js/Internet-Places-D
  - Db2JSON - converts database to JSON
  - DbFilter - filters database (only bookmarks? only votes?)
 
+# Installation
+
+pip install linkarchivetools
