@@ -123,14 +123,15 @@ class Db2Feeds(object):
         """
         table.insert_json_data("linkdatamodel", data)
 
-        entry_compacted_tags = ReflectedEntryCompactedTags(self.engine, self.connection)
-        tags = entry_compacted_tags.get_tags(entry.id)
+        source_entry_compacted_tags = ReflectedEntryCompactedTags(self.engine, self.connection)
+        tags = source_entry_compacted_tags.get_tags(entry.id)
 
         entry_tag_data = {}
         for tag in tags:
             entry_tag_data["tag"] = tag
             entry_tag_data["entry_id"] = entry.id
-            user_tags.insert_json_data("entrycompactedtags", entry_tag_data)
+            destination_entry_compacted_tags = ReflectedEntryCompactedTags(self.new_engine, self.new_connection)
+            destination_entry_compacted_tags.insert_json_data("entrycompactedtags", entry_tag_data)
 
     def truncate_tables(self):
         if not self.new_engine:
