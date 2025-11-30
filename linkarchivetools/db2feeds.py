@@ -186,7 +186,7 @@ class Db2Feeds(object):
         if self.output_format == "LINES" or self.output_format == "SQLITE":
             print(f"[{page_rating_votes}] {link} - {title}")
             user_tags = ReflectedUserTags(self.new_engine, self.new_connection)
-            tags = user_tags.get_tag_string(entry.id)
+            tags = user_tags.get_tags_string(entry.id)
             print(f"{tags}")
         elif self.output_format == "JSON":
             user_tags = ReflectedUserTags(self.new_engine, self.new_connection)
