@@ -123,7 +123,7 @@ class Db2Feeds(object):
         """
         table.insert_json_data("linkdatamodel", data)
 
-        entry_compacted_tags = ReflectedEntrCompactedTags(self.new_engine, self.new_connection)
+        entry_compacted_tags = ReflectedEntryCompactedTags(self.new_engine, self.new_connection)
         tags = entry_compacted_tags.get_tags(entry.id)
 
         entry_tag_data = {}
