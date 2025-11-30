@@ -34,7 +34,12 @@ class ReflectedTable(object):
     def insert_json_data(self, table_name, json_data: dict):
         table = self.get_table(table_name)
 
-        stmt = insert(table).values(**json_data)
+        stmt = (
+            insert(table)
+            .values(**json_data)
+            .returning(table.c.id)
+        )
+
         result = self.connection.execute(stmt)
         inserted_id = result.scalar_one()
         self.connection.commit()
