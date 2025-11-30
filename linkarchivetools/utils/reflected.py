@@ -35,8 +35,11 @@ class ReflectedTable(object):
         table = self.get_table(table_name)
 
         stmt = insert(table).values(**json_data)
-        self.connection.execute(stmt)
+        result = self.connection.execute(stmt)
+        inserted_id = result.scalar_one()
         self.connection.commit()
+
+        return inserted_id
 
     def print_summary(self, print_columns=False):
         inspector = inspect(self.engine)

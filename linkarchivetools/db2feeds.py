@@ -121,7 +121,7 @@ class Db2Feeds(object):
         """
         TODO copy from origin table tags
         """
-        table.insert_json_data("linkdatamodel", data)
+        new_entry = table.insert_json_data("linkdatamodel", data)
 
         source_entry_compacted_tags = ReflectedEntryCompactedTags(self.engine, self.connection)
         tags = source_entry_compacted_tags.get_tags(entry.id)
@@ -129,7 +129,7 @@ class Db2Feeds(object):
         entry_tag_data = {}
         for tag in tags:
             entry_tag_data["tag"] = tag
-            entry_tag_data["entry_id"] = entry.id
+            entry_tag_data["entry_id"] = new_entry.id
             destination_entry_compacted_tags = ReflectedEntryCompactedTags(self.new_engine, self.new_connection)
             destination_entry_compacted_tags.insert_json_data("entrycompactedtags", entry_tag_data)
 
