@@ -163,6 +163,7 @@ class Db2Feeds(object):
             "usersearchhistory",
             "userentrytransitionhistory",
             "userentryvisithistory",
+            "user",
         ]
         return table_names
 
