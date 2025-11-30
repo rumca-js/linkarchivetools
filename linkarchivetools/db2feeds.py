@@ -112,7 +112,7 @@ class Db2Feeds(object):
                     data["description"] = url_feed.get_description()
                     data["status_code"] = url_feed.get_status_code()
 
-                self.print_data(data, tags)
+                self.print_data(entry, data)
 
                 if new_table:
                     self.copy_entry(entry, new_table, data)
@@ -175,7 +175,7 @@ class Db2Feeds(object):
         ]
         return table_names
 
-    def print_data(self, data, tags):
+    def print_data(self, entry, data):
         """
         If we print to SQLITE we want to see progress so we display it anyway
         """
