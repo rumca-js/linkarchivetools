@@ -34,14 +34,14 @@ class Db2Feeds(object):
         self.update_rss = update_rss
         self.read_internet_links = read_internet_links
 
-        self.output_db = output_file
+        self.output_db = output_db
         self.output_format = output_format
 
         if self.output_db:
             self.output_format = "SQLITE"
         self.make_output_db()
 
-    def process(self):
+    def convert(self):
         self.engine = create_engine(f"sqlite:///{self.input_db}")
         with self.engine.connect() as connection:
             self.connection = connection
@@ -88,7 +88,6 @@ class Db2Feeds(object):
             feeds = url.get_feeds()
 
             for feed in feeds:
-
                 data = {}
                 data["link"] = feed
                 data["title"] = entry.title
@@ -113,16 +112,25 @@ class Db2Feeds(object):
                     data["description"] = url_feed.get_description()
                     data["status_code"] = url_feed.get_status_code()
 
-                self.print_data(data)
+                self.print_data(data, tags)
 
                 if new_table:
-                    self.copy_entry(new_table, data)
+                    self.copy_entry(entry, new_table, data)
 
-    def copy_entry(self, table, data):
+    def copy_entry(self, entry, table, data):
         """
         TODO copy from origin table tags
         """
         table.insert_json_data("linkdatamodel", data)
+
+        entry_compacted_tags = ReflectedEntrCompactedTags(self.new_engine, self.new_connection)
+        tags = entry_compacted_tags.get_tags(entry.id)
+
+        entry_tag_data = {}
+        for tag in tags:
+            entry_tag_data["tag"] = tag
+            entry_tag_data["entry_id"] = entry.id
+            user_tags.insert_json_data("entrycompactedtags", entry_tag_data)
 
     def truncate_tables(self):
         if not self.new_engine:
@@ -167,7 +175,7 @@ class Db2Feeds(object):
         ]
         return table_names
 
-    def print_data(self, data):
+    def print_data(self, data, tags):
         """
         If we print to SQLITE we want to see progress so we display it anyway
         """
@@ -177,12 +185,18 @@ class Db2Feeds(object):
 
         if self.output_format == "LINES" or self.output_format == "SQLITE":
             print(f"[{page_rating_votes}] {link} - {title}")
+            user_tags = ReflectedUserTags(self.new_engine, self.new_connection)
+            tags = user_tags.get_tag_string(entry.id)
+            print(f"{tags}")
         elif self.output_format == "JSON":
+            user_tags = ReflectedUserTags(self.new_engine, self.new_connection)
+            tags = user_tags.get_tags(entry.id)
             print(
                 f"""
             \{ "title" : "{title}",
               "link" : "{link}",
-              "page_rating_votes : {page_rating_votes}
+              "page_rating_votes : {page_rating_votes},
+              "tags" : {tags}
             \}"""
             )
         else:
@@ -193,8 +207,8 @@ def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
     parser.add_argument("--output-db", help="File to be created")
-    parser.add_argument("--update-rss",action="store_true" help="Reads RSS to check it's title and properties")
-    parser.add_argument("--read-internet-links",action="store_true" help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
+    parser.add_argument("--update-rss",action="store_true", help="Reads RSS to check it's title and properties")
+    parser.add_argument("--read-internet-links",action="store_true", help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
     parser.add_argument(
         "--output-format",
         default="LINES",
@@ -221,7 +235,7 @@ def main():
         output_db=args.output_db,
         output_format=args.output_format,
     )
-    reader.process()
+    reader.convert()
 
 
 if __name__ == "__main__":

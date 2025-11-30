@@ -10,7 +10,7 @@ import json
 import argparse
 import time
 
-from utils.sqlmodel import SqlModel
+#from .utils.sqlmodel import SqlModel
 from dateutil import parser
 
 
@@ -32,7 +32,7 @@ class DirReader(object):
         return file_list
 
 
-class Converter(object):
+class JSON2Db(object):
     """
     Performs actual conversion between file and database
     """
@@ -165,7 +165,7 @@ def main():
     try:
         start_time = time.time()
 
-        c = Converter(db, parser)
+        c = JSON2Db(db, parser)
         c.convert()
 
         elapsed_time_seconds = time.time() - start_time

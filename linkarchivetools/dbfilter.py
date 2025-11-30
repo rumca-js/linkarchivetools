@@ -77,6 +77,15 @@ class DbFilter(object):
         table.truncate_table("compactedtags")
         table.truncate_table("blockentrylist")
 
+    def filter(self, conditions):
+        table = ReflectedEntryTable(self.engine, self.connection)
+
+        sql_text = f"DELETE FROM linkdatamodel WHERE {conditions};"
+        # TODO delete depnded things
+        table.run_sql(sql_text)
+        table.vacuum()
+        table.close()
+
     def filter_bookmarks(self):
         table = ReflectedEntryTable(self.engine, self.connection)
 
@@ -89,7 +98,18 @@ class DbFilter(object):
     def filter_votes(self):
         table = ReflectedEntryTable(self.engine, self.connection)
 
-        sql_text = f"DELETE FROM linkdatamodel WHERE page_rating_votes = 0;"
+        sql_text = f"DELETE FROM linkdatamodel WHERE page_rating_votes=0;"
+        table.run_sql(sql_text)
+        table.vacuum()
+        table.close()
+
+    def filter_redundant(self):
+        """
+        Not bookmarked AND without votes are redundant
+        """
+        table = ReflectedEntryTable(self.engine, self.connection)
+
+        sql_text = f"DELETE FROM linkdatamodel WHERE bookmarked=False AND page_rating_votes=0;"
         table.run_sql(sql_text)
         table.vacuum()
         table.close()
@@ -122,6 +142,8 @@ def main():
         thefilter.filter_bookmarks()
     if args.votes:
         thefilter.filter_votes()
+
+    thefilter.vacuum()
     thefilter.close()
 
     end_time = time.time()

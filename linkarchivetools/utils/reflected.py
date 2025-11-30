@@ -122,6 +122,39 @@ class ReflectedUserTags(ReflectedTable):
         return tags
 
 
+class ReflectedEntryCompactedTags(ReflectedTable):
+    def get_tags_string(self, entry_id):
+        destination_table = self.get_table("entrycompactedtags")
+
+        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+
+        tags = ""
+
+        result = self.connection.execute(stmt)
+        rows = result.fetchall()
+        for row in rows:
+            if tags:
+                tags += ", "
+
+            tags += "#" + row.tag
+
+        return tags
+
+    def get_tags(self, entry_id):
+        destination_table = self.get_table("entrycompactedtags")
+
+        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+
+        tags = []
+
+        result = self.connection.execute(stmt)
+        rows = result.fetchall()
+        for row in rows:
+            tags.append(row.tag)
+
+        return tags
+
+
 class ReflectedSourceTable(ReflectedTable):
     def truncate(self):
         self.truncate_table("sourcedatamodel")
