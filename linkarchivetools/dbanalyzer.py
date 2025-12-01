@@ -41,8 +41,8 @@ def print_time_diff(start_time):
 
 class RowHandler(object):
 
-    def __init__(self, parser=None, engine=None, connection=None):
-        self.parser = parser
+    def __init__(self, args=None, engine=None, connection=None):
+        self.args = args
         self.start_time = time.time()
         self.engine = engine
         self.connection = connection
@@ -54,20 +54,20 @@ class RowHandler(object):
         self.dead_entries = 0
 
     def print_entry(self, entry):
-        level = self.parser.get_verbosity_level()
+        level = self.args.get("verbosity")
 
         text = ""
 
-        if self.parser.args.description:
+        if self.args.get("description"):
             print("---------------------")
 
         text = "[{:03d}] {}".format(entry.page_rating_votes, entry.link)
 
-        if self.parser.args.title:
+        if self.args.get("title"):
             if entry.title:
                 text += " " + entry.title
 
-        if self.parser.args.source:
+        if self.args.get("source"):
             source_id = entry.source
             if source_id:
                 r = ReflectedEntryTable(self.engine, self.connection)
@@ -76,29 +76,29 @@ class RowHandler(object):
 
         print(text)
 
-        if self.parser.args.date_published:
+        if self.args.get("date_published"):
             date_published = entry.date_published
             if date_published:
                 print(date_published)
 
-        if self.parser.args.description:
+        if self.args.get("description"):
             description = entry.description
             if description:
                 print(description)
 
-        if self.parser.args.tags:
+        if self.args.get("tags"):
             tags_table = ReflectedUserTags(self.engine, self.connection)
             tags = tags_table.get_tags_string(entry.id)
             if tags and tags != "":
                 self.print_tags(tags)
 
-        if self.parser.args.social:
+        if self.args.get("social"):
             social_table = ReflectedSocialData(self.engine, self.connection)
             social = social_table.get(entry.id)
             if social is not None:
                 self.print_social(social)
 
-        if self.parser.args.status:
+        if self.args.get("status"):
             print(entry.status_code)
 
     def print_tags(self, tags):
@@ -144,15 +144,15 @@ class RowHandler(object):
         """
         link = row.link
 
-        level = self.parser.get_verbosity_level()
+        level = self.args.get("verbosity")
 
         self.print_entry(row)
 
         self.total_entries += 1
 
     def summary(self):
-        if self.parser.args.summary:
-            if self.parser.args.verify:
+        if self.args.get("summary"):
+            if self.args.get("verify"):
                 print(
                     "total:{} good:{} dead:{}".format(
                         self.total_entries, self.good_entries, self.dead_entries
@@ -163,8 +163,8 @@ class RowHandler(object):
 
 
 class DbAnalyzer(object):
-    def __init__(self, input_db, parser=None):
-        self.parser = parser
+    def __init__(self, input_db, args=None):
+        self.args = args
         self.result = None
         self.engine = None
         self.input_db = input_db
@@ -195,14 +195,18 @@ class DbAnalyzer(object):
             with self.engine.connect() as connection:
                 self.connection = connection
 
-                row_handler = RowHandler(self.parser, self.engine, self.connection)
+                row_handler = RowHandler(args=self.args, engine=self.engine, connection=self.connection)
+
+                search = None
+                if self.args:
+                    search = self.args.get("search")
 
                 print("Starting alchemy")
                 searcher = AlchemySearch(
                     self.engine,
-                    self.parser.args.search,
+                    search,
                     row_handler=row_handler,
-                    args=self.parser.args,
+                    args=self.args,
                     connection=self.connection,
                 )
                 print("Starting alchemy DONE")
@@ -211,7 +215,7 @@ class DbAnalyzer(object):
                 searcher.search()
 
     def is_db_scan(self):
-        if self.parser.args.db:
+        if self.input_db:
             return True
 
         return False
@@ -263,21 +267,11 @@ class Parser(object):
         self.parser.add_argument(
             "-i", "--ignore-case", action="store_true", help="Ignores case"
         )
-        self.parser.add_argument("-v", "--verbosity", help="Verbosity level")
+        self.parser.add_argument("-v", "--verbosity",  type=int, default = 1, help="Verbosity level")
 
         self.args = self.parser.parse_args()
 
         return True
-
-    def get_verbosity_level(self):
-        level = 1
-        if self.args.verbosity:
-            try:
-                level = int(self.args.verbosity)
-            except Exception as E:
-                print(str(E))
-
-        return level
 
 
 def main():
@@ -288,7 +282,7 @@ def main():
 
     start_time = time.time()
 
-    m = DbAnalyzer(input_db=p.args.db, parser=p)
+    m = DbAnalyzer(input_db=p.args.db, args=p.args)
     if p.args.summary:
         m.print_summary(p.args.columns)
     else:
