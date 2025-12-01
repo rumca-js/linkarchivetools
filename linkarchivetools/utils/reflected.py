@@ -96,6 +96,18 @@ class ReflectedEntryTable(ReflectedTable):
         for entry in entries:
             yield entry
 
+    def is_entry_link(self, link):
+        destination_table = self.get_table("linkdatamodel")
+
+        stmt = (
+            select(1)
+            .where(destination_table.c.link == link)
+            .limit(1)
+        )
+
+        result = self.connection.execute(stmt).scalar()
+        return result is not None
+
 
 class ReflectedUserTags(ReflectedTable):
     def get_tags_string(self, entry_id):
