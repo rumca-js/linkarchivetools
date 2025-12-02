@@ -136,6 +136,8 @@ class Db2Feeds(object):
         source_entry_social_data = ReflectedSocialData(self.engine, self.connection)
         social_data = source_entry_social_data.get_json(entry.id)
         if social_data:
+            if "id" in social_data:
+                del social_data["id"]
             social_data["entry_id"] = new_entry_id
 
             destination_entry_social_data = ReflectedSocialData(self.new_engine, self.new_connection)
