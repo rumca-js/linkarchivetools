@@ -133,6 +133,14 @@ class Db2Feeds(object):
             destination_entry_compacted_tags = ReflectedEntryCompactedTags(self.new_engine, self.new_connection)
             destination_entry_compacted_tags.insert_json_data("entrycompactedtags", entry_tag_data)
 
+        source_entry_social_data = ReflectedSocialData(self.engine, self.connection)
+        social_data = source_entry_social_data.get_json(entry.id)
+        if social_data:
+            social_data["entry_id"] = new_entry_id
+
+            destination_entry_social_data = ReflectedSocialData(self.new_engine, self.new_connection)
+            destination_entry_social_data.insert_json_data("socialdata", social_data)
+
     def truncate_tables(self):
         if not self.new_engine:
             return
@@ -180,6 +188,9 @@ class Db2Feeds(object):
         """
         If we print to SQLITE we want to see progress so we display it anyway
         """
+        if not self.verbose:
+            return
+
         link = data["link"]
         title = data["title"]
         page_rating_votes = data["page_rating_votes"]

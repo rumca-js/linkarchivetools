@@ -55,6 +55,8 @@ class RowHandler(object):
 
     def print_entry(self, entry):
         level = self.args.get("verbosity")
+        if level is None or level == 0:
+            return
 
         text = ""
 
@@ -171,6 +173,10 @@ class DbAnalyzer(object):
 
     def print_summary(self, print_columns=False):
         db = self.input_db
+
+        level = self.args.get("verbosity")
+        if level is None or level == 0:
+            return
 
         if not os.path.isfile(db):
             print("File does not exist:{}".format(db))

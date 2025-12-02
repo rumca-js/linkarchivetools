@@ -61,6 +61,10 @@ class ReflectedTable(object):
                 column_names = [column["name"] for column in columns]
                 print(f"Columns in {table}: {', '.join(column_names)}")
 
+    def row_to_json_data(self, row):
+        data = dict(row._mapping)
+        return data
+
     def run_sql(self, sql_text):
         self.connection.execute(text(sql_text))
         self.connection.commit()
@@ -199,3 +203,11 @@ class ReflectedSocialData(ReflectedTable):
 
         result = self.connection.execute(stmt)
         return result.first()
+
+    def get_json(self, entry_id):
+        row = self.get(entry_id)
+        if row is None:
+            return None
+
+        data = self.row_to_json_data(row)
+        return data

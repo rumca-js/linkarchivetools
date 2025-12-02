@@ -19,3 +19,9 @@ class Db2FeedsTest(unittest.TestCase):
         self.copy_input()
 
         feeds = Db2Feeds(input_db="input.db", output_db="output.db")
+
+    def test_convert(self):
+        self.copy_input()
+
+        feeds = Db2Feeds(input_db="input.db", output_db="output.db")
+        feeds.convert()
