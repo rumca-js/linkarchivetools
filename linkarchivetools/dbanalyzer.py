@@ -54,22 +54,22 @@ class RowHandler(object):
         self.dead_entries = 0
 
     def print_entry(self, entry):
-        level = self.args.get("verbosity")
+        level = self.args.verbosity
         if level is None or level == 0:
             return
 
         text = ""
 
-        if self.args.get("description"):
+        if self.args.description:
             print("---------------------")
 
         text = "[{:03d}] {}".format(entry.page_rating_votes, entry.link)
 
-        if self.args.get("title"):
+        if self.args.title:
             if entry.title:
                 text += " " + entry.title
 
-        if self.args.get("source"):
+        if self.args.source:
             source_id = entry.source
             if source_id:
                 r = ReflectedEntryTable(self.engine, self.connection)
@@ -78,29 +78,29 @@ class RowHandler(object):
 
         print(text)
 
-        if self.args.get("date_published"):
+        if self.args.date_published:
             date_published = entry.date_published
             if date_published:
                 print(date_published)
 
-        if self.args.get("description"):
+        if self.args.description:
             description = entry.description
             if description:
                 print(description)
 
-        if self.args.get("tags"):
+        if self.args.tags:
             tags_table = ReflectedUserTags(self.engine, self.connection)
             tags = tags_table.get_tags_string(entry.id)
             if tags and tags != "":
                 self.print_tags(tags)
 
-        if self.args.get("social"):
+        if self.args.social:
             social_table = ReflectedSocialData(self.engine, self.connection)
             social = social_table.get(entry.id)
             if social is not None:
                 self.print_social(social)
 
-        if self.args.get("status"):
+        if self.args.status:
             print(entry.status_code)
 
     def print_tags(self, tags):
@@ -146,15 +146,15 @@ class RowHandler(object):
         """
         link = row.link
 
-        level = self.args.get("verbosity")
+        level = self.args.verbosity
 
         self.print_entry(row)
 
         self.total_entries += 1
 
     def summary(self):
-        if self.args.get("summary"):
-            if self.args.get("verify"):
+        if self.args.summary:
+            if self.args.verify:
                 print(
                     "total:{} good:{} dead:{}".format(
                         self.total_entries, self.good_entries, self.dead_entries
@@ -174,7 +174,7 @@ class DbAnalyzer(object):
     def print_summary(self, print_columns=False):
         db = self.input_db
 
-        level = self.args.get("verbosity")
+        level = self.args.verbosity
         if level is None or level == 0:
             return
 
@@ -205,7 +205,7 @@ class DbAnalyzer(object):
 
                 search = None
                 if self.args:
-                    search = self.args.get("search")
+                    search = self.args.search
 
                 print("Starting alchemy")
                 searcher = AlchemySearch(

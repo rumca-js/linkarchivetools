@@ -11,7 +11,9 @@ class Db2AnalyzerTest(unittest.TestCase):
         analyzer = DbAnalyzer(input_db="input.db")
 
     def test_print_summary(self):
-        analyzer = DbAnalyzer(input_db="input.db", args={"verbosity" : 0})
+        args = SimpleNamespace(search=None, ignore_case=True, verbosity=0)
+
+        analyzer = DbAnalyzer(input_db="input.db", args=args)
         analyzer.print_summary()
 
     def test_search__none(self):
@@ -21,11 +23,8 @@ class Db2AnalyzerTest(unittest.TestCase):
         analyzer.search()
 
     def test_search__search(self):
-        #search = "*youtube.com*"
-        #args = SimpleNamespace(search=search, ignore_case = True)
-
         search = "*youtube.com*"
-        args = {"search":search, "ignore_case" : True, "verbosity" : 0}
+        args = SimpleNamespace(search=search, ignore_case = True, verbosity=0, table=False, order_by=None, asc=True, desc=False)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
         analyzer.search()
