@@ -88,34 +88,41 @@ class Db2Feeds(object):
             feeds = url.get_feeds()
 
             for feed in feeds:
-                data = {}
-                data["link"] = feed
-                data["title"] = entry.title
-                data["page_rating_votes"] = entry.page_rating_votes
-                data["manual_status_code"] = entry.manual_status_code
-
-                # not null requirement
-                data["source_url"] = ""
-                data["permanent"] = False
-                data["bookmarked"] = False
-                data["status_code"] = entry.status_code
-                data["contents_type"] = 0
-                data["page_rating_contents"] = 0
-                data["page_rating_visits"] = 0
-                data["page_rating"] = 0
-
-                if self.update_rss and self.remote_server:
-                    url_feed = RemoteUrl(remote_server=self.remote_server, url=feed)
-                    url_feed.get_response()
-
-                    data["title"] = url_feed.get_title()
-                    data["description"] = url_feed.get_description()
-                    data["status_code"] = url_feed.get_status_code()
+                data = self.prepare_data(entry, feed)
 
                 self.print_data(entry, data)
 
                 if new_table:
                     self.copy_entry(entry, new_table, data)
+
+    def prepare_data(self, entry, feed):
+        data = {}
+        data["link"] = feed
+        data["title"] = entry.title
+        data["page_rating_votes"] = entry.page_rating_votes
+        data["manual_status_code"] = entry.manual_status_code
+        data["thumbnail"] = entry.thumbnail
+        data["language"] = entry.language
+
+        # not null requirement
+        data["source_url"] = ""
+        data["permanent"] = False
+        data["bookmarked"] = False
+        data["status_code"] = entry.status_code
+        data["contents_type"] = 0
+        data["page_rating_contents"] = 0
+        data["page_rating_visits"] = 0
+        data["page_rating"] = 0
+
+        if self.update_rss and self.remote_server:
+            url_feed = RemoteUrl(remote_server=self.remote_server, url=feed)
+            url_feed.get_response()
+
+            data["title"] = url_feed.get_title()
+            data["description"] = url_feed.get_description()
+            data["status_code"] = url_feed.get_status_code()
+            data["thumbnail"] = url_feed.get_thumbnail()
+        return data
 
     def copy_entry(self, entry, table, data):
         """
