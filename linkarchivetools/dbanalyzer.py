@@ -174,10 +174,6 @@ class DbAnalyzer(object):
     def print_summary(self, print_columns=False):
         db = self.input_db
 
-        level = self.args.verbosity
-        if level is None or level == 0:
-            return
-
         if not os.path.isfile(db):
             print("File does not exist:{}".format(db))
             return
