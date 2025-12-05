@@ -50,7 +50,6 @@ class Db2FeedsTest(unittest.TestCase):
 
             table.insert_json_data("socialdata", data)
 
-
     def test_init(self):
         self.copy_input()
 

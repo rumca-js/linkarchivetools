@@ -47,19 +47,29 @@ class ReflectedTable(object):
         return inserted_id
 
     def print_summary(self, print_columns=False):
-        inspector = inspect(self.engine)
-        tables = inspector.get_table_names()
+        tables = self.get_table_names()
 
         for table in tables:
-            row_count = self.connection.execute(
-                text(f"SELECT COUNT(*) FROM {table}")
-            ).scalar()
-            print(f"Table: {table}, Row count: {row_count}")
-
+            columns = self.get_column_names(table)
             if print_columns:
-                columns = inspector.get_columns(table)
                 column_names = [column["name"] for column in columns]
                 print(f"Columns in {table}: {', '.join(column_names)}")
+
+
+    def get_table_names(self):
+        inspector = inspect(self.engine)
+        tables = inspector.get_table_names()
+        return list(tables)
+
+    def get_column_names(self, table):
+        inspector = inspect(self.engine)
+        row_count = self.connection.execute(
+            text(f"SELECT COUNT(*) FROM {table}")
+        ).scalar()
+
+        columns = inspector.get_columns(table)
+        column_names = [column["name"] for column in columns]
+        return column_names
 
     def row_to_json_data(self, row):
         data = dict(row._mapping)
@@ -73,6 +83,31 @@ class ReflectedTable(object):
 class ReflectedEntryTable(ReflectedTable):
     def truncate(self):
         self.truncate_table("linkdatamodel")
+
+    def insert_entry_json(self, entry_json):
+        if "link" not in entry_json:
+            return
+
+        if "source_url" not in entry_json:
+            entry_json["source_url"] = ""
+        if "permanent" not in entry_json:
+            entry_json["permanent"] = False
+        if "bookmarked" not in entry_json:
+            entry_json["bookmarked"] = False
+        if "status_code" not in entry_json:
+            entry_json["status_code"] = 0
+        if "contents_type" not in entry_json:
+            entry_json["contents_type"] = 0
+        if "page_rating_contents" not in entry_json:
+            entry_json["page_rating_contents"] = 0
+        if "page_rating_visits" not in entry_json:
+            entry_json["page_rating_visits"] = 0
+        if "page_rating_votes" not in entry_json:
+            entry_json["page_rating_votes"] = 0
+        if "page_rating" not in entry_json:
+            entry_json["page_rating"] = 0
+
+        return self.insert_json_data("linkdatamodel", entry_json)
 
     def get_entries(self):
         destination_table = self.get_table("linkdatamodel")
@@ -106,6 +141,18 @@ class ReflectedEntryTable(ReflectedTable):
         stmt = (
             select(1)
             .where(destination_table.c.link == link)
+            .limit(1)
+        )
+
+        result = self.connection.execute(stmt).scalar()
+        return result is not None
+
+    def is_entry_id(self, entry_id):
+        destination_table = self.get_table("linkdatamodel")
+
+        stmt = (
+            select(1)
+            .where(destination_table.c.id == entry_id)
             .limit(1)
         )
 

@@ -9,9 +9,11 @@ import sqlite3
 import json
 import argparse
 import time
-
-#from .utils.sqlmodel import SqlModel
+from pathlib import Path
+from sqlalchemy import create_engine
 from dateutil import parser
+
+from .utils.reflected import *
 
 
 class DirReader(object):
@@ -34,21 +36,41 @@ class DirReader(object):
 
 class JSON2Db(object):
     """
-    Performs actual conversion between file and database
+    Performs actual conversion between from JSON to DB
     """
 
-    def __init__(self, db_conn, parser):
-        self.conn = db_conn
-        self.parser = parser
-        self.file_reader = DirReader(source_files_directory=parser.dir)
-        self.files = self.file_reader.get_files()
+    def __init__(self, input_file=None, input_dir=None, output_db=None, preserve_id=False, vote_threshold=None, verbose=False):
+        self.input_file = input_file
+        self.input_dir = input_dir
+        self.output_db = output_db
+        self.preserve_id = preserve_id
+        self.vote_threshold = vote_threshold
+        self.verbose = verbose
+
+        if self.input_dir:
+            self.file_reader = DirReader(source_files_directory=self.input_dir)
+            self.files = self.file_reader.get_files()
+        elif self.input_file:
+            self.file_reader = None
+            self.files = [self.input_file]
+        else:
+            self.file_reader = None
+            self.files = []
 
     def convert(self):
-        total_num_files = len(self.files)
+        #path = Path(self.output_db)
+        #if path.exists():
+        #    path.unlink()
 
-        for row, afile in enumerate(self.files):
-            print("[{}/{}]: file:{}".format(row, total_num_files, afile))
-            self.convert_file(afile)
+        self.engine = create_engine(f"sqlite:///{self.output_db}")
+        with self.engine.connect() as connection:
+            self.connection = connection
+
+            total_num_files = len(self.files)
+
+            for row, afile in enumerate(self.files):
+                print("[{}/{}]: file:{}".format(row, total_num_files, afile))
+                self.convert_file(afile)
 
     def convert_file(self, file_name):
         data = self.read_file(file_name)
@@ -58,8 +80,9 @@ class JSON2Db(object):
         total_rows = len(data)
 
         for row, entry in enumerate(data):
+            entry = self.prepare_entry(entry)
             if "link" in entry:
-                if self.parser and self.parser.preserve_id:
+                if self.preserve_id:
                     if "id" not in entry:
                         print("Entry {} is missing ID".format(entry["link"]))
                         continue
@@ -67,8 +90,9 @@ class JSON2Db(object):
                     entry["id"] = row
 
                 if self.is_entry_to_be_added(entry):
-                    if self.conn.entries_table.add_entry(entry):
-                        if self.parser.args.verbose:
+                    table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
+                    if table.insert_entry_json(entry) is not None:
+                        if self.verbose:
                             print(
                                 " -> [{}/{}] Link:{} Added".format(
                                     row, total_rows, entry["link"]
@@ -81,21 +105,49 @@ class JSON2Db(object):
                             )
                         )
                 else:
-                    if self.parser.args.verbose:
+                    if self.verbose:
                         print(
                             " -> [{}/{}] Link:{} Skipped".format(
                                 row, total_rows, entry["link"]
                             )
                         )
 
+    def prepare_entry(self, entry):
+        """
+        Drops any unwelcome keys
+        """
+        table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
+        columns = table.get_column_names("linkdatamodel")
+        keys = list(entry.keys())
+
+        diff = list(set(keys) - set(columns))
+        for item in diff:
+            del entry[item]
+
+        for key in entry:
+            if key.startswith("date"):
+                if entry[key]:
+                    entry[key] = parser.parse(entry[key])
+
+        return entry
+
     def is_entry_to_be_added(self, entry):
         # entry already exists
-        if self.conn.entries_table.is_entry(entry):
+        table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
+        if "id" in entry and table.is_entry_id(entry["id"]):
+            return False
+        if "link" in entry and table.is_entry_link(entry["link"]):
             return False
 
-        if self.parser.vote_min:
-            if int(entry["page_rating_votes"]) < self.parser.vote_min:
+        if self.vote_threshold:
+            if "page_rating_votes" in entry:
+                if entry["page_rating_votes"]:
+                    if int(entry["page_rating_votes"]) < self.vote_threshold:
+                        return False
+                    else:
+                        return True
                 return False
+            return False
 
         return True
 
@@ -122,9 +174,10 @@ class JSON2Db(object):
 class Parser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data converter program")
-        self.parser.add_argument("--dir", help="Directory to be scanned")
+        self.parser.add_argument("--input-file", help="File to be scanned")
+        self.parser.add_argument("--input-dir", help="Directory to be scanned")
         self.parser.add_argument(
-            "--db", default="converted.sqlite", help="Database output file"
+            "--output-db", default="converted.sqlite", help="Output db name"
         )
         self.parser.add_argument(
             "--preserve-id", action="store_true", help="Preserves ID of objects"
@@ -160,12 +213,10 @@ def main():
     parser = Parser()
     parser.parse()
 
-    db = SqlModel(database_file=parser.args.db)
-
     try:
         start_time = time.time()
 
-        c = JSON2Db(db, parser)
+        c = JSON2Db(input_file = parser.args.input_file, input_dir=parser.args.input_dir, output_db = parser.args.output_db)
         c.convert()
 
         elapsed_time_seconds = time.time() - start_time

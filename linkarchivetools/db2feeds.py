@@ -124,11 +124,11 @@ class Db2Feeds(object):
             data["thumbnail"] = url_feed.get_thumbnail()
         return data
 
-    def copy_entry(self, entry, table, data):
+    def copy_entry(self, entry, entry_table, data):
         """
         TODO copy from origin table tags
         """
-        new_entry_id = table.insert_json_data("linkdatamodel", data)
+        new_entry_id = entry_table.insert_entry_json(data)
 
         source_entry_compacted_tags = ReflectedEntryCompactedTags(self.engine, self.connection)
         tags = source_entry_compacted_tags.get_tags(entry.id)
