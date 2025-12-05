@@ -73,7 +73,7 @@ class Db2Feeds(object):
 
         new_table = None
         if self.new_engine:
-            new_table = ReflectedTable(self.new_engine, self.new_connection)
+            new_table = ReflectedEntryTable(self.new_engine, self.new_connection)
             new_table.vacuum()
 
         for entry in table.get_entries_good():

@@ -1,6 +1,8 @@
+from datetime import datetime
 from pathlib import Path
 import shutil
 import unittest
+from sqlalchemy import create_engine
 
 from linkarchivetools import (
    Db2Feeds,
@@ -17,14 +19,13 @@ class Db2FeedsTest(unittest.TestCase):
         shutil.copy("example/db.db", "input.db")
 
     def add_entry_with_tags(self):
-        engine = create_engine(f"sqlite:///{self.input_db}")
+        engine = create_engine(f"sqlite:///input.db")
         with engine.connect() as connection:
             table = ReflectedTable(engine=engine, connection=connection)
 
             data = {}
-            data["link"] = "https://youtube.com/watch?v=12345678"
+            data["link"] = "https://youtube.com/channel/12345678"
             data["title"] = "Test title"
-            data["page_rating_votes"] = 80
             data["manual_status_code"] = 0
             data["source_url"] = ""
             data["permanent"] = False
@@ -33,6 +34,7 @@ class Db2FeedsTest(unittest.TestCase):
             data["contents_type"] = 0
             data["page_rating_contents"] = 0
             data["page_rating_visits"] = 0
+            data["page_rating_votes"] = 80
             data["page_rating"] = 0
 
             entry_id = table.insert_json_data("linkdatamodel", data)
@@ -47,6 +49,7 @@ class Db2FeedsTest(unittest.TestCase):
             data["entry_id"] = entry_id
             data["stars"] = 123
             data["followers_count"] = 123
+            data["date_updated"] = datetime.now()
 
             table.insert_json_data("socialdata", data)
 
@@ -57,6 +60,8 @@ class Db2FeedsTest(unittest.TestCase):
 
     def test_convert(self):
         self.copy_input()
+
+        self.add_entry_with_tags()
 
         feeds = Db2Feeds(input_db="input.db", output_db="output.db")
         feeds.convert()
