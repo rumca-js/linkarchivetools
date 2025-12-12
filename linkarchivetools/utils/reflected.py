@@ -50,6 +50,11 @@ class ReflectedTable(object):
         tables = self.get_table_names()
 
         for table in tables:
+            row_count = self.connection.execute(
+                text(f"SELECT COUNT(*) FROM {table}")
+            ).scalar()
+            print(f"Table: {table}, Row count: {row_count}")
+
             columns = self.get_column_names(table)
             if print_columns:
                 column_names = [column["name"] for column in columns]
