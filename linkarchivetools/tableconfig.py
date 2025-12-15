@@ -1,4 +1,4 @@
-def get_tables(self):
+def get_tables():
     table_names = [
         "credentials",
         "sourcecategories",
@@ -32,8 +32,8 @@ def get_tables(self):
     return tables
 
 
-def get_backup_tables(self):
-    table_names = [
+def get_backup_tables():
+    tables = [
         "credentials",
         "sourcecategories",
         "sourcesubcategories",
