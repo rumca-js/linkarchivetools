@@ -109,6 +109,7 @@ class AlchemySearch(object):
 
         for row in rows:
             self.alchemy_row_handler.handle_row(row)
+            yield row
 
     def get_destination_table(self):
         destination_metadata = MetaData()

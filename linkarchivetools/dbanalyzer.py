@@ -39,7 +39,7 @@ def print_time_diff(start_time):
     print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
-class RowHandler(object):
+class DisplayRowHandler(object):
 
     def __init__(self, args=None, engine=None, connection=None):
         self.args = args
@@ -164,6 +164,27 @@ class RowHandler(object):
                 print("total:{}".format(self.total_entries))
 
 
+class YieldRowHandler(object):
+
+    def __init__(self, args=None, engine=None, connection=None):
+        self.args = args
+        self.start_time = time.time()
+        self.engine = engine
+        self.connection = connection
+
+        self.files = []
+
+        self.total_entries = 0
+        self.good_entries = 0
+        self.dead_entries = 0
+
+    def handle_row(self, row):
+        """
+        Row is to be expected a 'dict', eg. row["link"]
+        """
+        yield row
+
+
 class DbAnalyzer(object):
     def __init__(self, input_db, args=None):
         self.args = args
@@ -196,25 +217,62 @@ class DbAnalyzer(object):
 
             with self.engine.connect() as connection:
                 self.connection = connection
+                yield self.perform_search()
 
-                row_handler = RowHandler(args=self.args, engine=self.engine, connection=self.connection)
+    def perform_search(self):
+        row_handler = DisplayRowHandler(args=self.args, engine=self.engine, connection=self.connection)
 
-                search = None
-                if self.args:
-                    search = self.args.search
+        search = None
+        if self.args:
+            search = self.args.search
 
-                print("Starting alchemy")
-                searcher = AlchemySearch(
-                    self.engine,
-                    search,
-                    row_handler=row_handler,
-                    args=self.args,
-                    connection=self.connection,
-                )
-                print("Starting alchemy DONE")
+        print("Starting alchemy")
+        searcher = AlchemySearch(
+            self.engine,
+            search,
+            row_handler=row_handler,
+            args=self.args,
+            connection=self.connection,
+        )
+        print("Starting alchemy DONE")
 
-                print("Searching...")
-                searcher.search()
+        print("Searching...")
+        yield from searcher.search()
+
+    def get_entries(self):
+        if self.is_db_scan():
+            file = self.input_db
+            if not os.path.isfile(file):
+                print("File does not exist:{}".format(file))
+                return
+
+            print("Creating engine")
+            self.engine = create_engine("sqlite:///" + self.input_db)
+            print("Creating engine DONE")
+
+            with self.engine.connect() as connection:
+                self.connection = connection
+                yield from self.perform_get_entries()
+
+    def perform_get_entries(self):
+        row_handler = YieldRowHandler(args=self.args, engine=self.engine, connection=self.connection)
+
+        search = None
+        if self.args:
+            search = self.args.search
+
+        print("Starting alchemy")
+        searcher = AlchemySearch(
+            self.engine,
+            search,
+            row_handler=row_handler,
+            args=self.args,
+            connection=self.connection,
+        )
+        print("Starting alchemy DONE")
+
+        print("Searching...")
+        yield from searcher.search()
 
     def is_db_scan(self):
         if self.input_db:
