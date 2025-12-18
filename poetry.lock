@@ -257,14 +257,14 @@ files = [
 
 [[package]]
 name = "filelock"
-version = "3.20.0"
+version = "3.20.1"
 description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "filelock-3.20.0-py3-none-any.whl", hash = "sha256:339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2"},
-    {file = "filelock-3.20.0.tar.gz", hash = "sha256:711e943b4ec6be42e1d4e6690b48dc175c822967466bb31c0c293f34334c13f4"},
+    {file = "filelock-3.20.1-py3-none-any.whl", hash = "sha256:15d9e9a67306188a44baa72f569d2bfd803076269365fdea0934385da4dc361a"},
+    {file = "filelock-3.20.1.tar.gz", hash = "sha256:b8360948b351b80f420878d8516519a2204b07aefcdcfd24912a5d33127f188c"},
 ]
 
 [[package]]
@@ -688,14 +688,14 @@ files = [
 
 [[package]]
 name = "soupsieve"
-version = "2.8"
+version = "2.8.1"
 description = "A modern CSS selector implementation for Beautiful Soup."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "soupsieve-2.8-py3-none-any.whl", hash = "sha256:0cc76456a30e20f5d7f2e14a98a4ae2ee4e5abdc7c5ea0aafe795f344bc7984c"},
-    {file = "soupsieve-2.8.tar.gz", hash = "sha256:e2dd4a40a628cb5f28f6d4b0db8800b8f581b65bb380b97de22ba5ca8d72572f"},
+    {file = "soupsieve-2.8.1-py3-none-any.whl", hash = "sha256:a11fe2a6f3d76ab3cf2de04eb339c1be5b506a8a47f2ceb6d139803177f85434"},
+    {file = "soupsieve-2.8.1.tar.gz", hash = "sha256:4cf733bc50fa805f5df4b8ef4740fc0e0fa6218cf3006269afd3f9d6d80fd350"},
 ]
 
 [[package]]
@@ -935,14 +935,14 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 
 [[package]]
 name = "webtoolkit"
-version = "0.0.151"
+version = "0.0.152"
 description = "Web tools and interfaces for Internet data processing."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "webtoolkit-0.0.151-py3-none-any.whl", hash = "sha256:d2cc63c925bc6d9840fa3aaf83786119e7aaff228fd599145f35ae70e0b32cae"},
-    {file = "webtoolkit-0.0.151.tar.gz", hash = "sha256:9a627824c535763ca0b7272b59cd88a1be20f2695cef64696fe1e509859cc752"},
+    {file = "webtoolkit-0.0.152-py3-none-any.whl", hash = "sha256:7e64e003d5e14f2a69ce67ba32893c87242d13d97e2038b5186f94259435d016"},
+    {file = "webtoolkit-0.0.152.tar.gz", hash = "sha256:42a0b79c88c7bf2ab1d37fc834b905c48dcf60cabd8447917586140af7672f48"},
 ]
 
 [package.dependencies]
@@ -960,4 +960,4 @@ url-cleaner = "*"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "04d298a63ceddba076782598ae4c73e7d4a754b631b78e1f3541ee94650d1e82"
+content-hash = "726aaff2f9117bb0b5c1c7ccc57b1427f60e72686ed1c59da416830c63cf27a1"
