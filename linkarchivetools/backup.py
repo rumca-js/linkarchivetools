@@ -418,18 +418,20 @@ def create_indexes(destination_engine, table_name, column_name):
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 
-    r = ReflectedTable(destination_engine)
+    #r = ReflectedTable(destination_engine)
     #r.create_index(destination_table, "link")
     #r.create_index(destination_table, "title")
     #r.create_index(destination_table, "date_published")
 
 
 def obfuscate_all(destination_engine):
-    r = ReflectedTable(destination_engine)
     obfuscate_user_table("user", destination_engine)
-    r.truncate_table("dataexport")
-    r.truncate_table("usersearchhistory")
-    r.truncate_table("credentials")
+
+    with destination_engine.connect() as connection:
+        r = ReflectedTable(engine=destination_engine, connection=connection)
+        r.truncate_table("dataexport")
+        r.truncate_table("usersearchhistory")
+        r.truncate_table("credentials")
 
 
 #### SQLite
@@ -675,17 +677,17 @@ class Backup(object):
     def process(self):
         workspaces = []
 
-        if self.args.workspace:
-            if self.args.workspace.find(",") >= 0:
-                workspaces = self.args.workspace.split(",")
+        if self.args.workspaces:
+            if self.args.workspaces.find(",") >= 0:
+                workspaces = self.args.workspaces.split(",")
             else:
-                workspaces = [self.args.workspace]
+                workspaces = [self.args.workspaces]
         else:
             print("Provide workspace")
             sys.exit(1)
 
-        if self.args.output_directory:
-            output_directory = Path(self.args.output_directory)
+        if self.args.output_dir:
+            output_directory = Path(self.args.output_dir)
 
         start_time = time.time()
 
