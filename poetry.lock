@@ -970,13 +970,13 @@ zstd = ["backports-zstd (>=1.0.0)"]
 
 [[package]]
 name = "webtoolkit"
-version = "0.0.166"
+version = "0.0.169"
 description = "Web tools and interfaces for Internet data processing."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "webtoolkit-0.0.166-py3-none-any.whl", hash = "sha256:dd4ee511c5f073205a03456792295e6645d21e1581450ec65c86159fc6521abd"},
-    {file = "webtoolkit-0.0.166.tar.gz", hash = "sha256:81d8aa1abfe079b38c36bc347fb129dfc8577544e66a6d0ad18a4161aa9775da"},
+    {file = "webtoolkit-0.0.169-py3-none-any.whl", hash = "sha256:7ba924fee0fc98f14fc4abf40db23588988c4b05f194c318d4daf6e87802a620"},
+    {file = "webtoolkit-0.0.169.tar.gz", hash = "sha256:70aa76f77f0d4bc92a422685d57ce56a2bdf3e9fa5c0def7d357f05585eb425b"},
 ]
 
 [package.dependencies]
@@ -994,4 +994,4 @@ url-cleaner = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c3cf5aa746f2af2bb5ebcca391d91eabcabd102b177b21fff54d48099887c546"
+content-hash = "390fd20a5eddaafd143c84a764076135de7cbb4e9c5d3f2a98adf329cabc2804"
