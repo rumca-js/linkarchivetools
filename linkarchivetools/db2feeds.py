@@ -37,6 +37,8 @@ class Db2Feeds(object):
         self.output_db = output_db
         self.output_format = output_format
 
+        self.new_table = None
+
         if self.output_db:
             self.output_format = "SQLITE"
         self.make_output_db()
@@ -73,27 +75,30 @@ class Db2Feeds(object):
 
         new_table = None
         if self.new_engine:
-            new_table = ReflectedEntryTable(self.new_engine, self.new_connection)
-            new_table.vacuum()
+            self.new_table = ReflectedEntryTable(self.new_engine, self.new_connection)
+            self.new_table.vacuum()
 
         for entry in table.get_entries_good():
-            if self.read_internet_links and self.remote_server:
-                url = RemoteUrl(remote_server=self.remote_server, url=entry.link)
-                feeds = url.get_feeds()
-                if len(feeds) == 0:
-                    url.get_response()
-            else:
-                url = BaseUrl(entry.link)
+            self.process_entry(entry)
 
-            feeds = url.get_feeds()
+    def process_entry(self, entry):
+        url = BaseUrl(entry.link)
+        feeds = url.get_feeds()
 
-            for feed in feeds:
-                data = self.prepare_data(entry, feed)
+        if len(feeds) == 0:
+            if self.read_internet_links:
+                if self.remote_server:
+                    url_ex = RemoteUrl(remote_server_location=self.remote_server, url=entry.link)
+                    url_ex.get_response()
+                    feeds.extend(url_ex.get_feeds())
 
-                self.print_data(entry, data)
+        for feed in feeds:
+            data = self.prepare_data(entry, feed)
 
-                if new_table:
-                    self.copy_entry(entry, new_table, data)
+            self.print_data(entry, data)
+
+            if self.new_table:
+                self.copy_entry(entry, self.new_table, data)
 
     def prepare_data(self, entry, feed):
         data = {}

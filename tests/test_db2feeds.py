@@ -58,10 +58,18 @@ class Db2FeedsTest(unittest.TestCase):
 
         feeds = Db2Feeds(input_db="input.db", output_db="output.db")
 
-    def test_convert(self):
+    def test_convert__standard(self):
         self.copy_input()
 
         self.add_entry_with_tags()
 
         feeds = Db2Feeds(input_db="input.db", output_db="output.db")
+        feeds.convert()
+
+    def test_convert__with_read_internet(self):
+        self.copy_input()
+
+        self.add_entry_with_tags()
+
+        feeds = Db2Feeds(input_db="input.db", output_db="output.db", remote_server="https://127.0.0.1:3000", read_internet_links=True)
         feeds.convert()
