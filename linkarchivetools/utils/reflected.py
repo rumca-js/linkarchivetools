@@ -46,6 +46,12 @@ class ReflectedTable(object):
 
         return inserted_id
 
+    def count(self, table_name):
+        row_count = self.connection.execute(
+            text(f"SELECT COUNT(*) FROM {table}")
+        ).scalar()
+        return row_count
+
     def print_summary(self, print_columns=False):
         tables = self.get_table_names()
 
@@ -85,9 +91,89 @@ class ReflectedTable(object):
         self.connection.commit()
 
 
-class ReflectedEntryTable(ReflectedTable):
+class ReflectedGenericTable(object):
+    def __init__(self, engine, connection, table_name=None):
+        self.engine = engine
+        self.connection = connection
+        self.table_name = table_name
+        if self.table_name is None:
+            self.table_name = self.get_table_name()
+
+    def get_table_name():
+        return self.table_name
+
+    def get_table(self):
+        destination_metadata = MetaData()
+        destination_table = Table(
+            self.table_name, destination_metadata, autoload_with=self.engine
+        )
+        return destination_table
+
     def truncate(self):
-        self.truncate_table("linkdatamodel")
+        sql_text = f"DELETE FROM {self.table_name};"
+        self.connection.execute(text(sql_text))
+        self.connection.commit()
+
+    def create_index(self, column_name):
+        index_name = f"idx_{self.table.name}_{column_name}"
+        index = Index(index_name, getattr(table.c, column_name))
+
+        index.create(bind=self.engine)
+
+    def insert_json_data(self, json_data: dict):
+        table = self.get_table()
+
+        stmt = (
+            insert(table)
+            .values(**json_data)
+            .returning(table.c.id)
+        )
+
+        result = self.connection.execute(stmt)
+        inserted_id = result.scalar_one()
+        self.connection.commit()
+
+        return inserted_id
+
+    def count(self):
+        row_count = self.connection.execute(
+            text(f"SELECT COUNT(*) FROM {self.table_name}")
+        ).scalar()
+        return row_count
+
+    def print_summary(self, print_columns=False):
+        row_count = self.connection.execute(
+            text(f"SELECT COUNT(*) FROM {self.table_name}")
+        ).scalar()
+        print(f"Table: {self.table_name}, Row count: {row_count}")
+
+        columns = self.get_column_names()
+        if print_columns:
+            column_names = [column["name"] for column in columns]
+            print(f"Columns in {self.table_name}: {', '.join(column_names)}")
+
+    def get_column_names(self):
+        inspector = inspect(self.engine)
+        row_count = self.connection.execute(
+            text(f"SELECT COUNT(*) FROM {self.table_name}")
+        ).scalar()
+
+        columns = inspector.get_columns(self.table_name)
+        column_names = [column["name"] for column in columns]
+        return column_names
+
+    def row_to_json_data(self, row):
+        data = dict(row._mapping)
+        return data
+
+    def run_sql(self, sql_text):
+        self.connection.execute(text(sql_text))
+        self.connection.commit()
+
+
+class ReflectedEntryTable(ReflectedGenericTable):
+    def get_table_name(self):
+        return "linkdatamodel"
 
     def insert_entry_json(self, entry_json):
         if "link" not in entry_json:
@@ -112,10 +198,10 @@ class ReflectedEntryTable(ReflectedTable):
         if "page_rating" not in entry_json:
             entry_json["page_rating"] = 0
 
-        return self.insert_json_data("linkdatamodel", entry_json)
+        return self.insert_json_data(entry_json)
 
     def get_entries(self):
-        destination_table = self.get_table("linkdatamodel")
+        destination_table = self.get_table()
 
         entries_select = select(destination_table)
 
@@ -126,7 +212,7 @@ class ReflectedEntryTable(ReflectedTable):
             yield entry
 
     def get_entries_good(self):
-        destination_table = self.get_table("linkdatamodel")
+        destination_table = self.get_table()
 
         stmt = (
             select(destination_table)
@@ -141,7 +227,7 @@ class ReflectedEntryTable(ReflectedTable):
             yield entry
 
     def is_entry_link(self, link):
-        destination_table = self.get_table("linkdatamodel")
+        destination_table = self.get_table()
 
         stmt = (
             select(1)
@@ -153,7 +239,7 @@ class ReflectedEntryTable(ReflectedTable):
         return result is not None
 
     def is_entry_id(self, entry_id):
-        destination_table = self.get_table("linkdatamodel")
+        destination_table = self.get_table()
 
         stmt = (
             select(1)
@@ -165,9 +251,12 @@ class ReflectedEntryTable(ReflectedTable):
         return result is not None
 
 
-class ReflectedUserTags(ReflectedTable):
+class ReflectedUserTags(ReflectedGenericTable):
+    def get_table_name(self):
+        return "usertags"
+
     def get_tags_string(self, entry_id):
-        destination_table = self.get_table("usertags")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -184,7 +273,7 @@ class ReflectedUserTags(ReflectedTable):
         return tags
 
     def get_tags(self, entry_id):
-        destination_table = self.get_table("usertags")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -198,9 +287,12 @@ class ReflectedUserTags(ReflectedTable):
         return tags
 
 
-class ReflectedEntryCompactedTags(ReflectedTable):
+class ReflectedEntryCompactedTags(ReflectedGenericTable):
+    def get_table_name(self):
+        return "entrycompactedtags"
+
     def get_tags_string(self, entry_id):
-        destination_table = self.get_table("entrycompactedtags")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -217,7 +309,7 @@ class ReflectedEntryCompactedTags(ReflectedTable):
         return tags
 
     def get_tags(self, entry_id):
-        destination_table = self.get_table("entrycompactedtags")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 
@@ -231,12 +323,12 @@ class ReflectedEntryCompactedTags(ReflectedTable):
         return tags
 
 
-class ReflectedSourceTable(ReflectedTable):
-    def truncate(self):
-        self.truncate_table("sourcedatamodel")
+class ReflectedSourceTable(ReflectedGenericTable):
+    def get_table_name(self):
+        return "sourcedatamodel"
 
     def get_source(self, source_id):
-        destination_table = self.get_table("sourcedatamodel")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.id == source_id)
 
@@ -244,12 +336,12 @@ class ReflectedSourceTable(ReflectedTable):
         return result.first()
 
 
-class ReflectedSocialData(ReflectedTable):
-    def truncate(self):
-        self.truncate_table("socialdata")
+class ReflectedSocialData(ReflectedGenericTable):
+    def get_table_name(self):
+        return "socialdata"
 
     def get(self, entry_id):
-        destination_table = self.get_table("socialdata")
+        destination_table = self.get_table()
 
         stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
 

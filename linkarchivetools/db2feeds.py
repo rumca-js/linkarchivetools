@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 
 from webtoolkit import RemoteUrl, BaseUrl
+from linkarchivetools import tableconfig
 from .utils.reflected import *
 
 
@@ -21,38 +22,34 @@ class Db2Feeds(object):
     def __init__(
         self,
         input_db=None,
-        verbose=True,
-        remote_server="",
         output_db=None,
+        verbose=True,
+        clean=False,
+        remote_server="",
         output_format=None,
         read_internet_links=False,
-        update_rss=False,
+        update_feed=False,
     ):
+        """
+        Constructor
+        @param read_internet_links Read links to find RSS feeds
+        @param update_feed Many things are copied from original entry.
+                          If this setting is true, feed entry fetches title, and other properties
+        """
         self.input_db = input_db
-        self.verbose = verbose
-        self.remote_server = remote_server
-        self.update_rss = update_rss
-        self.read_internet_links = read_internet_links
-
         self.output_db = output_db
+        self.verbose = verbose
+        self.clean = clean
+        self.remote_server = remote_server
         self.output_format = output_format
+        self.read_internet_links = read_internet_links
+        self.update_feed = update_feed
 
         self.new_table = None
 
         if self.output_db:
             self.output_format = "SQLITE"
         self.make_output_db()
-
-    def convert(self):
-        self.engine = create_engine(f"sqlite:///{self.input_db}")
-        with self.engine.connect() as connection:
-            self.connection = connection
-            if self.new_engine:
-                with self.new_engine.connect() as new_connection:
-                    self.new_connection = new_connection
-                    self.read()
-            else:
-                self.read()
 
     def make_output_db(self):
         if self.output_format != "SQLITE":
@@ -61,27 +58,45 @@ class Db2Feeds(object):
             return
 
         new_path = Path(self.output_db)
-        if new_path.exists():
+        if new_path.exists() and self.clean:
             new_path.unlink()
 
-        shutil.copy(self.input_db, self.output_db)
+        if not new_path.exists():
+            shutil.copy(self.input_db, self.output_db)
+            self.new_engine = create_engine(f"sqlite:///{self.output_db}")
+            with self.new_engine.connect() as new_connection:
+                self.new_connection = new_connection
+                self.truncate_tables()
 
         self.new_engine = create_engine(f"sqlite:///{self.output_db}")
 
-    def read(self):
-        self.truncate_tables()
+    def convert(self):
+        """
+        API
+        """
+        self.engine = create_engine(f"sqlite:///{self.input_db}")
+        with self.engine.connect() as connection:
+            self.connection = connection
+            if self.new_engine:
+                with self.new_engine.connect() as new_connection:
+                    self.new_connection = new_connection
+                    self.convert_entries()
+            else:
+                self.convert_entries()
 
-        table = ReflectedEntryTable(self.engine, self.connection)
+    def convert_entries(self):
+        if self.clean:
+            self.truncate_tables()
 
-        new_table = None
+        self.new_table = None
         if self.new_engine:
             self.new_table = ReflectedEntryTable(self.new_engine, self.new_connection)
-            self.new_table.vacuum()
 
+        table = ReflectedEntryTable(self.engine, self.connection)
         for entry in table.get_entries_good():
-            self.process_entry(entry)
+            self.convert_entry(entry)
 
-    def process_entry(self, entry):
+    def convert_entry(self, entry):
         url = BaseUrl(entry.link)
         feeds = url.get_feeds()
 
@@ -95,10 +110,12 @@ class Db2Feeds(object):
         for feed in feeds:
             data = self.prepare_data(entry, feed)
 
-            self.print_data(entry, data)
-
             if self.new_table:
-                self.copy_entry(entry, self.new_table, data)
+                if not self.new_table.is_entry_link(feed):
+                    self.print_data(entry, data)
+                    self.copy_entry(entry, self.new_table, data)
+            else:
+                self.print_data(entry, data)
 
     def prepare_data(self, entry, feed):
         data = {}
@@ -119,7 +136,7 @@ class Db2Feeds(object):
         data["page_rating_visits"] = 0
         data["page_rating"] = 0
 
-        if self.update_rss and self.remote_server:
+        if self.update_feed and self.remote_server:
             url_feed = RemoteUrl(remote_server=self.remote_server, url=feed)
             url_feed.get_response()
 
@@ -131,10 +148,12 @@ class Db2Feeds(object):
 
     def copy_entry(self, entry, entry_table, data):
         """
-        TODO copy from origin table tags
         """
         new_entry_id = entry_table.insert_entry_json(data)
+        self.copy_tags(entry, new_entry_id)
+        self.copy_social_data(entry, new_entry_id)
 
+    def copy_tags(self, entry, new_entry_id):
         source_entry_compacted_tags = ReflectedEntryCompactedTags(self.engine, self.connection)
         tags = source_entry_compacted_tags.get_tags(entry.id)
 
@@ -143,8 +162,9 @@ class Db2Feeds(object):
             entry_tag_data["tag"] = tag
             entry_tag_data["entry_id"] = new_entry_id
             destination_entry_compacted_tags = ReflectedEntryCompactedTags(self.new_engine, self.new_connection)
-            destination_entry_compacted_tags.insert_json_data("entrycompactedtags", entry_tag_data)
+            destination_entry_compacted_tags.insert_json_data(entry_tag_data)
 
+    def copy_social_data(self, entry, new_entry_id):
         source_entry_social_data = ReflectedSocialData(self.engine, self.connection)
         social_data = source_entry_social_data.get_json(entry.id)
         if social_data:
@@ -153,7 +173,7 @@ class Db2Feeds(object):
             social_data["entry_id"] = new_entry_id
 
             destination_entry_social_data = ReflectedSocialData(self.new_engine, self.new_connection)
-            destination_entry_social_data.insert_json_data("socialdata", social_data)
+            destination_entry_social_data.insert_json_data(social_data)
 
     def truncate_tables(self):
         if not self.new_engine:
@@ -164,39 +184,11 @@ class Db2Feeds(object):
             table = ReflectedTable(self.new_engine, self.new_connection)
             table.truncate_table(table_name)
 
+        table = ReflectedTable(self.new_engine, self.new_connection)
+        table.vacuum()
+
     def get_table_names(self):
-        table_names = [
-            "credentials",
-            "sourcecategories",
-            "sourcesubcategories",
-            "sourcedatamodel",
-            "userconfig",
-            "configurationentry",
-            "linkdatamodel",
-            "domains",
-            "usertags",
-            "compactedtags",
-            "usercompactedtags",
-            "entrycompactedtags",
-            "uservotes",
-            "browser",
-            "entryrules",
-            "dataexport",
-            "gateway",
-            "modelfiles",
-            "readlater",
-            "searchview",
-            "socialdata",
-            # "blockentry",
-            "blockentrylist",
-            "usercomments",
-            "userbookmarks",
-            "usersearchhistory",
-            "userentrytransitionhistory",
-            "userentryvisithistory",
-            "user",
-        ]
-        return table_names
+        return tableconfig.get_backup_tables()
 
     def print_data(self, entry, data):
         """
@@ -235,6 +227,7 @@ def parse():
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
     parser.add_argument("--output-db", help="File to be created")
     parser.add_argument("--update-rss",action="store_true", help="Reads RSS to check it's title and properties")
+    parser.add_argument("--clean",action="store_true", help="If output db exists, then it is removed at start")
     parser.add_argument("--read-internet-links",action="store_true", help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
     parser.add_argument(
         "--output-format",
@@ -258,8 +251,9 @@ def main():
 
     reader = Db2Feeds(
         input_db=args.db,
-        remote_server=args.crawling_server,
         output_db=args.output_db,
+        clean=args.clean,
+        remote_server=args.crawling_server,
         output_format=args.output_format,
     )
     reader.convert()

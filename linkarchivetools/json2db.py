@@ -117,7 +117,7 @@ class JSON2Db(object):
         Drops any unwelcome keys
         """
         table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
-        columns = table.get_column_names("linkdatamodel")
+        columns = table.get_column_names()
         keys = list(entry.keys())
 
         diff = list(set(keys) - set(columns))
