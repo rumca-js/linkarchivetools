@@ -355,3 +355,46 @@ class ReflectedSocialData(ReflectedGenericTable):
 
         data = self.row_to_json_data(row)
         return data
+
+
+class EntryCopier(object):
+    def __init__(self, src_engine, src_connection, dst_engine, dst_connection):
+        self.src_engine = src_engine
+        self.src_connection = src_connection
+
+        self.dst_engine = dst_engine
+        self.dst_connection = dst_connection
+
+    def copy_entry(self, entry):
+        """
+        """
+        entry_table = ReflectedEntryTable(self.dst_engine, self.dst_connection)
+        data = entry_table.row_to_json_data(entry)
+        del data["id"]
+        new_entry_id = entry_table.insert_entry_json(data)
+        if new_entry_id is not None:
+            self.copy_tags(entry, new_entry_id)
+            self.copy_social_data(entry, new_entry_id)
+        return new_entry_id
+
+    def copy_tags(self, entry, new_entry_id):
+        source_entry_compacted_tags = ReflectedEntryCompactedTags(self.src_engine, self.src_connection)
+        tags = source_entry_compacted_tags.get_tags(entry.id)
+
+        entry_tag_data = {}
+        for tag in tags:
+            entry_tag_data["tag"] = tag
+            entry_tag_data["entry_id"] = new_entry_id
+            destination_entry_compacted_tags = ReflectedEntryCompactedTags(self.dst_engine, self.dst_connection)
+            destination_entry_compacted_tags.insert_json_data(entry_tag_data)
+
+    def copy_social_data(self, entry, new_entry_id):
+        source_entry_social_data = ReflectedSocialData(self.src_engine, self.src_connection)
+        social_data = source_entry_social_data.get_json(entry.id)
+        if social_data:
+            if "id" in social_data:
+                del social_data["id"]
+            social_data["entry_id"] = new_entry_id
+
+            destination_entry_social_data = ReflectedSocialData(self.dst_engine, self.dst_connection)
+            destination_entry_social_data.insert_json_data(social_data)

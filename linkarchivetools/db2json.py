@@ -142,6 +142,7 @@ class Db2JSON(object):
         except ValueError as e:
             print(f"Error writing file {file_path}: {e}")
         self.handle.close()
+        self.handle = None
         self.rows = []
 
     def convert(self):
