@@ -154,6 +154,8 @@ class Db2JSON(object):
                 # print(entry)
                 self.write(entry)
 
+        self.close()
+
 
 def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
@@ -180,7 +182,6 @@ def main():
         rows_max=args.rows_max,
     )
     f.convert()
-    f.close()
 
 
 if __name__ == "__main__":
