@@ -56,16 +56,13 @@ class ReflectedTable(object):
         tables = self.get_table_names()
 
         for table in tables:
-            row_count = self.connection.execute(
-                text(f"SELECT COUNT(*) FROM {table}")
-            ).scalar()
+            row_count = self.count(table)
             print(f"Table: {table}, Row count: {row_count}")
 
-            columns = self.get_column_names(table)
             if print_columns:
+                columns = self.get_column_names(table)
                 column_names = [column["name"] for column in columns]
                 print(f"Columns in {table}: {', '.join(column_names)}")
-
 
     def get_table_names(self):
         inspector = inspect(self.engine)
@@ -74,9 +71,6 @@ class ReflectedTable(object):
 
     def get_column_names(self, table):
         inspector = inspect(self.engine)
-        row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {table}")
-        ).scalar()
 
         columns = inspector.get_columns(table)
         column_names = [column["name"] for column in columns]
@@ -142,13 +136,11 @@ class ReflectedGenericTable(object):
         return row_count
 
     def print_summary(self, print_columns=False):
-        row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {self.table_name}")
-        ).scalar()
+        row_count = self.count()
         print(f"Table: {self.table_name}, Row count: {row_count}")
 
-        column_names = self.get_column_names()
         if print_columns:
+            column_names = self.get_column_names()
             print(f"Columns in {self.table_name}: {', '.join(column_names)}")
 
     def get_column_names(self):
