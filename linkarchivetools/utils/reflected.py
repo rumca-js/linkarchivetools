@@ -147,9 +147,8 @@ class ReflectedGenericTable(object):
         ).scalar()
         print(f"Table: {self.table_name}, Row count: {row_count}")
 
-        columns = self.get_column_names()
+        column_names = self.get_column_names()
         if print_columns:
-            column_names = [column["name"] for column in columns]
             print(f"Columns in {self.table_name}: {', '.join(column_names)}")
 
     def get_column_names(self):
