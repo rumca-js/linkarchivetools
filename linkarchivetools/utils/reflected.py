@@ -48,7 +48,7 @@ class ReflectedTable(object):
 
     def count(self, table_name):
         row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {table}")
+            text(f"SELECT COUNT(*) FROM {table_name}")
         ).scalar()
         return row_count
 

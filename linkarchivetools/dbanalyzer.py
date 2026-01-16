@@ -26,6 +26,7 @@ from .utils.alchemysearch import (
     AlchemySearch,
 )
 from .utils.reflected import (
+    ReflectedTable,
     ReflectedEntryTable,
     ReflectedUserTags,
     ReflectedSocialData,
@@ -201,7 +202,7 @@ class DbAnalyzer(object):
 
         self.engine = create_engine("sqlite:///" + db)
         with self.engine.connect() as connection:
-            r = ReflectedEntryTable(self.engine, connection)
+            r = ReflectedTable(self.engine, connection)
             r.print_summary(print_columns)
 
     def search(self):
