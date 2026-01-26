@@ -326,6 +326,12 @@ class ReflectedSourceTable(ReflectedGenericTable):
         result = self.connection.execute(stmt)
         return result.first()
 
+    def insert_json(self, source_json):
+        if "url" not in source_json:
+            source_json["url"] = ""
+
+        return self.insert_json_data(source_json)
+
 
 class ReflectedSocialData(ReflectedGenericTable):
     def get_table_name(self):
