@@ -332,6 +332,18 @@ class ReflectedSourceTable(ReflectedGenericTable):
 
         return self.insert_json_data(source_json)
 
+    def is_url(self, url):
+        destination_table = self.get_table()
+
+        stmt = (
+            select(1)
+            .where(destination_table.c.url == url)
+            .limit(1)
+        )
+
+        result = self.connection.execute(stmt).scalar()
+        return result is not None
+
 
 class ReflectedSocialData(ReflectedGenericTable):
     def get_table_name(self):
