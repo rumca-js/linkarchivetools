@@ -89,6 +89,26 @@ class UtilsReflectedEntryTableTest(DbTestCase):
             entry = table.get(entry_id)
             self.assertTrue(entry)
 
+    def test_get_where(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+            
+            self.assertEqual(table.count(), 0)
+            # call tested function
+            entry_id = table.insert_json(entry_json)
+
+            self.assertTrue(entry_id)
+            entries = table.get_where({"title" : "Test"})
+            self.assertTrue(entries)
+
 
 class UtilsReflectedSourceTableTest(DbTestCase):
     def test_insert_json(self):

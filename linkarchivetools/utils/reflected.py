@@ -165,6 +165,20 @@ class ReflectedGenericTable(object):
         result = self.connection.execute(stmt)
         return result.first()
 
+    def get_where(self, conditions: dict):
+        destination_table = self.get_table()
+
+        filters = []
+        for column_name, value in conditions.items():
+            if not hasattr(destination_table.c, column_name):
+                raise ValueError(f"Unknown column: {column_name}")
+
+            filters.append(getattr(destination_table.c, column_name) == value)
+
+        stmt = select(exists().where(or_(*filters)))
+
+        return self.connection.execute(stmt).scalar()
+
     def delete(self, id):
         destination_table = self.get_table()
 
