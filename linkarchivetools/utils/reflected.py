@@ -2,7 +2,9 @@ from sqlalchemy import (
     MetaData,
     Table,
     select,
+    delete,
     or_,
+    and_,
     exists,
     text,
     inspect,
@@ -162,6 +164,33 @@ class ReflectedGenericTable(object):
 
         result = self.connection.execute(stmt)
         return result.first()
+
+    def delete(self, id):
+        destination_table = self.get_table()
+
+        stmt = delete(destination_table).where(destination_table.c.id == id)
+
+        result = self.connection.execute(stmt)
+        self.connection.commit()
+
+        return result.rowcount  # number of rows deleted
+
+    def delete_where(self, conditions: dict):
+        destination_table = self.get_table()
+
+        filters = []
+        for column_name, value in conditions.items():
+            if not hasattr(destination_table.c, column_name):
+                raise ValueError(f"Unknown column: {column_name}")
+
+            filters.append(getattr(destination_table.c, column_name) == value)
+
+        stmt = delete(destination_table).where(and_(*filters))
+
+        result = self.connection.execute(stmt)
+        self.connection.commit()
+
+        return result.rowcount
 
     def print_summary(self, print_columns=False):
         row_count = self.count()
