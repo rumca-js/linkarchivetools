@@ -111,7 +111,7 @@ class Db2Feeds(object):
             data = self.prepare_data(entry, feed)
 
             if self.new_table:
-                if not self.new_table.is_entry_link(feed):
+                if not self.new_table.exists(link=feed):
                     self.print_data(entry, data)
                     self.copy_entry(entry, self.new_table, data)
             else:
@@ -149,7 +149,7 @@ class Db2Feeds(object):
     def copy_entry(self, entry, entry_table, data):
         """
         """
-        new_entry_id = entry_table.insert_entry_json(data)
+        new_entry_id = entry_table.insert_json(data)
         self.copy_tags(entry, new_entry_id)
         self.copy_social_data(entry, new_entry_id)
 

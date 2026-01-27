@@ -34,7 +34,7 @@ class DbTestCase(unittest.TestCase):
         with engine.connect() as connection:
             data = self.get_default_entry_data(url="https://youtube.com/channel/12345678")
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            entry_id = table.insert_entry_json(data)
+            entry_id = table.insert_json(data)
 
             data = {}
             data["entry_id"] = entry_id
@@ -54,14 +54,14 @@ class DbTestCase(unittest.TestCase):
 
             data = self.get_default_entry_data(url="https://google.com")
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            entry_id = table.insert_entry_json(data)
+            entry_id = table.insert_json(data)
 
     def add_entry_with_tags2(self, file_name):
         engine = create_engine(f"sqlite:///{file_name}")
         with engine.connect() as connection:
             data = self.get_default_entry_data(url="https://youtube.com/channel/123456789")
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            entry_id = table.insert_entry_json(data)
+            entry_id = table.insert_json(data)
 
             data = {}
             data["entry_id"] = entry_id
@@ -81,7 +81,7 @@ class DbTestCase(unittest.TestCase):
 
             data = self.get_default_entry_data(url="https://linkedin.com")
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            entry_id = table.insert_entry_json(data)
+            entry_id = table.insert_json(data)
 
     def get_default_entry_data(self, url):
         data = {}

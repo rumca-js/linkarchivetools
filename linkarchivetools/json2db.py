@@ -91,7 +91,7 @@ class JSON2Db(object):
 
                 if self.is_entry_to_be_added(entry):
                     table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
-                    if table.insert_entry_json(entry) is not None:
+                    if table.insert_json(entry) is not None:
                         if self.verbose:
                             print(
                                 " -> [{}/{}] Link:{} Added".format(
@@ -134,9 +134,9 @@ class JSON2Db(object):
     def is_entry_to_be_added(self, entry):
         # entry already exists
         table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
-        if "id" in entry and table.is_entry_id(entry["id"]):
+        if "id" in entry and table.exists(id=entry["id"]):
             return False
-        if "link" in entry and table.is_entry_link(entry["link"]):
+        if "link" in entry and table.exists(link=entry["link"]):
             return False
 
         if self.vote_threshold:

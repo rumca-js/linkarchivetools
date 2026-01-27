@@ -12,21 +12,82 @@ from .dbtestcase import DbTestCase
 
 
 class UtilsReflectedEntryTableTest(DbTestCase):
-    def test_insert_entry_json(self):
+    def test_insert_json(self):
         self.create_db("input1.db")
 
         engine = create_engine(f"sqlite:///input1.db")
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
             entry_json = {
-               "link" : "https://test.com"
+               "link" : "https://test.com",
+               "title" : "Test"
             }
             table.truncate()
             
             self.assertEqual(table.count(), 0)
             # call tested function
-            table.insert_entry_json(entry_json)
+            entry_id = table.insert_json(entry_json)
             self.assertEqual(table.count(), 1)
+            self.assertTrue(entry_id)
+
+    def test_is__link(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+
+            # call tested function
+            self.assertFalse(table.exists(link="https://test.com"))
+            table.insert_json(entry_json)
+            # call tested function
+            self.assertTrue(table.exists(link="https://test.com"))
+
+    def test_update(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+
+            entry_id = table.insert_json(entry_json)
+
+            # call tested function
+            table.update_json_data(entry_id, {"title" : "New title"})
+
+            entry = table.get(entry_id)
+            self.assertTrue(entry)
+            self.assertEqual(entry.title, "New title")
+
+    def test_get(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+            
+            self.assertEqual(table.count(), 0)
+            # call tested function
+            entry_id = table.insert_json(entry_json)
+
+            self.assertTrue(entry_id)
+            entry = table.get(entry_id)
+            self.assertTrue(entry)
 
 
 class UtilsReflectedSourceTableTest(DbTestCase):
@@ -62,7 +123,7 @@ class UtilsReflectedSourceTableTest(DbTestCase):
             table.insert_json(source_json)
             self.assertEqual(table.count(), 1)
 
-    def test_is_url(self):
+    def test_is__url(self):
         self.create_db("input1.db")
 
         engine = create_engine(f"sqlite:///input1.db")
@@ -90,7 +151,7 @@ class UtilsReflectedSourceTableTest(DbTestCase):
             table.truncate()
 
             # call tested function
-            self.assertFalse(table.is_url("https://test.com"))
+            self.assertFalse(table.exists(url="https://test.com"))
             table.insert_json(source_json)
             # call tested function
-            self.assertTrue(table.is_url("https://test.com"))
+            self.assertTrue(table.exists(url="https://test.com"))

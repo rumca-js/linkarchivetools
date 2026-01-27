@@ -65,7 +65,7 @@ class DbMerge(object):
         src_table = ReflectedEntryTable(self.src_engine, self.src_connection)
         for entry in src_table.get_entries_good():
             dst_table = ReflectedEntryTable(self.dst_engine, self.dst_connection)
-            if not dst_table.is_entry_link(entry.link):
+            if not dst_table.exists(link=entry.link):
                 self.convert_entry(entry)
             elif self.verbose:
                 print(f"Entry {entry.link} is already present")

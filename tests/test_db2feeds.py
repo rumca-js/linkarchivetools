@@ -46,7 +46,7 @@ class Db2FeedsTest(DbTestCase):
         engine = create_engine(f"sqlite:///output.db")
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            self.assertTrue(table.is_entry_link("https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
+            self.assertTrue(table.exists(link="https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
             self.assertEqual(table.count(), 1)
 
         # check that if we add new things into input output is not cleared
@@ -58,8 +58,8 @@ class Db2FeedsTest(DbTestCase):
         engine = create_engine(f"sqlite:///output.db")
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            self.assertTrue(table.is_entry_link("https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
-            self.assertTrue(table.is_entry_link("https://www.youtube.com/feeds/videos.xml?channel_id=123456789"))
+            self.assertTrue(table.exists(link="https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
+            self.assertTrue(table.exists(link="https://www.youtube.com/feeds/videos.xml?channel_id=123456789"))
             self.assertEqual(table.count(), 2)
 
     def test_convert__clean(self):
@@ -80,7 +80,7 @@ class Db2FeedsTest(DbTestCase):
         engine = create_engine(f"sqlite:///output.db")
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            self.assertTrue(table.is_entry_link("https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
+            self.assertTrue(table.exists(link="https://www.youtube.com/feeds/videos.xml?channel_id=12345678"))
             self.assertEqual(table.count(), 1)
 
         # check that if we add new things into input output is cleared
@@ -93,5 +93,5 @@ class Db2FeedsTest(DbTestCase):
         engine = create_engine(f"sqlite:///output.db")
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
-            self.assertTrue(table.is_entry_link("https://www.youtube.com/feeds/videos.xml?channel_id=123456789"))
+            self.assertTrue(table.exists(link="https://www.youtube.com/feeds/videos.xml?channel_id=123456789"))
             self.assertEqual(table.count(), 1)

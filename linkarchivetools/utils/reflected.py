@@ -1,5 +1,15 @@
-from sqlalchemy import MetaData, Table, select, text, inspect, insert
-from sqlalchemy import Index
+from sqlalchemy import (
+    MetaData,
+    Table,
+    select,
+    or_,
+    exists,
+    text,
+    inspect,
+    insert,
+    update,
+    Index,
+)
 
 
 class ReflectedTable(object):
@@ -60,8 +70,7 @@ class ReflectedTable(object):
             print(f"Table: {table}, Row count: {row_count}")
 
             if print_columns:
-                columns = self.get_column_names(table)
-                column_names = [column["name"] for column in columns]
+                column_names = self.get_column_names(table)
                 print(f"Columns in {table}: {', '.join(column_names)}")
 
     def get_table_names(self):
@@ -129,11 +138,30 @@ class ReflectedGenericTable(object):
 
         return inserted_id
 
+    def update_json_data(self, id, json_data):
+        table = self.get_table()
+
+        stmt = (
+            update(table)
+            .where(table.c.id == id)
+            .values(**json_data)
+        )
+
+        self.connection.execute(stmt)
+
     def count(self):
         row_count = self.connection.execute(
             text(f"SELECT COUNT(*) FROM {self.table_name}")
         ).scalar()
         return row_count
+
+    def get(self, id):
+        destination_table = self.get_table()
+
+        stmt = select(destination_table).where(destination_table.c.id == id)
+
+        result = self.connection.execute(stmt)
+        return result.first()
 
     def print_summary(self, print_columns=False):
         row_count = self.count()
@@ -166,7 +194,7 @@ class ReflectedEntryTable(ReflectedGenericTable):
     def get_table_name(self):
         return "linkdatamodel"
 
-    def insert_entry_json(self, entry_json):
+    def insert_json(self, entry_json):
         if "link" not in entry_json:
             return
 
@@ -217,29 +245,20 @@ class ReflectedEntryTable(ReflectedGenericTable):
         for entry in entries:
             yield entry
 
-    def is_entry_link(self, link):
-        destination_table = self.get_table()
+    def exists(self, *, id=None, link=None):
+        table = self.get_table()
 
-        stmt = (
-            select(1)
-            .where(destination_table.c.link == link)
-            .limit(1)
-        )
+        conditions = []
+        if id is not None:
+            conditions.append(table.c.id == id)
+        if link is not None:
+            conditions.append(table.c.link == link)
 
-        result = self.connection.execute(stmt).scalar()
-        return result is not None
+        if not conditions:
+            return False
 
-    def is_entry_id(self, entry_id):
-        destination_table = self.get_table()
-
-        stmt = (
-            select(1)
-            .where(destination_table.c.id == entry_id)
-            .limit(1)
-        )
-
-        result = self.connection.execute(stmt).scalar()
-        return result is not None
+        stmt = select(exists().where(or_(*conditions)))
+        return self.connection.execute(stmt).scalar()
 
 
 class ReflectedUserTags(ReflectedGenericTable):
@@ -326,23 +345,37 @@ class ReflectedSourceTable(ReflectedGenericTable):
         result = self.connection.execute(stmt)
         return result.first()
 
+    def get_sources(self):
+        destination_table = self.get_table()
+
+        sources_select = select(destination_table)
+
+        result = self.connection.execute(sources_select)
+        sources = result.fetchall()
+
+        for source in sources:
+            yield source
+
     def insert_json(self, source_json):
         if "url" not in source_json:
             source_json["url"] = ""
 
         return self.insert_json_data(source_json)
 
-    def is_url(self, url):
-        destination_table = self.get_table()
+    def exists(self, *, id=None, url=None):
+        table = self.get_table()
 
-        stmt = (
-            select(1)
-            .where(destination_table.c.url == url)
-            .limit(1)
-        )
+        conditions = []
+        if id is not None:
+            conditions.append(table.c.id == id)
+        if url is not None:
+            conditions.append(table.c.url == url)
 
-        result = self.connection.execute(stmt).scalar()
-        return result is not None
+        if not conditions:
+            return False
+
+        stmt = select(exists().where(or_(*conditions)))
+        return self.connection.execute(stmt).scalar()
 
 
 class ReflectedSocialData(ReflectedGenericTable):
@@ -380,7 +413,7 @@ class EntryCopier(object):
         entry_table = ReflectedEntryTable(self.dst_engine, self.dst_connection)
         data = entry_table.row_to_json_data(entry)
         del data["id"]
-        new_entry_id = entry_table.insert_entry_json(data)
+        new_entry_id = entry_table.insert_json(data)
         if new_entry_id is not None:
             self.copy_tags(entry, new_entry_id)
             self.copy_social_data(entry, new_entry_id)
