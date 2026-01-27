@@ -248,15 +248,19 @@ class ReflectedEntryTable(ReflectedGenericTable):
 
         return self.insert_json_data(entry_json)
 
-    def get_entries(self):
+    def get_entries(self, limit:int|None=None, offset:int=0):
         destination_table = self.get_table()
 
         entries_select = select(destination_table)
 
-        result = self.connection.execute(entries_select)
-        entries = result.fetchall()
+        if offset:
+            entries_select = entries_select.offset(offset)
+        if limit is not None:
+            entries_select = entries_select.limit(limit)
 
-        for entry in entries:
+        result = self.connection.execute(entries_select)
+
+        for entry in result:
             yield entry
 
     def get_entries_good(self):
@@ -374,15 +378,19 @@ class ReflectedSourceTable(ReflectedGenericTable):
         result = self.connection.execute(stmt)
         return result.first()
 
-    def get_sources(self):
+    def get_sources(self, limit:int|None=None, offset:int=0):
         destination_table = self.get_table()
 
         sources_select = select(destination_table)
 
-        result = self.connection.execute(sources_select)
-        sources = result.fetchall()
+        if offset:
+            sources_select = sources_select.offset(offset)
+        if limit is not None:
+            sources_select = sources_select.limit(limit)
 
-        for source in sources:
+        result = self.connection.execute(sources_select)
+
+        for source in result:
             yield source
 
     def insert_json(self, source_json):
