@@ -175,7 +175,7 @@ class ReflectedGenericTable(object):
 
             filters.append(getattr(destination_table.c, column_name) == value)
 
-        stmt = select(exists().where(or_(*filters)))
+        stmt = select(table).where(or_(*filters))
 
         result = self.connection.execute(stmt)
         for row in result:
