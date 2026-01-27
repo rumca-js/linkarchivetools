@@ -177,7 +177,9 @@ class ReflectedGenericTable(object):
 
         stmt = select(exists().where(or_(*filters)))
 
-        return self.connection.execute(stmt).scalar()
+        result = self.connection.execute(stmt)
+        for row in result:
+            yield row
 
     def delete(self, id):
         destination_table = self.get_table()
