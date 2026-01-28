@@ -89,7 +89,7 @@ class UtilsReflectedEntryTableTest(DbTestCase):
             entry = table.get(entry_id)
             self.assertTrue(entry)
 
-    def test_get_where(self):
+    def test_get_where__conditions_map(self):
         self.create_db("input1.db")
 
         engine = create_engine(f"sqlite:///input1.db")
@@ -106,7 +106,47 @@ class UtilsReflectedEntryTableTest(DbTestCase):
             entry_id = table.insert_json(entry_json)
 
             self.assertTrue(entry_id)
-            entries = table.get_where({"title" : "Test"})
+            entries = table.get_where(conditions_map={"title" : "Test"})
+            self.assertTrue(entries)
+
+    def test_get_where__conditions(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+            
+            self.assertEqual(table.count(), 0)
+            # call tested function
+            entry_id = table.insert_json(entry_json)
+
+            self.assertTrue(entry_id)
+            entries = table.get_where(conditions=[table.get_table().c.title == "Test"])
+            self.assertTrue(entries)
+
+    def test_get_where__order_by(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedEntryTable(engine=engine, connection=connection)
+            entry_json = {
+               "link" : "https://test.com",
+               "title" : "Test"
+            }
+            table.truncate()
+            
+            self.assertEqual(table.count(), 0)
+            # call tested function
+            entry_id = table.insert_json(entry_json)
+
+            self.assertTrue(entry_id)
+            entries = table.get_where(order_by=[table.get_table().c.title.desc()])
             self.assertTrue(entries)
 
 

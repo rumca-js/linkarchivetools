@@ -165,17 +165,39 @@ class ReflectedGenericTable(object):
         result = self.connection.execute(stmt)
         return result.first()
 
-    def get_where(self, conditions: dict):
+    def get_where(self,
+                  conditions_map: dict=None,
+                  conditions=None,
+                  order_by=None,
+                  limit:int|None=None,
+                  offset:int=0):
+        """
+        @param conditions_map can be passed as {"name": "Test"}
+        @param conditions can be passed as [destionation_table.c.rating > 5]
+        @param order_by can be passed as [destionation_table.c.name.asc()]
+        """
         destination_table = self.get_table()
 
-        filters = []
-        for column_name, value in conditions.items():
-            if not hasattr(destination_table.c, column_name):
-                raise ValueError(f"Unknown column: {column_name}")
+        if not conditions:
+            conditions = []
 
-            filters.append(getattr(destination_table.c, column_name) == value)
+        if not conditions and conditions_map:
+            for column_name, value in conditions_map.items():
+                if not hasattr(destination_table.c, column_name):
+                    raise ValueError(f"Unknown column: {column_name}")
 
-        stmt = select(destination_table).where(or_(*filters))
+                conditions.append(getattr(destination_table.c, column_name) == value)
+
+        stmt = select(destination_table)
+
+        if conditions:
+            stmt = stmt.where(or_(*conditions))
+        if order_by:
+            stmt = stmt.order_by(*order_by)
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
 
         result = self.connection.execute(stmt)
         for row in result:
