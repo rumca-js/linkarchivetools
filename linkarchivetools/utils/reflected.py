@@ -17,7 +17,6 @@ from sqlalchemy import (
 class ReflectedTable(object):
     def __init__(self, engine, connection):
         self.engine = engine
-        self.connection = connection
 
     def get_table(self, table_name):
         destination_metadata = MetaData()
@@ -28,8 +27,9 @@ class ReflectedTable(object):
 
     def truncate_table(self, table_name):
         sql_text = f"DELETE FROM {table_name};"
-        self.connection.execute(text(sql_text))
-        self.connection.commit()
+
+        with self.engine.begin() as connection:
+            connection.execute(text(sql_text))
 
     def create_index(self, table, column_name):
         index_name = f"idx_{table.name}_{column_name}"
@@ -38,7 +38,9 @@ class ReflectedTable(object):
         index.create(bind=self.engine)
 
     def vacuum(self):
-        self.connection.execute(text("VACUUM"))
+        with self.engine.connect() as connection:
+            connection.execution_options(isolation_level="AUTOCOMMIT")
+            connection.execute(text("VACUUM"))
 
     def close(self):
         pass
@@ -52,16 +54,16 @@ class ReflectedTable(object):
             .returning(table.c.id)
         )
 
-        result = self.connection.execute(stmt)
-        inserted_id = result.scalar_one()
-        self.connection.commit()
+        with self.engine.begin() as connection:
+            result = connection.execute(stmt)
+            inserted_id = result.scalar_one()
 
         return inserted_id
 
     def count(self, table_name):
-        row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {table_name}")
-        ).scalar()
+        sql_text = text(f"SELECT COUNT(*) FROM {table_name}")
+        with self.engine.connect() as connection:
+            row_count = connection.execute(sql_text).scalar_one()
         return row_count
 
     def print_summary(self, print_columns=False):
@@ -92,14 +94,13 @@ class ReflectedTable(object):
         return data
 
     def run_sql(self, sql_text):
-        self.connection.execute(text(sql_text))
-        self.connection.commit()
+        with self.engine.begin() as connection:
+            connection.execute(text(sql_text))
 
 
 class ReflectedGenericTable(object):
     def __init__(self, engine, connection, table_name=None):
         self.engine = engine
-        self.connection = connection
         self.table_name = table_name
         if self.table_name is None:
             self.table_name = self.get_table_name()
@@ -116,8 +117,8 @@ class ReflectedGenericTable(object):
 
     def truncate(self):
         sql_text = f"DELETE FROM {self.table_name};"
-        self.connection.execute(text(sql_text))
-        self.connection.commit()
+        with self.engine.begin() as connection:
+            result = connection.execute(text(sql_text))
 
     def create_index(self, column_name):
         index_name = f"idx_{self.table.name}_{column_name}"
@@ -134,9 +135,9 @@ class ReflectedGenericTable(object):
             .returning(table.c.id)
         )
 
-        result = self.connection.execute(stmt)
-        inserted_id = result.scalar_one()
-        self.connection.commit()
+        with self.engine.begin() as connection:
+            result = connection.execute(stmt)
+            inserted_id = result.scalar_one()
 
         return inserted_id
 
@@ -149,21 +150,22 @@ class ReflectedGenericTable(object):
             .values(**json_data)
         )
 
-        self.connection.execute(stmt)
+        with self.engine.begin() as connection:
+            connection.execute(stmt)
 
     def count(self):
-        row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {self.table_name}")
-        ).scalar()
+        sql = text(f"SELECT COUNT(*) FROM {self.table_name}")
+        with self.engine.connect() as connection:
+            row_count = connection.execute(sql).scalar_one()
         return row_count
 
     def get(self, id):
-        destination_table = self.get_table()
+        table = self.get_table()
+        stmt = select(table).where(table.c.id == id)
 
-        stmt = select(destination_table).where(destination_table.c.id == id)
-
-        result = self.connection.execute(stmt)
-        return result.first()
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            return result.first()
 
     def get_where(self,
                   conditions_map: dict=None,
@@ -199,36 +201,36 @@ class ReflectedGenericTable(object):
         if limit is not None:
             stmt = stmt.limit(limit)
 
-        result = self.connection.execute(stmt)
-        for row in result:
-            yield row
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            yield from result
 
     def delete(self, id):
-        destination_table = self.get_table()
+        table = self.get_table()
+        stmt = delete(table).where(table.c.id == id)
 
-        stmt = delete(destination_table).where(destination_table.c.id == id)
+        with self.engine.begin() as connection:
+            result = connection.execute(stmt)
+            rowcount = result.rowcount  # number of rows deleted
 
-        result = self.connection.execute(stmt)
-        self.connection.commit()
-
-        return result.rowcount  # number of rows deleted
+        return rowcount
 
     def delete_where(self, conditions: dict):
-        destination_table = self.get_table()
+        table = self.get_table()
 
         filters = []
         for column_name, value in conditions.items():
-            if not hasattr(destination_table.c, column_name):
+            if not hasattr(table.c, column_name):
                 raise ValueError(f"Unknown column: {column_name}")
+            filters.append(getattr(table.c, column_name) == value)
 
-            filters.append(getattr(destination_table.c, column_name) == value)
+        stmt = delete(table).where(and_(*filters))
 
-        stmt = delete(destination_table).where(and_(*filters))
+        with self.engine.begin() as connection:
+            result = connection.execute(stmt)
+            rowcount = result.rowcount  # number of rows deleted
 
-        result = self.connection.execute(stmt)
-        self.connection.commit()
-
-        return result.rowcount
+        return rowcount
 
     def print_summary(self, print_columns=False):
         row_count = self.count()
@@ -240,21 +242,23 @@ class ReflectedGenericTable(object):
 
     def get_column_names(self):
         inspector = inspect(self.engine)
-        row_count = self.connection.execute(
-            text(f"SELECT COUNT(*) FROM {self.table_name}")
-        ).scalar()
+
+        with self.engine.connect() as connection:
+            row_count = connection.execute(text(f"SELECT COUNT(*) FROM {self.table_name}")).scalar_one()
 
         columns = inspector.get_columns(self.table_name)
         column_names = [column["name"] for column in columns]
         return column_names
 
     def row_to_json_data(self, row):
-        data = dict(row._mapping)
-        return data
+        """
+        Convert SQLAlchemy row to a dict
+        """
+        return dict(row._mapping)
 
     def run_sql(self, sql_text):
-        self.connection.execute(text(sql_text))
-        self.connection.commit()
+        with self.engine.begin() as connection:
+            connection.execute(text(sql_text))
 
 
 class ReflectedEntryTable(ReflectedGenericTable):
@@ -286,35 +290,36 @@ class ReflectedEntryTable(ReflectedGenericTable):
 
         return self.insert_json_data(entry_json)
 
-    def get_entries(self, limit:int|None=None, offset:int=0):
-        destination_table = self.get_table()
-
-        entries_select = select(destination_table)
+    def get_entries(self, limit: int | None = None, offset: int = 0):
+        """
+        TODO remove use get_where
+        """
+        table = self.get_table()
+        stmt = select(table)
 
         if offset:
-            entries_select = entries_select.offset(offset)
+            stmt = stmt.offset(offset)
         if limit is not None:
-            entries_select = entries_select.limit(limit)
+            stmt = stmt.limit(limit)
 
-        result = self.connection.execute(entries_select)
-
-        for entry in result:
-            yield entry
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            yield from result  # keep generator semantics
 
     def get_entries_good(self):
-        destination_table = self.get_table()
-
+        """
+        TODO remove use get_where
+        """
+        table = self.get_table()
         stmt = (
-            select(destination_table)
-            .where(destination_table.c.page_rating_votes > 0)
-            .order_by(destination_table.c.page_rating_votes.desc())
+            select(table)
+            .where(table.c.page_rating_votes > 0)
+            .order_by(table.c.page_rating_votes.desc())
         )
 
-        result = self.connection.execute(stmt)
-        entries = result.fetchall()
-
-        for entry in entries:
-            yield entry
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            yield from result
 
     def exists(self, *, id=None, link=None):
         table = self.get_table()
@@ -329,7 +334,9 @@ class ReflectedEntryTable(ReflectedGenericTable):
             return False
 
         stmt = select(exists().where(or_(*conditions)))
-        return self.connection.execute(stmt).scalar()
+
+        with self.engine.connect() as connection:
+            return connection.execute(stmt).scalar()
 
 
 class ReflectedUserTags(ReflectedGenericTable):
@@ -337,33 +344,27 @@ class ReflectedUserTags(ReflectedGenericTable):
         return "usertags"
 
     def get_tags_string(self, entry_id):
-        destination_table = self.get_table()
+        table = self.get_table()
+        stmt = select(table).where(table.c.entry_id == entry_id)
 
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+        tags_list = []
 
-        tags = ""
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            for row in result:
+                tags_list.append(f"#{row.tag}")
 
-        result = self.connection.execute(stmt)
-        rows = result.fetchall()
-        for row in rows:
-            if tags:
-                tags += ", "
-
-            tags += "#" + row.tag
-
-        return tags
+        return ", ".join(tags_list)
 
     def get_tags(self, entry_id):
-        destination_table = self.get_table()
-
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+        table = self.get_table()
+        stmt = select(table).where(table.c.entry_id == entry_id)
 
         tags = []
-
-        result = self.connection.execute(stmt)
-        rows = result.fetchall()
-        for row in rows:
-            tags.append(row.tag)
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            for row in result:
+                tags.append(row.tag)
 
         return tags
 
@@ -372,36 +373,32 @@ class ReflectedEntryCompactedTags(ReflectedGenericTable):
     def get_table_name(self):
         return "entrycompactedtags"
 
-    def get_tags_string(self, entry_id):
-        destination_table = self.get_table()
-
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
-
-        tags = ""
-
-        result = self.connection.execute(stmt)
-        rows = result.fetchall()
-        for row in rows:
-            if tags:
-                tags += ", "
-
-            tags += "#" + row.tag
-
-        return tags
-
     def get_tags(self, entry_id):
-        destination_table = self.get_table()
-
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+        """Return a list of tag strings for the given entry_id."""
+        table = self.get_table()
+        stmt = select(table).where(table.c.entry_id == entry_id)
 
         tags = []
-
-        result = self.connection.execute(stmt)
-        rows = result.fetchall()
-        for row in rows:
-            tags.append(row.tag)
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            for row in result:
+                tags.append(row.tag)
 
         return tags
+
+
+    def get_tags_string(self, entry_id):
+        """Return tags for the given entry_id as a single string formatted as '#tag1, #tag2'."""
+        table = self.get_table()
+        stmt = select(table).where(table.c.entry_id == entry_id)
+
+        tags_list = []
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            for row in result:
+                tags_list.append(f"#{row.tag}")
+
+        return ", ".join(tags_list)
 
 
 class ReflectedSourceTable(ReflectedGenericTable):
@@ -409,35 +406,34 @@ class ReflectedSourceTable(ReflectedGenericTable):
         return "sourcedatamodel"
 
     def get_source(self, source_id):
-        destination_table = self.get_table()
+        """Return a single source row by ID, or None if not found."""
+        table = self.get_table()
+        stmt = select(table).where(table.c.id == source_id)
 
-        stmt = select(destination_table).where(destination_table.c.id == source_id)
+        with self.engine.connect() as connection:
+            return connection.execute(stmt).first()
 
-        result = self.connection.execute(stmt)
-        return result.first()
-
-    def get_sources(self, limit:int|None=None, offset:int=0):
-        destination_table = self.get_table()
-
-        sources_select = select(destination_table)
+    def get_sources(self, limit: int | None = None, offset: int = 0):
+        """Yield sources with optional offset and limit."""
+        table = self.get_table()
+        stmt = select(table)
 
         if offset:
-            sources_select = sources_select.offset(offset)
+            stmt = stmt.offset(offset)
         if limit is not None:
-            sources_select = sources_select.limit(limit)
+            stmt = stmt.limit(limit)
 
-        result = self.connection.execute(sources_select)
+        with self.engine.connect() as connection:
+            result = connection.execute(stmt)
+            yield from result
 
-        for source in result:
-            yield source
-
-    def insert_json(self, source_json):
-        if "url" not in source_json:
-            source_json["url"] = ""
-
+    def insert_json(self, source_json: dict):
+        """Insert a source JSON dict, ensuring 'url' key exists."""
+        source_json.setdefault("url", "")
         return self.insert_json_data(source_json)
 
     def exists(self, *, id=None, url=None):
+        """Return True if a source with given ID or URL exists."""
         table = self.get_table()
 
         conditions = []
@@ -450,7 +446,9 @@ class ReflectedSourceTable(ReflectedGenericTable):
             return False
 
         stmt = select(exists().where(or_(*conditions)))
-        return self.connection.execute(stmt).scalar()
+
+        with self.engine.connect() as connection:
+            return connection.execute(stmt).scalar()
 
 
 class ReflectedSocialData(ReflectedGenericTable):
@@ -458,20 +456,20 @@ class ReflectedSocialData(ReflectedGenericTable):
         return "socialdata"
 
     def get(self, entry_id):
-        destination_table = self.get_table()
+        """Return a single row matching entry_id, or None if not found."""
+        table = self.get_table()
+        stmt = select(table).where(table.c.entry_id == entry_id)
 
-        stmt = select(destination_table).where(destination_table.c.entry_id == entry_id)
+        with self.engine.connect() as connection:
+            return connection.execute(stmt).first()
 
-        result = self.connection.execute(stmt)
-        return result.first()
 
     def get_json(self, entry_id):
+        """Return the row as a dict (JSON-style), or None if not found."""
         row = self.get(entry_id)
         if row is None:
             return None
-
-        data = self.row_to_json_data(row)
-        return data
+        return self.row_to_json_data(row)
 
 
 class EntryCopier(object):
