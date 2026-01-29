@@ -18,13 +18,6 @@ class ReflectedTable(object):
     def __init__(self, engine, connection):
         self.engine = engine
 
-    def get_table(self, table_name):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            table_name, destination_metadata, autoload_with=self.engine
-        )
-        return destination_table
-
     def truncate_table(self, table_name):
         sql_text = f"DELETE FROM {table_name};"
 
@@ -44,21 +37,6 @@ class ReflectedTable(object):
 
     def close(self):
         pass
-
-    def insert_json_data(self, table_name, json_data: dict):
-        table = self.get_table(table_name)
-
-        stmt = (
-            insert(table)
-            .values(**json_data)
-            .returning(table.c.id)
-        )
-
-        with self.engine.begin() as connection:
-            result = connection.execute(stmt)
-            inserted_id = result.scalar_one()
-
-        return inserted_id
 
     def count(self, table_name):
         sql_text = text(f"SELECT COUNT(*) FROM {table_name}")
@@ -104,16 +82,19 @@ class ReflectedGenericTable(object):
         self.table_name = table_name
         if self.table_name is None:
             self.table_name = self.get_table_name()
+        self.table = None
 
     def get_table_name():
         return self.table_name
 
     def get_table(self):
-        destination_metadata = MetaData()
-        destination_table = Table(
-            self.table_name, destination_metadata, autoload_with=self.engine
-        )
-        return destination_table
+        if self.table is None:
+            destination_metadata = MetaData()
+            self.table = Table(
+                self.table_name, destination_metadata, autoload_with=self.engine
+            )
+            return self.table
+        return self.table
 
     def truncate(self):
         sql_text = f"DELETE FROM {self.table_name};"
@@ -203,7 +184,9 @@ class ReflectedGenericTable(object):
 
         with self.engine.connect() as connection:
             result = connection.execute(stmt)
-            yield from result
+            rows = result.fetchall()  # fetch all rows immediately
+
+        return rows
 
     def delete(self, id):
         table = self.get_table()
@@ -304,7 +287,8 @@ class ReflectedEntryTable(ReflectedGenericTable):
 
         with self.engine.connect() as connection:
             result = connection.execute(stmt)
-            yield from result  # keep generator semantics
+            rows = result.fetchall()  # fetch all rows immediately
+        return rows
 
     def get_entries_good(self):
         """
@@ -319,7 +303,8 @@ class ReflectedEntryTable(ReflectedGenericTable):
 
         with self.engine.connect() as connection:
             result = connection.execute(stmt)
-            yield from result
+            rows = result.fetchall()  # fetch all rows immediately
+        return rows
 
     def exists(self, *, id=None, link=None):
         table = self.get_table()
@@ -425,7 +410,8 @@ class ReflectedSourceTable(ReflectedGenericTable):
 
         with self.engine.connect() as connection:
             result = connection.execute(stmt)
-            yield from result
+            sources = result.fetchall()
+        return sources
 
     def insert_json(self, source_json: dict):
         """Insert a source JSON dict, ensuring 'url' key exists."""
