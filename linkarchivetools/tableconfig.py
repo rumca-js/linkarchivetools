@@ -1,9 +1,15 @@
 def get_tables():
-    table_names = [
+    tables = [
+        "apikeys",
+        "applogging",
+        "backgroundjob",
+        "backgroundjobhistory",
+        "keywords",
         "credentials",
         "sourcecategories",
         "sourcesubcategories",
         "sourcedatamodel",
+        "sourceoperationaldata",
         "userconfig",
         "configurationentry",
         "linkdatamodel",

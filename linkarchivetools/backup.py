@@ -22,12 +22,13 @@ from sqlalchemy.dialects.postgresql.types import BYTEA
 from sqlalchemy.orm import sessionmaker
 
 from linkarchivetools.utils.reflected import *
-from linkarchivetools.tableconfig import get_backup_tables
+from linkarchivetools.tableconfig import get_backup_tables, get_tables
 
 
 output_directory = Path(__file__).parents[1]
 
 
+tables_to_create = get_tables()
 tables_to_backup = get_backup_tables()
 
 
@@ -540,7 +541,7 @@ def backup_workspace(run_info):
 
     workspace = run_info["workspace"]
 
-    for table in tables_to_backup:
+    for table in tables_to_create:
         new_run_info = dict(run_info)
         new_key = "instance_" + table
 
@@ -551,11 +552,14 @@ def backup_workspace(run_info):
         new_run_info["tables"].append(table_name)
 
         if new_run_info["format"] == "sqlite":
+            if table not in tables_to_backup:
+                new_run_info["empty"] = True
             if not run_db_copy_backup(new_run_info):
                 return False
         else:
-            if not run_pg_dump_backup(new_run_info):
-                return False
+            if table in tables_to_backup:
+                if not run_pg_dump_backup(new_run_info):
+                    return False
 
     if run_info["format"] == "custom":
         new_run_info = dict(run_info)
