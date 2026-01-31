@@ -5,5 +5,11 @@ from linkarchivetools import (
 
 
 class Db2FeedsTest(unittest.TestCase):
-    def test_init(self):
+    def test_constructor(self):
         filter = DbFilter(input_db="input.db", output_db="output.db")
+
+    def test_filter_votes(self):
+        filter = DbFilter(input_db="input.db", output_db="output.db")
+
+        # call tested function
+        filter.filter_votes()
