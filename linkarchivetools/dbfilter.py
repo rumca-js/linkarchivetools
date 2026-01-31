@@ -54,6 +54,11 @@ class DbFilter(object):
             self.connection = None
 
     def truncate(self):
+        """
+        TODO remove these hardcoded tables
+        with something from table_config
+        though it seems it should not clear linkdatamodel
+        """
         table = ReflectedTable(self.engine, self.connection)
 
         table.truncate_table("userentrytransitionhistory")
