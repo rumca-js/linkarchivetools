@@ -106,6 +106,8 @@ class ReflectedGenericTable(object):
         self.engine = engine
         self.connection = connection
         self.table_name = table_name
+        self.table = None
+
         if self.table_name is None:
             self.table_name = self.get_table_name()
 
@@ -113,11 +115,14 @@ class ReflectedGenericTable(object):
         return self.table_name
 
     def get_table(self):
+        if self.table is not None:
+            return self.table
+
         destination_metadata = MetaData()
-        destination_table = Table(
+        self.table = Table(
             self.table_name, destination_metadata, autoload_with=self.engine
         )
-        return destination_table
+        return self.table
 
     def truncate(self):
         sql_text = f"DELETE FROM {self.table_name};"
