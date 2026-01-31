@@ -484,6 +484,11 @@ class ReflectedSocialData(ReflectedGenericTable):
         return data
 
 
+class ReflectedEntryRules(ReflectedGenericTable):
+    def get_table_name(self):
+        return "entryrules"
+
+
 class EntryCopier(object):
     def __init__(self, src_engine, src_connection, dst_engine, dst_connection):
         self.src_engine = src_engine
