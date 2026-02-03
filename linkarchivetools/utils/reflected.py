@@ -42,6 +42,11 @@ class ReflectedTable(object):
 
         index.create(bind=self.engine)
 
+    def enable_sqlite_wal(self, table_name):
+        sql_text = f"PRAGMA journal_mode=WAL;"
+        self.connection.execute(text(sql_text))
+        self.connection.commit()
+
     def vacuum(self):
         self.connection.execute(text("VACUUM"))
 
@@ -126,6 +131,11 @@ class ReflectedGenericTable(object):
 
     def truncate(self):
         sql_text = f"DELETE FROM {self.table_name};"
+        self.connection.execute(text(sql_text))
+        self.connection.commit()
+
+    def enable_sqlite_wal(self):
+        sql_text = f"PRAGMA journal_mode=WAL;"
         self.connection.execute(text(sql_text))
         self.connection.commit()
 
