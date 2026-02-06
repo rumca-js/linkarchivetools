@@ -388,11 +388,6 @@ class ReflectedUserTags(ReflectedGenericTable):
         return tags
 
 
-class ReflectedUserTags(ReflectedGenericTable):
-    def get_table_name(self):
-        return "usertags"
-
-
 class ReflectedEntryCompactedTags(ReflectedGenericTable):
     def get_table_name(self):
         return "entrycompactedtags"
