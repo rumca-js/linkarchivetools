@@ -478,6 +478,19 @@ class ReflectedSourceTable(ReflectedGenericTable):
         return self.connection.execute(stmt).scalar()
 
 
+class ReflectedSourceOperationalData(ReflectedGenericTable):
+    def get_table_name(self):
+        return "sourceoperationaldata"
+
+    def get_for_source(self, source_id):
+        destination_table = self.get_table()
+
+        stmt = select(destination_table).where(destination_table.c.source_obj_id == source_id)
+
+        result = self.connection.execute(stmt)
+        return result.first()
+
+
 class ReflectedSocialData(ReflectedGenericTable):
     def get_table_name(self):
         return "socialdata"
@@ -502,6 +515,34 @@ class ReflectedSocialData(ReflectedGenericTable):
 class ReflectedEntryRules(ReflectedGenericTable):
     def get_table_name(self):
         return "entryrules"
+
+
+class ReflectedConfigurationEntry(ReflectedGenericTable):
+    def get_table_name(self):
+        return "configurationentry"
+
+    def get(self):
+        first_item = self.get_first()
+        if first_item:
+            return first_item
+
+        self.add_configuration()
+
+        first_item = self.get_first()
+        if first_item:
+            return first_item
+
+    def get_first(self):
+        destination_table = self.get_table()
+
+        stmt = select(destination_table)
+
+        result = self.connection.execute(stmt)
+        return result.first()
+
+    def add_configuration(self):
+        json_data = {}
+        self.insert_json_data(json_data)
 
 
 class EntryCopier(object):
