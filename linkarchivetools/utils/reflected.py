@@ -170,6 +170,7 @@ class ReflectedGenericTable(object):
         )
 
         self.connection.execute(stmt)
+        self.connection.commit()
 
     def count(self):
         row_count = self.connection.execute(
