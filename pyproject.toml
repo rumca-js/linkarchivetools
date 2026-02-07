@@ -3,7 +3,7 @@
 
 [tool.poetry]
 name = "linkarchivetools"
-version = "0.1.21"
+version = "0.1.22"
 description = "Link Archive Tools"
 authors = ["Iwan Grozny <renegat@renegat0x0.ddns.net>"]
 license = "GPL3"
@@ -13,7 +13,7 @@ readme = "README.md"
 python = "^3.10"
 python-dateutil = "^2.8.2"
 sqlalchemy="*"
-webtoolkit="^0.0.194"
+webtoolkit="^0.0.196"
 sympy="^1.13.2"
 psycopg2-binary="*"
 
