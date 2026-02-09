@@ -541,6 +541,11 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         self.insert_json_data(json_data)
 
 
+class ReflectedAppLogging(ReflectedGenericTable):
+    def get_table_name(self):
+        return "applogging"
+
+
 class EntryCopier(object):
     def __init__(self, src_engine, src_connection, dst_engine, dst_connection):
         self.src_engine = src_engine
