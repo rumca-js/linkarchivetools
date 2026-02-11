@@ -68,6 +68,9 @@ class DbMerge(object):
             if not dst_table.exists(link=entry.link):
                 self.convert_entry(entry)
             elif self.verbose:
+                destination_entries = dst_table.get_where({"link" : entry.link})
+                for destination_entry in destination_entries:
+                    self.fill_blanks(entry, destination_entry)
                 print(f"Entry {entry.link} is already present")
 
     def convert_entry(self, entry):
@@ -80,3 +83,21 @@ class DbMerge(object):
                              dst_engine = self.dst_engine,
                              dst_connection=self.dst_connection) 
         copier.copy_entry(entry)
+
+    def fill_blanks(self, source_entry, destination_entry):
+        if (not self.is_entry_attribute_set(destination_entry, "thumbnail") and
+           self.is_entry_attribute_set(source_entry, "thumbnail")):
+               destination_entry.thumbnail = source_entry.thumbnail
+        if (not self.is_entry_attribute_set(destination_entry, "title") and
+           self.is_entry_attribute_set(source_entry, "title")):
+               destination_entry.title = source_entry.title
+        if (not self.is_entry_attribute_set(destination_entry, "description") and
+           self.is_entry_attribute_set(source_entry, "description")):
+               destination_entry.description = source_entry.description
+
+    def is_entry_attribute_set(self, entry, attribute):
+        attribute = getattr(entry, attribute, None)
+        if not attribute:
+            return False
+
+        return True
