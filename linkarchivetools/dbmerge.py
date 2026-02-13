@@ -70,7 +70,7 @@ class DbMerge(object):
             elif self.verbose:
                 destination_entries = dst_table.get_where({"link" : entry.link})
                 for destination_entry in destination_entries:
-                    self.fill_blanks(entry, destination_entry)
+                    self.fill_blanks(entry, destination_entry, dst_table)
                 print(f"Entry {entry.link} is already present")
 
     def convert_entry(self, entry):
@@ -84,16 +84,22 @@ class DbMerge(object):
                              dst_connection=self.dst_connection) 
         copier.copy_entry(entry)
 
-    def fill_blanks(self, source_entry, destination_entry):
+    def fill_blanks(self, source_entry, destination_entry, destination_table):
         if (not self.is_entry_attribute_set(destination_entry, "thumbnail") and
            self.is_entry_attribute_set(source_entry, "thumbnail")):
-               destination_entry.thumbnail = source_entry.thumbnail
+               data = {}
+               data["thumbnail"] = source_entry.thumbnail
+               destination_table.update_json_data(id=destination_entry.id, json_data=data)
         if (not self.is_entry_attribute_set(destination_entry, "title") and
            self.is_entry_attribute_set(source_entry, "title")):
-               destination_entry.title = source_entry.title
+               data = {}
+               data["title"] = source_entry.title
+               destination_table.update_json_data(id=destination_entry.id, json_data=data)
         if (not self.is_entry_attribute_set(destination_entry, "description") and
            self.is_entry_attribute_set(source_entry, "description")):
-               destination_entry.description = source_entry.description
+               data = {}
+               data["description"] = source_entry.description
+               destination_table.update_json_data(id=destination_entry.id, json_data=data)
 
     def is_entry_attribute_set(self, entry, attribute):
         attribute = getattr(entry, attribute, None)
