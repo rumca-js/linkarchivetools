@@ -1,5 +1,5 @@
 test:
-	poetry run python -m unittest discover -v 2>&1 | tee test_output.txt
+	poetry run python -u -m unittest discover -v 2>&1 | tee test_output.txt
 
 build:
 	poetry build
