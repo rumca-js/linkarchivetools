@@ -250,13 +250,13 @@ files = [
 
 [[package]]
 name = "filelock"
-version = "3.24.2"
+version = "3.24.3"
 description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "filelock-3.24.2-py3-none-any.whl", hash = "sha256:667d7dc0b7d1e1064dd5f8f8e80bdac157a6482e8d2e02cd16fd3b6b33bd6556"},
-    {file = "filelock-3.24.2.tar.gz", hash = "sha256:c22803117490f156e59fafce621f0550a7a853e2bbf4f87f112b11d469b6c81b"},
+    {file = "filelock-3.24.3-py3-none-any.whl", hash = "sha256:426e9a4660391f7f8a810d71b0555bce9008b0a1cc342ab1f6947d37639e002d"},
+    {file = "filelock-3.24.3.tar.gz", hash = "sha256:011a5644dc937c22699943ebbfc46e969cdde3e171470a6e40b9533e5a72affa"},
 ]
 
 [[package]]
@@ -1031,13 +1031,13 @@ zstd = ["backports-zstd (>=1.0.0)"]
 
 [[package]]
 name = "webtoolkit"
-version = "0.0.201"
+version = "0.0.202"
 description = "Web tools and interfaces for Internet data processing."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "webtoolkit-0.0.201-py3-none-any.whl", hash = "sha256:eaad233c501170145eaacc4c53e0a048ab7f079198e48d17e058a895da33da7b"},
-    {file = "webtoolkit-0.0.201.tar.gz", hash = "sha256:f9a2d551fd700d49abac64d9f130345c49c582e68b1a47e036072b91f1ee71da"},
+    {file = "webtoolkit-0.0.202-py3-none-any.whl", hash = "sha256:337a3b3228fcf65c6f55f3747beffed9d4988386b49de8636c73581402cea44b"},
+    {file = "webtoolkit-0.0.202.tar.gz", hash = "sha256:7b5840845ead1d82a56f78ed34f616c1cbd6e1b29b349707a34fb63c0d85ff04"},
 ]
 
 [package.dependencies]
@@ -1055,4 +1055,4 @@ url-cleaner = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "473da4908677c500322bf60a2c589d8554ffb65320c22a36a7aa05bbed254b57"
+content-hash = "5ee1c470c4f39120caae35678043c219fbd50e37319afe81b7b249fb90f27260"
