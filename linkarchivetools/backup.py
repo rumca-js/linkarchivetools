@@ -293,11 +293,6 @@ def create_destionation_table(table_name, source_table, destination_engine):
                         nullable=column.nullable
                     ))
 
-                # For debugging purposes, you can print column details
-                # print(column.name)
-                # print(column.type.__class__)
-                # print(f"Nullable: {column.nullable}")
-
             destination_metadata = MetaData()
             destination_table = Table(table_name, destination_metadata, *columns)
             destination_table.create(destination_engine)
@@ -662,7 +657,6 @@ def parse_backup_commandline():
     parser.add_argument("-d", "--database", default="db", help="Database name (default: 'db')")
     parser.add_argument("-p", "--password", default="", help="Password. Necessary for sqlite format")
     parser.add_argument("-w", "--workspaces", help="Workspace for which to perform backup/restore. If not specified - all")
-    parser.add_argument("-D", "--debug", help="Enable debug output")  # TODO implement debug
     parser.add_argument("-i", "--ignore-errors", action="store_true", help="Ignore errors during the operation")
     parser.add_argument("--empty", action="store_true", help="Creates empty table version during backup")
     parser.add_argument("--append", action="store_true", help="Appends data during restore, does not clear tables")

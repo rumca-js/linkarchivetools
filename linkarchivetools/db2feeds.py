@@ -1,7 +1,5 @@
 """
 Converts Database to information about RSS feeds.
-
-TODO - copy tags from origin to RSS feeds
 """
 
 import shutil

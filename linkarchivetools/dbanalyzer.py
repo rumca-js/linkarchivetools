@@ -6,11 +6,6 @@ Examples:
   $ --search "title=*Musk*"
  - What was said about Musk (title, link, description, etc)
   $ --search "Musk"
-
-TODO
- - Output formats? (md)?
- - Maybe it could produce a chart?
-
 """
 
 import argparse

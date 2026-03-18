@@ -13,7 +13,7 @@ import argparse
 
 from sqlalchemy import create_engine
 from .utils.reflected import *
-from .tableconfig import get_tables
+from .tableconfig import get_tables, get_truncate_tables
 
 
 class DbFilter(object):
@@ -61,27 +61,10 @@ class DbFilter(object):
         """
         table = ReflectedTable(self.engine, self.connection)
 
-        table.truncate_table("userentrytransitionhistory")
-        table.truncate_table("userentryvisithistory")
-        table.truncate_table("usersearchhistory")
-        table.truncate_table("uservotes")
-        table.truncate_table("usercompactedtags")
-        table.truncate_table("usercomments")
-        table.truncate_table("userbookmarks")
-        table.truncate_table("user")
-        table.truncate_table("userconfig")
-        table.truncate_table("sourcedatamodel")
-        table.truncate_table("sourcecategories")
-        table.truncate_table("sourcesubcategories")
-        table.truncate_table("readlater")
-        table.truncate_table("modelfiles")
-        table.truncate_table("gateway")
-        table.truncate_table("entryrules")
-        table.truncate_table("domains")
-        table.truncate_table("dataexport")
-        table.truncate_table("configurationentry")
-        table.truncate_table("compactedtags")
-        table.truncate_table("blockentrylist")
+        truncate_tables = get_truncate_tables()
+
+        for table in truncate_tables:
+            table.truncate_table(table)
 
     def filter(self, conditions):
         table = ReflectedTable(self.engine, self.connection)

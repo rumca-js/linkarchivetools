@@ -70,3 +70,29 @@ def get_backup_tables():
         "userentryvisithistory",
     ]
     return tables
+
+def get_truncate_tables():
+    tables = [
+        "userentrytransitionhistory",
+        "userentryvisithistory",
+        "usersearchhistory",
+        "uservotes",
+        "usercompactedtags",
+        "usercomments",
+        "userbookmarks",
+        "user",
+        "userconfig",
+        "sourcedatamodel",
+        "sourcecategories",
+        "sourcesubcategories",
+        "readlater",
+        "modelfiles",
+        "gateway",
+        "entryrules",
+        "domains",
+        "dataexport",
+        "configurationentry",
+        "compactedtags",
+        "blockentrylist",
+    ]
+    return tables

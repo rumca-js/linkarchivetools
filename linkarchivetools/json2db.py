@@ -183,9 +183,6 @@ class Parser(object):
             "--preserve-id", action="store_true", help="Preserves ID of objects"
         )
         self.parser.add_argument("--vote-min", help="Minimum amount of entry vote")
-        self.parser.add_argument("--language", help="Accept language")  # TODO implement
-        self.parser.add_argument("--entries", help="Convert entries")  # TODO implement
-        self.parser.add_argument("--sources", help="Convert sources")  # TODO implement
         self.parser.add_argument(
             "--verbose", action="store_true", help="Shows more info"
         )
