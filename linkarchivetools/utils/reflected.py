@@ -224,6 +224,33 @@ class ReflectedGenericTable(object):
         for row in result:
             yield row
 
+    def get_where_ex(self,
+                  conditions=None,
+                  order_by=None,
+                  limit:int|None=None,
+                  offset:int=0):
+        """
+        @param conditions_map can be passed as {"name": "Test"}
+        @param conditions can be passed as [destionation_table.c.rating > 5]
+        @param order_by can be passed as [destionation_table.c.name.asc()]
+        """
+        destination_table = self.get_table()
+
+        stmt = select(destination_table)
+
+        if conditions is not None:
+            stmt = stmt.where(conditions)
+        if order_by:
+            stmt = stmt.order_by(*order_by)
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+
+        result = self.connection.execute(stmt)
+        for row in result:
+            yield row
+
     def delete(self, id):
         destination_table = self.get_table()
 
