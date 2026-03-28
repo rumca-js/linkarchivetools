@@ -207,7 +207,12 @@ class ReflectedGenericTable(object):
                 if not hasattr(destination_table.c, column_name):
                     raise ValueError(f"Unknown column: {column_name}")
 
-                conditions.append(getattr(destination_table.c, column_name) == value)
+                column = getattr(destination_table.c, column_name)
+
+                if value is None:
+                    conditions.append(column.is_(None))
+                else:
+                    conditions.append(column == value)
 
         stmt = select(destination_table)
 
