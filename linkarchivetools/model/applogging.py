@@ -1,8 +1,12 @@
+"""
+TODO remove hardcoded values
+"""
 import traceback
 from datetime import datetime
+from .basetable import BaseTable
 
 
-class AppLogging(object):
+class AppLogging(BaseTable):
     DEBUG = 10
     INFO = 20
     WARNING = 30
@@ -12,6 +16,7 @@ class AppLogging(object):
 
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("applogging")
 
     def create_entry(self, info_text, detail_text="", level=INFO, stack=False):
         if len(info_text) > 1900:

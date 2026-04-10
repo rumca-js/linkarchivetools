@@ -1,11 +1,13 @@
 from pathlib import Path
 from .sourcedata import SourceData
 from .entries import Entries
+from .basetable import BaseTable
 
 
-class Sources(object):
+class Sources(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("sources_table")
 
     def set(self, source_url, source_properties=None):
         link = source_url
@@ -62,9 +64,6 @@ class Sources(object):
        }
 
         return self.connection.sources_table.insert_json(properties)
-
-    def count(self):
-        return self.connection.sources_table.count()
 
     def delete_entries(self, source):
         """

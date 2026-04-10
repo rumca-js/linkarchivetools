@@ -87,14 +87,6 @@ class EntryRules(object):
 
             return self.connection.entry_rules.insert_json_data(data)
 
-    def truncate(self):
-        self.connection.entry_rules.truncate()
-
-    def close(self):
-        if self.connection:
-            self.connection.close()
-            self.connection = None
-
     def add_entry_rules(self, raw_input):
         entry_rule_urls = read_line_things(raw_input)
         for entry_rule_url in entry_rule_urls:
@@ -106,6 +98,9 @@ class EntryRules(object):
         entry_rule_urls = read_line_things(raw_input)
         for entry_rule_url in entry_rule_urls:
             self.add_entry_rule(entry_rule_url)
+
+    def truncate(self):
+        self.connection.entry_rules.truncate()
 
     def count(self):
         return self.connection.entry_rules.count()

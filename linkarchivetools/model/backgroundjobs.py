@@ -1,8 +1,10 @@
 from datetime import datetime
 from sqlalchemy import and_
 import json
+from .basetable import BaseTable
 
-class BackgroundJob(object):
+
+class BackgroundJob(BaseTable):
     JOB_PROCESS_SOURCE = "process-source"
     JOB_LINK_ADD = "link-add"
     JOB_LINK_SAVE = "link-save"
@@ -40,6 +42,7 @@ class BackgroundJob(object):
 
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("backgroundjob")
 
     def create_single_job(self, job_name, subject="", args="", user=None, cfg=None):
 
@@ -74,3 +77,9 @@ class BackgroundJob(object):
 
     def get(self, id):
         return self.connection.backgroundjob.get(id=id)
+
+    def truncate(self):
+        self.connection.entry_rules.truncate()
+
+    def count(self):
+        return self.connection.entries_table.count()

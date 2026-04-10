@@ -1,10 +1,12 @@
 from datetime import datetime
 from .socialdata import SocialData
+from .basetable import BaseTable
 
 
-class Entries(object):
+class Entries(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("entries_table")
 
     def add(self, entry_json, source=None):
         if self.connection.entries_table.exists(link=entry_json["link"]):
@@ -33,9 +35,6 @@ class Entries(object):
             print(entry_json)
             raise
 
-    def count(self):
-        return self.connection.entries_table.count()
-
     def delete(self, id):
         socialdata = SocialData(self.connection)
         socialdata.delete(entry_id = id)
@@ -47,6 +46,14 @@ class Entries(object):
     def exists(self,link=None):
         return self.connection.entries_table.exists(link=link)
 
+    def delete_where(self, conditions):
+        entries = self.connection.entries_table.get_where(conditions)
+        for entry in entries:
+            socialdata = SocialData(self.connection)
+            socialdata.delete(entry_id = entry.id)
+
+        self.connection.entries_table.delete_where(conditions)
+
     def cleanup(self):
         ids_to_remove = set()
         for entry in self.connection.entries_table.get_where():
@@ -57,10 +64,3 @@ class Entries(object):
         for id in ids_to_remove:
             self.connection.entries_table.delete(id=id)
 
-    def delete_where(self, conditions):
-        entries = self.connection.entries_table.get_where(conditions)
-        for entry in entries:
-            socialdata = SocialData(self.connection)
-            socialdata.delete(entry_id = entry.id)
-
-        self.connection.entries_table.delete_where(conditions)

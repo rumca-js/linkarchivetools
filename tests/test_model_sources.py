@@ -17,4 +17,6 @@ class SourcesTest(DbTestCase):
         connection = DbConnection("input.db")
 
         sources = Sources(connection=connection)
+        sources.truncate()
+
         self.assertEqual(sources.count(), 0)
