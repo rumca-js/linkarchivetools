@@ -50,6 +50,15 @@ class SourceData(BaseTable):
 
         return True
 
+    def get_update_seconds(self, source):
+        this_source_data = self.get_source_data(source)
+        if this_source_data:
+            date_fetched = this_source_data.date_fetched
+            diff = datetime.now() - date_fetched
+            return diff.total_seconds()
+
+        return 0
+
     def delete(self, source):
         self.connection.sourceoperationaldata.delete_where({"source_obj_id" : source.id})
 
