@@ -18,3 +18,6 @@ class BaseTable(object):
 
     def count(self):
         return self.get_table().count()
+
+    def insert_json_data(self, json_data):
+        return self.get_table().insert_json_data(json_data=json_data)

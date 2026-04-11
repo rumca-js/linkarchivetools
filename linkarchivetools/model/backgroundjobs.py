@@ -77,9 +77,3 @@ class BackgroundJob(BaseTable):
 
     def get(self, id):
         return self.connection.backgroundjob.get(id=id)
-
-    def truncate(self):
-        self.connection.entry_rules.truncate()
-
-    def count(self):
-        return self.connection.entries_table.count()
