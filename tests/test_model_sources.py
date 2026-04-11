@@ -39,3 +39,20 @@ class SourcesTest(DbTestCase):
         source = sources.get(source_id)
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
+
+    def test_delete(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        connection = DbConnection("input.db")
+
+        sources = Sources(connection=connection)
+        sources.truncate()
+
+        source_url = "https://google.com"
+        source_properties = {}
+
+        source_id = sources.set(source_url=source_url, source_properties=source_properties)
+        self.assertTrue(source_id is not None)
+
+        sources.delete(id = source_id)

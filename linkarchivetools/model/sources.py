@@ -78,7 +78,7 @@ class Sources(BaseTable):
         self.delete_entries(source)
 
         sources_data = SourceData(connection=self.connection)
-        sources_data.remove(source)
+        sources_data.delete(source)
 
         self.connection.sources_table.delete(id=id)
 
