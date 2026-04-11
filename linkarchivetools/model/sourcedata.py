@@ -5,9 +5,10 @@ from .basetable import BaseTable
 
 
 class SourceData(BaseTable):
-    def __init__(self, connection):
+    def __init__(self, connection, default_fetch_period_s=3600):
         self.connection = connection
         self.set_table("sourceoperationaldata")
+        self.default_fetch_period_s = default_fetch_period_s
 
     def get_source_data(self, source):
         op_datas = self.connection.sourceoperationaldata.get_where({"source_obj_id" : source.id})
@@ -40,7 +41,7 @@ class SourceData(BaseTable):
         if this_source_data:
             date_fetched = this_source_data.date_fetched
 
-            fetch_period_s = 3600 # 1 hour
+            fetch_period_s = self.default_fetch_period_s
             if source.fetch_period > 0:
                 fetch_period_s = source.fetch_period
 
