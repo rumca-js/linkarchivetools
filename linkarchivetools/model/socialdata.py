@@ -2,10 +2,13 @@ import json
 from pathlib import Path
 from datetime import datetime, timedelta
 
+from .basetable import BaseTable
 
-class SocialData(object):
+
+class SocialData(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("socialdata")
 
     def get(self, entry_id):
         social_datas = self.connection.socialdata.get_where({"entry_id" : entry_id})

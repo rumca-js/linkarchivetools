@@ -31,7 +31,7 @@ class DbConnection(object):
         self.sources_table = ReflectedSourceTable(engine=self.engine, connection=self.connection)
         self.entry_rules = ReflectedEntryRules(engine=self.engine, connection=self.connection)
         self.configurationentry = ReflectedConfigurationEntry(engine=self.engine, connection=self.connection)
-        self.sourceoperationaleata = ReflectedSourceOperationalData(engine=self.engine, connection=self.connection)
+        self.sourceoperationaldata = ReflectedSourceOperationalData(engine=self.engine, connection=self.connection)
         self.applogging = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="applogging")
         self.socialdata = ReflectedSocialData(engine=self.engine, connection=self.connection)
         self.backgroundjob = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="backgroundjob")

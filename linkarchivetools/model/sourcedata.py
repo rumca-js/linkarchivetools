@@ -1,14 +1,16 @@
 import json
 from pathlib import Path
 from datetime import datetime, timedelta
+from .basetable import BaseTable
 
 
-class SourceData(object):
+class SourceData(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("sourceoperationaldata")
 
     def get_source_data(self, source):
-        op_datas = self.connection.sourceoperationaleata.get_where({"source_obj_id" : source.id})
+        op_datas = self.connection.sourceoperationaldata.get_where({"source_obj_id" : source.id})
         for op_data in op_datas:
             return op_data
 
@@ -26,9 +28,9 @@ class SourceData(object):
 
         try:
             if op_data:
-                self.connection.sourceoperationaleata.update_json_data(id=op_data.id, json_data=new_data)
+                self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
             else:
-                self.connection.sourceoperationaleata.insert_json_data(json_data=new_data)
+                self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
         except Exception as E:
             E_str = str(E)
             print(f"Error for data {new_data} {E_str}")
@@ -50,16 +52,16 @@ class SourceData(object):
 
         return True
 
-    def remove(self, source):
-        self.connection.sourceoperationaleata.delete_where({"source_obj_id" : source.id})
+    def delete(self, source):
+        self.connection.sourceoperationaldata.delete_where({"source_obj_id" : source.id})
 
     def cleanup(self):
         ids_to_remove = []
-        op_datas = self.connection.sourceoperationaleata.get_where()
+        op_datas = self.connection.sourceoperationaldata.get_where()
         for op_data in op_datas:
             source = self.connection.sources_table.get(op_data.source_obj_id)
             if not source:
                 ids_to_remove.append(op_data.id)
 
         for id in ids_to_remove:
-            self.connection.sourceoperationaleata.delete(op_data.id)
+            self.connection.sourceoperationaldata.delete(op_data.id)

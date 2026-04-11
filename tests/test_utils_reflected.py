@@ -175,6 +175,7 @@ class UtilsReflectedSourceTableTest(DbTestCase):
                "entries_alpha": 1.0,
                "proxy_location": "",
                "auto_update_favicon":False,
+               "xpath":"",
             }
             table.truncate()
             
@@ -206,6 +207,7 @@ class UtilsReflectedSourceTableTest(DbTestCase):
                "entries_backgroundcolor": "",
                "entries_alpha": 1.0,
                "proxy_location": "",
+               "xpath": "",
                "auto_update_favicon":False,
             }
             table.truncate()
