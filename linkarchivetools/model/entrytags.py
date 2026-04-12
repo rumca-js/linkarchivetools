@@ -1,7 +1,9 @@
+from .basetable import BaseTable
 
-class EntryTags(object):
+class EntryTags(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("entrycompactedtags")
 
     def get(self, entry_id):
         for row in self.connection.entrycompactedtags.get_where({"entry_id" : entry_id}):
