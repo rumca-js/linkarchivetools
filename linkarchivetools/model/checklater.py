@@ -23,6 +23,14 @@ class CheckLater(BaseTable):
 
         return result
 
+    def is_checked(self, entry):
+        rows = self.get_table().get_where({"entry_id" : entry.id})
+        for row in rows:
+            if row:
+                return True
+
+        return False
+
     def check_later(self, entry):
         rows = self.get_table().get_where({"entry_id" : entry.id})
         for row in rows:
@@ -33,13 +41,19 @@ class CheckLater(BaseTable):
         json_data["entry_id"] = entry.id
         json_data["user_id"] = None
 
-        return self.get_table().insert_json_data(json_data)
+        id = self.get_table().insert_json_data(json_data)
+        if id is None:
+            return False
+
+        return True
 
     def not_check_later(self, entry):
         rows = self.get_table().get_where({"entry_id" : entry.id})
         for row in rows:
             if row:
                 self.get_table().delete(id=row.id)
+                return True
+        return False
 
     def get_entries(self):
         result = []

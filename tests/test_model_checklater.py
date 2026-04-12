@@ -63,3 +63,33 @@ class CheckLaterTest(DbTestCase):
         laters.not_check_later(entry)
 
         self.assertEqual(laters.count(), 0)
+
+    def test_is_checked__false(self):
+        connection = DbConnection("input.db")
+
+        laters = CheckLater(connection=self.connection)
+        laters.truncate()
+
+        self.assertEqual(laters.count(), 0)
+
+        entry = self.add_entry()
+
+        # call tested function
+        status = laters.is_checked(entry)
+        self.assertFalse(status)
+
+    def test_is_checked__true(self):
+        connection = DbConnection("input.db")
+
+        laters = CheckLater(connection=self.connection)
+        laters.truncate()
+
+        self.assertEqual(laters.count(), 0)
+
+        entry = self.add_entry()
+
+        laters.check_later(entry)
+
+        # call tested function
+        status = laters.is_checked(entry)
+        self.assertTrue(status)
