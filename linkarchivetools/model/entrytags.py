@@ -6,6 +6,9 @@ class EntryTags(BaseTable):
         self.set_table("entrycompactedtags")
 
     def get(self, entry_id):
+        """
+        Return tag string
+        """
         for row in self.connection.entrycompactedtags.get_where({"entry_id" : entry_id}):
             tags = row.tag
             if tags and tags.endswith(","):
@@ -17,9 +20,17 @@ class EntryTags(BaseTable):
     def get_map(self, entry_id):
         tags = self.get(entry_id=entry_id)
         if tags:
-            return tags.split(",")
+            result = []
+            split = tags.split(",")
+            for tag in split:
+                result.append(tag.strip())
+
+            return result
 
     def set(self, entry_id, tags):
+        """
+        Tags is string
+        """
         if tags and not tags.endswith(","):
             tags = tags + ","
 
