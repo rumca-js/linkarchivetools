@@ -52,7 +52,7 @@ class Sources(BaseTable):
                "remove_after_days": 5,
                "language": language,
                "age": 0,
-               "fetch_period": 3600,
+               "fetch_period": 0,
                "auto_tag": "",
                "entries_backgroundcolor_alpha": 1.0,
                "entries_backgroundcolor": "",

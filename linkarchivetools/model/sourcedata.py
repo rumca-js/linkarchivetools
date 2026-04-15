@@ -29,9 +29,9 @@ class SourceData(BaseTable):
 
         try:
             if op_data:
-                self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
+                return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
             else:
-                self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
+                return self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
         except Exception as E:
             E_str = str(E)
             print(f"Error for data {new_data} {E_str}")
