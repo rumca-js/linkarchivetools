@@ -9,12 +9,7 @@ class CheckLater(BaseTable):
 
     def get(self, entry_id):
         for row in self.get_table().get_where({"entry_id" : entry_id}):
-            tags = row.tag
-            if tags and tags.endswith(","):
-                tags = tags[:-1]
-            return tags
-
-        return ""
+            return row
 
     def get_all_entry_ids(self):
         result = []
