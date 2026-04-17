@@ -7,6 +7,7 @@ from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
    ReflectedSourceTable,
    ReflectedTable,
+   ReflectedConfigurationEntry,
 )
 from .dbtestcase import DbTestCase
 
@@ -217,3 +218,13 @@ class UtilsReflectedSourceTableTest(DbTestCase):
             table.insert_json(source_json)
             # call tested function
             self.assertTrue(table.exists(url="https://test.com"))
+
+
+class ReflectedConfigurationEntryTest(DbTestCase):
+    def test_insert_json(self):
+        self.create_db("input1.db")
+
+        engine = create_engine(f"sqlite:///input1.db")
+        with engine.connect() as connection:
+            table = ReflectedConfigurationEntry(engine=engine, connection=connection)
+            table.add_configuration()

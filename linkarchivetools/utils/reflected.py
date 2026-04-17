@@ -3,6 +3,7 @@ This file is mainly for SQLite.
 It will not open several connection, will use one.
 This allows us to handle nested calls of generators without any problems.
 """
+from datetime import datetime, time
 from sqlalchemy import (
     MetaData,
     Table,
@@ -570,6 +571,94 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
 
     def add_configuration(self):
         json_data = {}
+        json_data["instance_title"] = ""
+        json_data["instance_description"] = ""
+        json_data["instance_internet_location"] = ""
+        json_data["favicon_internet_url"] = ""
+        json_data["view_access_type"] = ""
+        json_data["download_access_type"] = ""
+        json_data["add_access_type"] = ""
+        json_data["logging_level"] = 10
+        json_data["initialized"] = False
+        json_data["initialization_type"] = ""
+        json_data["enable_background_jobs"] = True
+        json_data["block_job_queue"] = False
+        json_data["use_internal_scripts"] = False
+        json_data["auto_store_thumbnails"] = False
+        json_data["thread_memory_threshold"] = 0
+
+        json_data["enable_keyword_support"] = False
+        json_data["enable_domain_support"] = False
+        json_data["enable_file_support"] = False
+        json_data["enable_link_archiving"] = False
+        json_data["enable_source_archiving"] = False
+        json_data["enable_crawling"] = False
+        #json_data["enable_social_data"] = False
+
+        json_data["accept_dead_links"] = False
+        json_data["accept_ip_links"] = False
+        json_data["accept_domain_links"] = False
+        json_data["accept_non_domain_links"] = False
+        json_data["accept_unknown_links"] = False
+        #json_data["accept_onion_links"] = False
+        json_data["accept_same_hashes"] = False
+
+        json_data["auto_crawl_sources"] = False
+        json_data["auto_scan_new_entries"] = False
+        json_data["auto_scan_updated_entries"] = False
+        json_data["new_entries_merge_data"] = False
+        json_data["new_entries_use_clean_data"] = False
+        json_data["new_entries_fetch_social_data"] = False
+        #json_data["browse_entries_fetch_social_data"] = False
+        #json_data["browse_entry_fetch_social_data"] = False
+
+        json_data["entry_update_via_internet"] = False
+        json_data["log_remove_entries"] = False
+        json_data["auto_create_sources"] = False
+        json_data["default_source_state"] = False
+
+        json_data["prefer_https_links"] = False
+        json_data["prefer_non_www_links"] = False
+        json_data["keep_social_data"] = False
+        json_data["sources_refresh_period"] = 0
+        json_data["days_to_move_to_archive"] = 0
+        json_data["days_to_remove_links"] = 0
+        json_data["days_to_remove_stale_entries"] = 0
+        json_data["days_to_check_std_entries"] = 0
+        json_data["days_to_check_stale_entries"] = 0
+        json_data["days_to_remove_social_data"] = 0
+        json_data["remove_entry_vote_threshold"] = 0
+        json_data["number_of_update_entries"] = 0
+
+        json_data["number_of_update_entries"] = 0
+        json_data["remote_webtools_server_location"] = ""
+
+        json_data["track_user_actions"] = False
+        json_data["track_user_searches"] = False
+        json_data["track_user_navigation"] = False
+        json_data["max_user_entry_visit_history"] = 500
+        json_data["max_number_of_user_search"] = 500
+        json_data["vote_min"] = 500
+        json_data["vote_max"] = 500
+        json_data["number_of_comments_per_day"] = 500
+
+        json_data["time_zone"] = ""
+        json_data["show_icons"] = True
+        json_data["thumbnails_as_icons"] = True
+        json_data["small_icons"] = True
+        json_data["local_icons"] = True
+        #json_data["highlight_bookmarks"] = True
+        #json_data["click_behavior_modal_window"] = True
+        json_data["links_per_page"] = True
+        json_data["sources_per_page"] = True
+        json_data["max_links_per_page"] = True
+        json_data["max_sources_per_page"] = True
+        json_data["max_number_of_related_links"] = True
+        json_data["entries_visit_alpha"] = 1.0
+        json_data["entries_dead_alpha"] = 1.0
+        json_data["debug_mode"] = False
+        json_data["cleanup_time"] = datetime.now().time()
+
         self.insert_json_data(json_data)
 
 
