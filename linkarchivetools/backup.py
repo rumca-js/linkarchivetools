@@ -15,13 +15,13 @@ import subprocess
 import argparse
 from pathlib import Path
 import time
-from datetime import datetime
 
 from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, text, LargeBinary, DateTime, select
 from sqlalchemy.dialects.postgresql.types import BYTEA
 from sqlalchemy.orm import sessionmaker
 
-from linkarchivetools.utils.reflected import *
+#from linkarchivetools.utils.reflected import *
+from linkarchivetools.utils.reflected import ReflectedTable
 from linkarchivetools.tableconfig import get_backup_tables, get_tables
 
 
