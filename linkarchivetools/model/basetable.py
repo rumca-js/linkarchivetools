@@ -19,5 +19,20 @@ class BaseTable(object):
     def count(self):
         return self.get_table().count()
 
+    def get(self, id):
+        return self.get_table().get(id=id)
+
     def insert_json_data(self, json_data):
         return self.get_table().insert_json_data(json_data=json_data)
+
+    def get_where(self,
+                  conditions_map: dict=None,
+                  conditions=None,
+                  order_by=None,
+                  limit:int|None=None,
+                  offset:int=0):
+        return self.get_table().get_where(conditions_map=conditions_map,
+                                          conditions=conditions,
+                                          order_by=order_by,
+                                          limit=limit,
+                                          offset=offset)

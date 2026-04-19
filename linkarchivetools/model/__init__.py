@@ -12,3 +12,4 @@ from .serializers import *
 from .socialdata import *
 from .sourcedata import *
 from .checklater import *
+from .searchview import *

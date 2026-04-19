@@ -214,6 +214,8 @@ class DbAnalyzer(object):
             with self.engine.connect() as connection:
                 self.connection = connection
                 yield self.perform_search()
+        else:
+            print("No database was specified")
 
     def perform_search(self):
         row_handler = DisplayRowHandler(args=self.args, engine=self.engine, connection=self.connection)
