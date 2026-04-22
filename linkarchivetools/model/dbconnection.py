@@ -42,6 +42,7 @@ class DbConnection(object):
         self.uservotes = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="uservotes")
         self.readlater = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="readlater")
         self.searchview = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="searchview")
+        self.backgroundjobhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="backgroundjobhistory")
 
     def create_engine(db_file):
         engine = create_engine(f"sqlite:///{db_file}", connect_args={"check_same_thread": False})
