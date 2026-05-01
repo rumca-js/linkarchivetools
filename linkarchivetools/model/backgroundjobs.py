@@ -77,3 +77,16 @@ class BackgroundJob(BaseTable):
 
     def get(self, id):
         return self.connection.backgroundjob.get(id=id)
+
+    def get_cfg(id, self):
+        job = self.get(id)
+        if job:
+            cfg = {}
+            if job.args != "":
+                try:
+                    cfg = json.loads(job.args)
+                except ValueError as E:
+                    pass
+                except TypeError as E:
+                    pass
+            return cfg
