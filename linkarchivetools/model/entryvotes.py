@@ -1,5 +1,8 @@
 from .serializers import entry_to_json
 
+from .basetable import BaseTable
+
+
 class EntryVotes(object):
     def __init__(self, connection):
         self.connection = connection

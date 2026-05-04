@@ -13,3 +13,4 @@ from .socialdata import *
 from .sourcedata import *
 from .checklater import *
 from .searchview import *
+from .blocklist import *

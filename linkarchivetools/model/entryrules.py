@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 from .sourcedata import SourceData
 from .sources import Sources
+from .basetable import BaseTable
 
 
 def read_line_things(input_text):
@@ -17,9 +18,10 @@ def read_line_things(input_text):
     return sources
 
 
-class EntryRules(object):
+class EntryRules(BaseTable):
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("entryrules")
 
     def is_url_blocked(self, url):
         conditions = {"block" : True, "enabled" : True}
@@ -98,9 +100,3 @@ class EntryRules(object):
         entry_rule_urls = read_line_things(raw_input)
         for entry_rule_url in entry_rule_urls:
             self.add_entry_rule(entry_rule_url)
-
-    def truncate(self):
-        self.connection.entry_rules.truncate()
-
-    def count(self):
-        return self.connection.entry_rules.count()
