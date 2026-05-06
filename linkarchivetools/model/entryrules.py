@@ -21,7 +21,7 @@ def read_line_things(input_text):
 class EntryRules(BaseTable):
     def __init__(self, connection):
         self.connection = connection
-        self.set_table("entryrules")
+        self.set_table("entry_rules")
 
     def is_url_blocked(self, url):
         conditions = {"block" : True, "enabled" : True}
