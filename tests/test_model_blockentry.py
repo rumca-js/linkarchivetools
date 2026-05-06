@@ -17,6 +17,9 @@ class BlockEntryTest(DbTestCase):
         connection = DbConnection("input.db")
 
         block_list = BlockEntry(connection=connection)
+        block_list.truncate()
+
+        # call tested function
         self.assertEqual(block_list.count(), 0)
 
     def test_add(self):
@@ -26,6 +29,9 @@ class BlockEntryTest(DbTestCase):
         connection = DbConnection("input.db")
 
         block_list = BlockEntry(connection=connection)
+        block_list.truncate()
+
+        # call tested function
         block_list.add("https://google.com")
         self.assertEqual(block_list.count(), 1)
 
@@ -36,8 +42,10 @@ class BlockEntryTest(DbTestCase):
         connection = DbConnection("input.db")
 
         block_list = BlockEntry(connection=connection)
+        block_list.truncate()
         block_list.add("https://google.com")
         self.assertEqual(block_list.count(), 1)
 
+        # call tested function
         self.assertFalse(block_list.is_blocked("https://youtube.com"))
         self.assertTrue(block_list.is_blocked("https://google.com"))
