@@ -65,9 +65,13 @@ class BackgroundJob(BaseTable):
 
             return self.connection.backgroundjob.insert_json_data(json_data)
 
-    def is_job(self, job_name, subject):
+    def is_job(self, job_name, subject=None):
         table = self.connection.backgroundjob.get_table()
-        conditions = and_(table.c.job==job_name, table.c.subject==subject)
+
+        if subject:
+            conditions = and_(table.c.job==job_name, table.c.subject==subject)
+        else:
+            conditions = and_(table.c.job==job_name)
 
         jobs = self.connection.backgroundjob.get_where_ex(conditions=conditions)
         for job in jobs:
