@@ -15,7 +15,7 @@ class SourceData(BaseTable):
         for op_data in op_datas:
             return op_data
 
-    def mark_read(self, source):
+    def mark_read(self, source, url = None):
         op_data = self.get_source_data(source)
 
         new_data = {}
@@ -26,6 +26,10 @@ class SourceData(BaseTable):
         new_data["consecutive_errors"] = 0
         new_data["import_seconds"] = 0
         new_data["number_of_entries"] = 0
+
+        if url:
+            new_data["page_hash"] = url.get_hash()
+            new_data["body_hash"] = url.get_body_hash()
 
         try:
             if op_data:
