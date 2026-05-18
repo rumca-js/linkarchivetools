@@ -124,6 +124,9 @@ class Db2Feeds(object):
         data["thumbnail"] = entry.thumbnail
         data["language"] = entry.language
 
+        data["date_created"] = datetime.now()
+        data["date_published"] = entry.date_published
+
         # not null requirement
         data["source_url"] = ""
         data["permanent"] = False
@@ -142,6 +145,7 @@ class Db2Feeds(object):
             data["description"] = url_feed.get_description()
             data["status_code"] = url_feed.get_status_code()
             data["thumbnail"] = url_feed.get_thumbnail()
+            data["date_published"] = url_feed.get_date_published()
         return data
 
     def copy_entry(self, entry, entry_table, data):
