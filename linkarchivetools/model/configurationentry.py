@@ -1,5 +1,9 @@
 
 class ConfigurationEntry(object):
+    CONFIGURATION_NEWS = "News"
+    CONFIGURATION_GALLERY = "Gallery"
+    CONFIGURATION_SEARCH_ENGINE = "Search Engine"
+
     def __init__(self, connection):
         self.connection = connection
 

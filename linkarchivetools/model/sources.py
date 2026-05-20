@@ -5,6 +5,10 @@ from .basetable import BaseTable
 
 
 class Sources(BaseTable):
+    SOURCE_TYPE_RSS = "RSS"
+    SOURCE_TYPE_PARSE = "Parse"
+    SOURCE_TYPE_EMAIL = "Email"
+
     def __init__(self, connection):
         self.connection = connection
         self.set_table("sources_table")
