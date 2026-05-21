@@ -13,7 +13,7 @@ class Sources(BaseTable):
         self.connection = connection
         self.set_table("sources_table")
 
-    def set(self, source_url, source_properties=None):
+    def set(self, source_url, source_properties=None, source_type=""):
         link = source_url
 
         title = ""
@@ -32,8 +32,7 @@ class Sources(BaseTable):
         if not favicon:
             favicon = ""
 
-        source_iter = self.connection.sources_table.get_where({"url":link})
-        source = next(source_iter, None)
+        source = self.get_with_url(link)
         if source:
             """
             TODO update source
@@ -42,13 +41,14 @@ class Sources(BaseTable):
             data["title"] = title
             data["favicon"] = favicon
             data["language"] = favicon
+            data["source_type"] = source_type
 
             return self.connection.sources_table.update_json_data(source.id, data)
 
         properties = {
                "url": link,
                "enabled" : True,
-               "source_type" : "",
+               "source_type" : source_type,
                "title" : title,
                "category_name": "",
                "subcategory_name": "",
@@ -89,12 +89,14 @@ class Sources(BaseTable):
     def get(self,id):
         return self.connection.sources_table.get(id=id)
 
+    def get_with_url(self,source_url):
+        for source in self.connection.sources_table.get_where({"url":source_url}):
+            return source
+
     def exists(self, source_url):
         link = source_url
 
-        source_iter = self.connection.sources_table.get_where({"url":link})
-        source = next(source_iter, None)
-        if source:
+        for source in self.connection.sources_table.get_where({"url":link}):
             return True
 
         return False

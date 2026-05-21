@@ -31,14 +31,52 @@ class SourcesTest(DbTestCase):
         sources.truncate()
 
         source_url = "https://google.com"
-        source_properties = {}
 
-        source_id = sources.set(source_url=source_url, source_properties=source_properties)
+        source_id = sources.set(source_url=source_url)
         self.assertTrue(source_id is not None)
+        self.assertEqual(sources.count(), 1)
 
         source = sources.get(source_id)
         self.assertTrue(source is not None)
+
+    def test_set__title(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        connection = DbConnection("input.db")
+
+        sources = Sources(connection=connection)
+        sources.truncate()
+
+        source_url = "https://google.com"
+        source_properties = {"title" : "Googly Title"}
+
+        source_id = sources.set(source_url=source_url, source_properties=source_properties)
+        self.assertTrue(source_id is not None)
         self.assertEqual(sources.count(), 1)
+
+        source = sources.get(source_id)
+        self.assertTrue(source is not None)
+        self.assertEqual(source.title, "Googly Title")
+
+    def test_set__source_type(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        connection = DbConnection("input.db")
+
+        sources = Sources(connection=connection)
+        sources.truncate()
+
+        source_url = "https://google.com"
+
+        source_id = sources.set(source_url=source_url, source_type="RSS")
+        self.assertTrue(source_id is not None)
+        self.assertEqual(sources.count(), 1)
+
+        source = sources.get(source_id)
+        self.assertTrue(source is not None)
+        self.assertEqual(source.source_type, "RSS")
 
     def test_delete(self):
         self.create_db("input.db")

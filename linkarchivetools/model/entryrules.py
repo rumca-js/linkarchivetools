@@ -68,12 +68,16 @@ class EntryRules(BaseTable):
 
         return result
 
-    def add_entry_rule(self, entry_rule_url):
+    def add_entry_rule(self, entry_rule_url, block=True, trust=False, properties=None):
         entries = self.connection.entry_rules.get_where({"trigger_rule_url" : entry_rule_url})
         entry = next(entries, None)
 
         if not entry:
-            data = {}
+            data = properties
+
+            if not data:
+                data = {}
+
             data["trigger_rule_url"] = entry_rule_url
             data["enabled"] = True
             data["priority"] = 0
@@ -81,8 +85,8 @@ class EntryRules(BaseTable):
             data["trigger_text"] = ""
             data["trigger_text_hits"] = 0
             data["trigger_text_fields"] = ""
-            data["block"] = True
-            data["trust"] = False
+            data["block"] = block
+            data["trust"] = trust
             data["auto_tag"] = ""
             data["apply_age_limit"] = 0
             data["browser_id"] = 0
