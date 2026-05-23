@@ -11,7 +11,7 @@ class ConfigurationEntry(object):
         return self.connection.configurationentry.get()
 
     def truncate(self):
-        self.connection.entry_rules.truncate()
+        self.connection.configurationentry.truncate()
 
     def count(self):
-        return self.connection.entries_table.count()
+        return self.connection.configurationentry.count()
