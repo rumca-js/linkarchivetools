@@ -12,3 +12,6 @@ config:
 
 reformat:
 	poetry run black linkarchivetools
+
+example:
+	poetry run python3 -m linkarchivetools.dbanalyzer --db linkarchivetools/internet.db --search "*warhammer*" --title

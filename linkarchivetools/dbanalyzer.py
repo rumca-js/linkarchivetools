@@ -14,13 +14,13 @@ import os
 import json
 from sqlalchemy import create_engine
 
-from .utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
-from .utils.alchemysearch import (
+from linkarchivetools.utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
+from linkarchivetools.utils.alchemysearch import (
     AlchemySymbolEvaluator,
     AlchemyEquationEvaluator,
     AlchemySearch,
 )
-from .utils.reflected import (
+from linkarchivetools.utils.reflected import (
     ReflectedTable,
     ReflectedEntryTable,
     ReflectedUserTags,
@@ -213,7 +213,7 @@ class DbAnalyzer(object):
 
             with self.engine.connect() as connection:
                 self.connection = connection
-                yield self.perform_search()
+                yield from self.perform_search()
         else:
             print("No database was specified")
 
@@ -344,7 +344,8 @@ def main():
     if p.args.summary:
         m.print_summary(p.args.columns)
     else:
-        m.search()
+        for _ in m.search():
+            pass
 
     print_time_diff(start_time)
 
