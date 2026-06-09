@@ -1,3 +1,5 @@
+.PHONY: test build publish config reformat example
+
 test:
 	poetry run python -u -m unittest discover -v 2>&1 | tee test_output.txt
 
