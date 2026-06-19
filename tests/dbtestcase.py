@@ -17,6 +17,14 @@ class DbTestCase(unittest.TestCase):
         if path.exists():
             path.unlink()
 
+        wal_path = Path(f"{file_name}-wal")
+        if wal_path.exists():
+            wal_path.unlink()
+
+        shm_path = Path(f"{file_name}-shm")
+        if shm_path.exists():
+            shm_path.unlink()
+
         shutil.copy("example/db.db", file_name)
 
         engine = create_engine(f"sqlite:///{file_name}")
@@ -25,9 +33,19 @@ class DbTestCase(unittest.TestCase):
             table.truncate()
 
     def clean_out(self):
-        path = Path("output.db")
+        file_name = "output.db"
+
+        path = Path(file_name)
         if path.exists():
             path.unlink()
+
+        wal_path = Path(f"{file_name}-wal")
+        if wal_path.exists():
+            wal_path.unlink()
+
+        shm_path = Path(f"{file_name}-shm")
+        if shm_path.exists():
+            shm_path.unlink()
 
     def add_entry_with_tags(self, file_name):
         engine = create_engine(f"sqlite:///{file_name}")

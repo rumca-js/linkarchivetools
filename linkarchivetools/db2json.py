@@ -150,9 +150,17 @@ class Db2JSON(object):
             self.connection = connection
             table = ReflectedEntryTable(self.engine, connection)
 
-            for entry in table.get_entries():
-                # print(entry)
-                self.write(entry)
+            page = 1
+            while True:
+                entry_processed = False
+                for entry in table.get_entries(page=page):
+                    # print(entry)
+                    self.write(entry)
+                    entry_processed = True
+
+                page += 1
+                if not entry_processed:
+                    break
 
         self.close()
 

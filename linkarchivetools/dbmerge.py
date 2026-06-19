@@ -2,6 +2,7 @@ import shutil
 import os
 from pathlib import Path
 from sqlalchemy import create_engine
+import argparse
 
 from .utils.reflected import *
 
@@ -107,3 +108,23 @@ class DbMerge(object):
             return False
 
         return True
+
+
+def parse():
+    parser = argparse.ArgumentParser(description="Data analyzer program")
+    parser.add_argument("--input-dbs", default="", help="DBs to be scanned. Delim ,")
+    parser.add_argument("--output", default="feeds.db", help="DB to be produced")
+
+    args = parser.parse_args()
+
+    return parser, args
+
+
+def main():
+    p, args = parse()
+
+    m = DbMerge()
+
+
+if __name__ == "__main__":
+    main()

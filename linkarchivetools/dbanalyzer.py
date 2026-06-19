@@ -14,12 +14,15 @@ import os
 import json
 from sqlalchemy import create_engine
 
+from webtoolkit import BaseUrl
+
 from linkarchivetools.utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from linkarchivetools.utils.alchemysearch import (
     AlchemySymbolEvaluator,
     AlchemyEquationEvaluator,
     AlchemySearch,
 )
+from linkarchivetools.model import entry_to_json
 from linkarchivetools.utils.reflected import (
     ReflectedTable,
     ReflectedEntryTable,
@@ -50,8 +53,44 @@ class DisplayRowHandler(object):
         self.dead_entries = 0
 
     def print_entry(self, entry):
+        if self.args.json:
+            self.print_entry_json(entry)
+        else:
+            self.print_entry_standard(entry)
+
+    def get_entry_link(self, entry):
+        if self.args.rss:
+            url = BaseUrl(entry.link)
+            feeds = url.get_feeds()
+            if feeds and len(feeds) > 0:
+                link = feeds[0]
+            else:
+                return
+        elif self.args.channels:
+            raise IOError("Not yet supported")
+            return
+        else:
+            link = entry.link
+        return link
+
+    def print_entry_json(self, entry):
+        json_data = entry_to_json(entry)
+
+        link = self.get_entry_link(entry)
+        if not link:
+            return
+
+        json_data["link"] = link
+
+        print(json.dumps(json_data))
+
+    def print_entry_standard(self, entry):
         level = self.args.verbosity
         if level is None or level == 0:
+            return
+
+        link = self.get_entry_link(entry)
+        if not link:
             return
 
         text = ""
@@ -59,7 +98,7 @@ class DisplayRowHandler(object):
         if self.args.description:
             print("---------------------")
 
-        text = "[{:03d}] {}".format(entry.page_rating_votes, entry.link)
+        text = "[{:03d}] {}".format(entry.page_rating_votes, link)
 
         if self.args.title:
             if entry.title:
@@ -319,7 +358,22 @@ class Parser(object):
         self.parser.add_argument(
             "--columns",
             action="store_true",
-            help="displays summary of tables column nmaes",
+            help="displays summary of tables column names",
+        )
+        self.parser.add_argument(
+            "--rss",
+            action="store_true",
+            help="displays RSS sources",
+        )
+        self.parser.add_argument(
+            "--channels",
+            action="store_true",
+            help="displays channels",
+        )
+        self.parser.add_argument(
+            "--json",
+            action="store_true",
+            help="JSON format",
         )
 
         self.parser.add_argument(

@@ -33,6 +33,10 @@ class ReflectedTable(object):
         return destination_table
 
     def truncate_table(self, table_name):
+        if not self.is_table(table_name):
+            print(f"SQLite table does not exist: {table_name}")
+            return
+
         sql_text = f"DELETE FROM {table_name};"
         self.connection.execute(text(sql_text))
         self.connection.commit()
@@ -90,6 +94,11 @@ class ReflectedTable(object):
         inspector = inspect(self.engine)
         tables = inspector.get_table_names()
         return list(tables)
+
+    def is_table(self, table_name):
+        if table_name in self.get_table_names():
+            return True
+        return False
 
     def get_column_names(self, table):
         inspector = inspect(self.engine)
@@ -340,10 +349,15 @@ class ReflectedEntryTable(ReflectedGenericTable):
 
         return self.insert_json_data(entry_json)
 
-    def get_entries(self, limit:int|None=None, offset:int=0):
+    def get_entries(self, limit:int|None=None, offset:int=0, page:int=None):
         destination_table = self.get_table()
 
         entries_select = select(destination_table)
+
+        if page:
+            if not limit:
+                limit = 1000
+            offset = (page - 1) * limit
 
         if offset:
             entries_select = entries_select.offset(offset)
@@ -355,16 +369,26 @@ class ReflectedEntryTable(ReflectedGenericTable):
         for entry in result:
             yield entry
 
-    def get_entries_good(self):
+    def get_entries_good(self, limit:int|None=None, offset:int=0, page:int=None):
         destination_table = self.get_table()
 
-        stmt = (
+        entries_select = (
             select(destination_table)
             .where(destination_table.c.page_rating_votes > 0)
             .order_by(destination_table.c.page_rating_votes.desc())
         )
 
-        result = self.connection.execute(stmt)
+        if page:
+            if not limit:
+                limit = 1000
+            offset = (page - 1) * limit
+
+        if offset:
+            entries_select = entries_select.offset(offset)
+        if limit is not None:
+            entries_select = entries_select.limit(limit)
+
+        result = self.connection.execute(entries_select)
         entries = result.fetchall()
 
         for entry in entries:

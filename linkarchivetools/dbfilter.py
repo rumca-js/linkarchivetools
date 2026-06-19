@@ -12,7 +12,7 @@ from pathlib import Path
 import argparse
 
 from sqlalchemy import create_engine
-from .utils.reflected import *
+from .utils.reflected import ReflectedTable
 from .tableconfig import get_tables, get_truncate_tables
 
 
@@ -103,14 +103,34 @@ class DbFilter(object):
         table.vacuum()
         table.close()
 
+    def cleanup_tables(self):
+        """
+        table = ReflectedGenericTable(self.engine, self.connection, "entrycompactedtags")
+        compacted = table.get_where({})
+        for row in compacted
+
+
+        entrycompactedtags
+        usertags
+        usercompactedtags
+        uservotes
+        usercomments
+        userbookmarks
+        userentrytransitionhistory
+        userentryvisithistory
+        """
+        pass
+
 
 def parse():
     parser = argparse.ArgumentParser(description="Data analyzer program")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
     parser.add_argument("--output-db", default="new.db", help="DB to be created")
+
     parser.add_argument("--bookmarked", action="store_true", help="export bookmarks")
     parser.add_argument("--votes", action="store_true", help="export if votes is > 0")
-    parser.add_argument("--clean", action="store_true", help="cleans db from tables")
+    parser.add_argument("--truncate", action="store_true", help="Truncates tables for public")
+
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
 
     args = parser.parse_args()
@@ -126,11 +146,18 @@ def main():
     if not thefilter.is_valid():
         return
 
-    thefilter.truncate()
+    entries_changed = False
+    if args.truncate:
+        thefilter.truncate()
     if args.bookmarked:
+        entries_changed = True
         thefilter.filter_bookmarks()
     if args.votes:
+        entries_changed = True
         thefilter.filter_votes()
+
+    if entries_changed:
+        thefilter.cleanup_tables()
 
     thefilter.vacuum()
     thefilter.close()
