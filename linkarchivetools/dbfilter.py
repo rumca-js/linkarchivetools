@@ -13,7 +13,7 @@ import argparse
 
 from sqlalchemy import create_engine
 from .utils.reflected import ReflectedTable
-from .tableconfig import get_tables, get_truncate_tables
+from .tableconfig import get_tables, get_truncate_tables_no_users, get_truncate_tables_internet
 
 
 class DbFilter(object):
@@ -53,7 +53,7 @@ class DbFilter(object):
             self.connection.close()
             self.connection = None
 
-    def truncate(self):
+    def trunceate_no_users(self):
         """
         TODO remove these hardcoded tables
         with something from table_config
@@ -61,7 +61,20 @@ class DbFilter(object):
         """
         reflected_table = ReflectedTable(self.engine, self.connection)
 
-        truncate_tables = get_truncate_tables()
+        truncate_tables = get_truncate_tables_no_users()
+
+        for table in truncate_tables:
+            reflected_table.truncate_table(table)
+
+    def truncate_internet(self):
+        """
+        TODO remove these hardcoded tables
+        with something from table_config
+        though it seems it should not clear linkdatamodel
+        """
+        reflected_table = ReflectedTable(self.engine, self.connection)
+
+        truncate_tables = get_truncate_tables_internet()
 
         for table in truncate_tables:
             reflected_table.truncate_table(table)
@@ -129,7 +142,8 @@ def parse():
 
     parser.add_argument("--bookmarked", action="store_true", help="export bookmarks")
     parser.add_argument("--votes", action="store_true", help="export if votes is > 0")
-    parser.add_argument("--truncate", action="store_true", help="Truncates tables for public")
+    parser.add_argument("--truncate-no-users", action="store_true", help="Truncates tables no users")
+    parser.add_argument("--truncate-internet", action="store_true", help="Truncates tables for public")
 
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
 
@@ -147,8 +161,10 @@ def main():
         return
 
     entries_changed = False
-    if args.truncate:
-        thefilter.truncate()
+    if args.truncate_no_users:
+        thefilter.truncate_no_users()
+    if args.truncate_internet:
+        thefilter.truncate_internet()
     if args.bookmarked:
         entries_changed = True
         thefilter.filter_bookmarks()

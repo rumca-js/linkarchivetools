@@ -126,37 +126,61 @@ class DbFilterTest(DbTestCase):
             self.assertIn("https://yahoo.com", links)
             self.assertNotIn("https://bing.com", links)
 
-    def test_truncate(self):
+    def test_truncate_no_users(self):
         self.create_db("input.db")
         self.clean_out()
 
-        # Let's verify that some of the tables that should be truncated have rows in the input db.
-        # e.g., 'browser' and 'userconfig' should have > 0 rows in the example db.
         input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
 
         self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
 
-        # Let's verify that some of the tables that should NOT be truncated have rows in the input db.
-        # e.g., 'compactedtags' and 'searchview' should have > 0 rows.
         input_compactedtags_count = self.get_row_count("input.db", "compactedtags")
         input_searchview_count = self.get_row_count("input.db", "searchview")
 
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        # Let's instantiate DbFilter and run truncate()
         db_filter = DbFilter(input_db="input.db", output_db="output.db")
         db_filter.truncate()
         db_filter.close()
 
-        # Check output db
-        # 1. Truncated tables should now have 0 rows
         self.assertEqual(self.get_row_count("output.db", "browser"), 0)
         self.assertEqual(self.get_row_count("output.db", "userconfig"), 0)
 
-        # 2. Non-truncated tables should still have the same number of rows
+        self.assertEqual(
+            self.get_row_count("output.db", "compactedtags"),
+            input_compactedtags_count,
+        )
+        self.assertEqual(
+            self.get_row_count("output.db", "searchview"),
+            input_searchview_count,
+        )
+
+    def test_truncate_internet(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        input_browser_count = self.get_row_count("input.db", "browser")
+        input_userconfig_count = self.get_row_count("input.db", "userconfig")
+
+        self.assertGreater(input_browser_count, 0)
+        self.assertGreater(input_userconfig_count, 0)
+
+        input_compactedtags_count = self.get_row_count("input.db", "compactedtags")
+        input_searchview_count = self.get_row_count("input.db", "searchview")
+
+        self.assertGreater(input_compactedtags_count, 0)
+        self.assertGreater(input_searchview_count, 0)
+
+        db_filter = DbFilter(input_db="input.db", output_db="output.db")
+        db_filter.truncate()
+        db_filter.close()
+
+        self.assertEqual(self.get_row_count("output.db", "browser"), 0)
+        self.assertEqual(self.get_row_count("output.db", "userconfig"), 0)
+
         self.assertEqual(
             self.get_row_count("output.db", "compactedtags"),
             input_compactedtags_count,

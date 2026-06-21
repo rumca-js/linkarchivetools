@@ -83,7 +83,7 @@ def get_backup_tables():
     return tables
 
 
-def get_truncate_tables():
+def get_truncate_tables_no_users():
     """
     When producing for public
     """
@@ -124,5 +124,50 @@ def get_truncate_tables():
         "usersearchhistory",
         "userentrytransitionhistory",
         "userentryvisithistory",
+    ]
+    return tables
+
+
+def get_truncate_tables_internet():
+    """
+    When producing for internet
+    """
+    tables = [
+        "apikeys",
+        "applogging",
+        "backgroundjob",
+        "backgroundjobhistory",
+        "keywords",
+        "credentials",
+        "sourcecategories",
+        "sourcesubcategories",
+        "sourcedatamodel",
+        "sourceoperationaldata",
+        #"configurationentry",
+        #"linkdatamodel",
+        #"domains",
+        #"compactedtags",
+        #"entrycompactedtags",
+        "browser",
+        #"entryrules",
+        "dataexport",
+        "gateway",
+        #"modelfiles",
+        #"searchview",
+        #"socialdata",
+        "blockentry",
+        #"blockentrylist",
+
+        #"user",
+        "readlater",
+        #"userconfig",
+        #"usertags",
+        #"usercompactedtags",
+        #"uservotes",
+        #"usercomments",
+        #"userbookmarks",
+        #"usersearchhistory",
+        #"userentrytransitionhistory",
+        #"userentryvisithistory",
     ]
     return tables
