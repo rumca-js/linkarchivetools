@@ -59,12 +59,12 @@ class DbFilter(object):
         with something from table_config
         though it seems it should not clear linkdatamodel
         """
-        table = ReflectedTable(self.engine, self.connection)
+        reflected_table = ReflectedTable(self.engine, self.connection)
 
         truncate_tables = get_truncate_tables()
 
         for table in truncate_tables:
-            table.truncate_table(table)
+            reflected_table.truncate_table(table)
 
     def filter(self, conditions):
         table = ReflectedTable(self.engine, self.connection)
