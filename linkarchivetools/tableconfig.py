@@ -35,6 +35,10 @@ def get_tables():
         "usersearchhistory",            # user search history
         "userentrytransitionhistory",   # user transition history
         "userentryvisithistory",        # user entry visit history
+
+        "searchhistory",
+        "entryvisithistory",
+        "entrytransitionhistory",
     ]
     return tables
 
@@ -79,6 +83,10 @@ def get_backup_tables():
         "usersearchhistory",
         "userentrytransitionhistory",
         "userentryvisithistory",
+
+        "searchhistory",
+        "entryvisithistory",
+        "entrytransitionhistory",
     ]
     return tables
 
@@ -124,6 +132,10 @@ def get_truncate_tables_no_users():
         "usersearchhistory",
         "userentrytransitionhistory",
         "userentryvisithistory",
+
+        #"searchhistory",
+        #"entryvisithistory",
+        #"entrytransitionhistory",
     ]
     return tables
 
@@ -169,5 +181,9 @@ def get_truncate_tables_internet():
         #"usersearchhistory",
         #"userentrytransitionhistory",
         #"userentryvisithistory",
+
+        #"searchhistory",
+        #"entryvisithistory",
+        #"entrytransitionhistory",
     ]
     return tables

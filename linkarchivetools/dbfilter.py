@@ -53,7 +53,7 @@ class DbFilter(object):
             self.connection.close()
             self.connection = None
 
-    def trunceate_no_users(self):
+    def truncate_no_users(self):
         """
         TODO remove these hardcoded tables
         with something from table_config

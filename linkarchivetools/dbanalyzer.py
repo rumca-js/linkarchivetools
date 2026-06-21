@@ -98,7 +98,10 @@ class DisplayRowHandler(object):
         if self.args.description:
             print("---------------------")
 
-        text = "[{:03d}] {}".format(entry.page_rating_votes, link)
+        if self.args.votes:
+            text = "[{:03d}] {}".format(entry.page_rating_votes, link)
+        else:
+            text = "{}".format(link)
 
         if self.args.title:
             if entry.title:
@@ -335,6 +338,7 @@ class Parser(object):
         self.parser.add_argument("--table", default="linkdatamodel", help="Table name")
 
         self.parser.add_argument("--title", action="store_true", help="displays title")
+        self.parser.add_argument("--votes", action="store_true", help="displays votes")
         self.parser.add_argument(
             "--description", action="store_true", help="displays description"
         )
