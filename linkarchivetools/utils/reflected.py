@@ -228,7 +228,7 @@ class ReflectedGenericTable(object):
 
         if conditions:
             stmt = stmt.where(or_(*conditions))
-        if order_by:
+        if order_by is not None:
             stmt = stmt.order_by(*order_by)
         if offset:
             stmt = stmt.offset(offset)

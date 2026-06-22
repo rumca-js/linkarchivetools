@@ -47,6 +47,8 @@ def entry_to_json(entry, with_id=False, source=None, social_data=None, tags=None
     json_entry["source_url"] = entry.source_url
     if source:
         json_entry["source_title"] = source.title
+        json_entry["source_url"] = source.url
+        json_entry["source_id"] = source.id
         json_entry["source"] = source_to_json(source)
 
     if social_data:
