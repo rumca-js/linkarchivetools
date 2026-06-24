@@ -40,6 +40,14 @@ class SourceData(BaseTable):
             E_str = str(E)
             print(f"Error for data {new_data} {E_str}")
 
+    def reset_hashes(self, source):
+        op_data = self.get_source_data(source)
+
+        if op_data:
+            new_data["page_hash"] = None
+            new_data["body_hash"] = None
+            return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
+
     def is_update_needed(self, source):
         this_source_data = self.get_source_data(source)
         if this_source_data:

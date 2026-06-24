@@ -86,7 +86,7 @@ class SourceDataTest(DbTestCase):
         # call tested function
         self.assertTrue(sc_controller.is_update_needed(source))
 
-    def test_is_update_needed__false(self):
+    def test_is_update_needed__false__immediately_after_read(self):
         self.create_db("input.db")
         self.clean_out()
 
