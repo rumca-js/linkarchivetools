@@ -55,9 +55,7 @@ class DbFilter(object):
 
     def truncate_no_users(self):
         """
-        TODO remove these hardcoded tables
-        with something from table_config
-        though it seems it should not clear linkdatamodel
+        Removes all users data
         """
         reflected_table = ReflectedTable(self.engine, self.connection)
 
@@ -68,9 +66,7 @@ class DbFilter(object):
 
     def truncate_internet(self):
         """
-        TODO remove these hardcoded tables
-        with something from table_config
-        though it seems it should not clear linkdatamodel
+        Removes dynamic data not necessary for the internet
         """
         reflected_table = ReflectedTable(self.engine, self.connection)
 
@@ -133,6 +129,30 @@ class DbFilter(object):
         userentryvisithistory
         """
         pass
+
+    def obfuscate(destination_engine):
+        """
+        Remove passwords from the database
+        """
+        table_name = 'user'
+
+        destination_metadata = MetaData()
+        destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+
+        columns = destination_table.columns.keys()
+        is_superuser_index = columns.index('is_superuser')
+
+        with destination_engine.connect() as destination_connection:
+            result = destination_connection.execute(destination_table.select())
+
+            for row in result:
+                update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
+                destination_connection.execute(update_stmt)
+
+                if is_superuser_index and row[is_superuser_index]:
+                    update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
+
+            destination_connection.commit()
 
 
 def parse():

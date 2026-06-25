@@ -37,12 +37,10 @@ class Sources(BaseTable):
             """
             """
             data = {}
-            if title:
-                data["title"] = title
-            if favicon:
-                data["favicon"] = favicon
-            if language:
-                data["language"] = language
+
+            data["title"] = title
+            data["favicon"] = favicon
+            data["language"] = language
             data["source_type"] = source_type
 
             return self.connection.sources_table.update_json_data(source.id, data)

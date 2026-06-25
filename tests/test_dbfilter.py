@@ -143,7 +143,7 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_searchview_count, 0)
 
         db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.truncate()
+        db_filter.truncate_no_users()
         db_filter.close()
 
         self.assertEqual(self.get_row_count("output.db", "browser"), 0)
@@ -175,11 +175,11 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_searchview_count, 0)
 
         db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.truncate()
+        db_filter.truncate_internet()
         db_filter.close()
 
         self.assertEqual(self.get_row_count("output.db", "browser"), 0)
-        self.assertEqual(self.get_row_count("output.db", "userconfig"), 0)
+        self.assertTrue(self.get_row_count("output.db", "userconfig") > 0)
 
         self.assertEqual(
             self.get_row_count("output.db", "compactedtags"),
