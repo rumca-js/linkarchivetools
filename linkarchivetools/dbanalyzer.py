@@ -67,8 +67,10 @@ class DisplayRowHandler(object):
             else:
                 return
         elif self.args.channels:
-            raise IOError("Not yet supported")
-            return
+            url = BaseUrl(entry.link)
+            urls = url.get_urls()
+            if "channel_url" in urls:
+                link = urls["channel_url"]
         else:
             link = entry.link
         return link
@@ -370,7 +372,7 @@ class Parser(object):
             help="displays RSS sources",
         )
         self.parser.add_argument(
-            "--channels",
+            "--channel",
             action="store_true",
             help="displays channels",
         )
