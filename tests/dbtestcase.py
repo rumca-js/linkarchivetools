@@ -4,6 +4,8 @@ from pathlib import Path
 import shutil
 from sqlalchemy import create_engine
 
+from linkarchivetools.model.definitions import create_tables
+
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
    ReflectedEntryCompactedTags,
@@ -28,6 +30,8 @@ class DbTestCase(unittest.TestCase):
         shutil.copy("example/db.db", file_name)
 
         engine = create_engine(f"sqlite:///{file_name}")
+        create_tables(engine)
+
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
             table.truncate()
