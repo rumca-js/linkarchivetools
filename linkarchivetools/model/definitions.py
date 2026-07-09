@@ -17,6 +17,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     LargeBinary,
+    Time,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import timedelta, datetime, timezone
@@ -113,6 +114,7 @@ class ConfigurationEntry(Base):
     instance_internet_location: Mapped[Optional[str]] = mapped_column(String(200))
     favicon_internet_url: Mapped[Optional[str]] = mapped_column(String(200))
     admin_user: Mapped[Optional[str]] = mapped_column(String(500))
+
     view_access_type: Mapped[Optional[str]] = mapped_column(String(100))
     download_access_type: Mapped[Optional[str]] = mapped_column(String(100))
     add_access_type: Mapped[Optional[str]] = mapped_column(String(100))
@@ -122,31 +124,52 @@ class ConfigurationEntry(Base):
     enable_background_jobs: Mapped[bool] = mapped_column(default=True)
     block_job_queue: Mapped[bool] = mapped_column(default=False)
     use_internal_scripts: Mapped[bool] = mapped_column(default=False)
+    cleanup_time = mapped_column(Time(), nullable=True) # TODO /Datetime?
+
     data_import_path: Mapped[Optional[str]] = mapped_column(String(2000))
     data_export_path: Mapped[Optional[str]] = mapped_column(String(2000))
     download_path: Mapped[Optional[str]] = mapped_column(String(2000))
     auto_store_thumbnails: Mapped[bool] = mapped_column(default=False)
     thread_memory_threshold: Mapped[int] = mapped_column(default=0)
+
     enable_keyword_support: Mapped[bool] = mapped_column(default=False)
     enable_domain_support: Mapped[bool] = mapped_column(default=False)
     enable_file_support: Mapped[bool] = mapped_column(default=False)
     enable_link_archiving: Mapped[bool] = mapped_column(default=False)
     enable_source_archiving: Mapped[bool] = mapped_column(default=False)
+    enable_crawling: Mapped[bool] = mapped_column(default=False)
+    enable_social_data: Mapped[bool] = mapped_column(default=False)
 
     accept_dead_links: Mapped[bool] = mapped_column(default=False)
     accept_ip_links: Mapped[bool] = mapped_column(default=False)
     accept_domain_links: Mapped[bool] = mapped_column(default=False)
     accept_non_domain_links: Mapped[bool] = mapped_column(default=False)
+    accept_unknown_links: Mapped[bool] = mapped_column(default=False)
+    accept_onion_links: Mapped[bool] = mapped_column(default=False)
+    accept_same_hashes: Mapped[bool] = mapped_column(default=False)
+
+    auto_crawl_sources: Mapped[bool] = mapped_column(default=False)
     auto_scan_new_entries: Mapped[bool] = mapped_column(default=False)
+    auto_scan_updated_entries: Mapped[bool] = mapped_column(default=False)
     new_entries_merge_data: Mapped[bool] = mapped_column(default=False)
     new_entries_use_clean_data: Mapped[bool] = mapped_column(default=False)
+    new_entries_fetch_social_data: Mapped[bool] = mapped_column(default=False)
+    browse_entries_fetch_social_data: Mapped[bool] = mapped_column(default=False)
+    browse_entry_fetch_social_data: Mapped[bool] = mapped_column(default=False)
+    entry_update_fetches_social_data: Mapped[bool] = mapped_column(default=False)
     entry_update_via_internet: Mapped[bool] = mapped_column(default=False)
+
     log_remove_entries: Mapped[bool] = mapped_column(default=False)
     auto_create_sources: Mapped[bool] = mapped_column(default=False)
     default_source_state: Mapped[bool] = mapped_column(default=False)
     prefer_https_links: Mapped[bool] = mapped_column(default=False)
     prefer_https_links: Mapped[bool] = mapped_column(default=False)
     prefer_non_www_links: Mapped[bool] = mapped_column(default=False)
+
+    new_entries_download_music: Mapped[bool] = mapped_column(default=False)
+    new_entries_download_video: Mapped[bool] = mapped_column(default=False)
+    entry_update_download_music: Mapped[bool] = mapped_column(default=False)
+    entry_update_download_video: Mapped[bool] = mapped_column(default=False)
 
     sources_refresh_period: Mapped[int] = mapped_column(default=0)
     days_to_move_to_archive: Mapped[int] = mapped_column(default=0)
@@ -179,11 +202,17 @@ class ConfigurationEntry(Base):
     thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
     small_icons: Mapped[bool] = mapped_column(default=False)
     local_icons: Mapped[bool] = mapped_column(default=False)
+    highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
+    click_behavior_model_window: Mapped[bool] = mapped_column(default=False)
     links_per_page: Mapped[int] = mapped_column(default=-100)
     sources_per_page: Mapped[int] = mapped_column(default=-100)
     max_links_per_page: Mapped[int] = mapped_column(default=-100)
     max_sources_per_page: Mapped[int] = mapped_column(default=-100)
     max_number_of_related_links: Mapped[int] = mapped_column(default=-100)
+
+    entries_visit_alpha: Mapped[float] = mapped_column(default=0.6)
+    entries_dead_alpha: Mapped[float] = mapped_column(default=0.6)
+
     debug_mode: Mapped[bool] = mapped_column(default=False)
 
 
