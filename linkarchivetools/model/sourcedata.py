@@ -49,6 +49,9 @@ class SourceData(BaseTable):
             return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
 
     def is_update_needed(self, source):
+        if not source.enabled:
+            return False
+
         this_source_data = self.get_source_data(source)
         if this_source_data:
             date_fetched = this_source_data.date_fetched

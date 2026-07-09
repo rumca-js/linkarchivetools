@@ -166,9 +166,9 @@ class ConfigurationEntry(Base):
     prefer_https_links: Mapped[bool] = mapped_column(default=False)
     prefer_non_www_links: Mapped[bool] = mapped_column(default=False)
 
-    new_entries_download_music: Mapped[bool] = mapped_column(default=False)
+    new_entries_download_audio: Mapped[bool] = mapped_column(default=False)
     new_entries_download_video: Mapped[bool] = mapped_column(default=False)
-    entry_update_download_music: Mapped[bool] = mapped_column(default=False)
+    entry_update_download_audio: Mapped[bool] = mapped_column(default=False)
     entry_update_download_video: Mapped[bool] = mapped_column(default=False)
 
     sources_refresh_period: Mapped[int] = mapped_column(default=0)
