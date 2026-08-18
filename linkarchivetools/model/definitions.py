@@ -334,6 +334,7 @@ class SocialData(Base):
     __tablename__ = "socialdata"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    entry_id: Mapped[Optional[int]] = mapped_column()
     thumbs_up: Mapped[Optional[int]] = mapped_column(default=0)
     thumbs_down: Mapped[Optional[int]] = mapped_column(default=0)
     view_count: Mapped[Optional[int]] = mapped_column(default=0)
