@@ -343,6 +343,7 @@ class SocialData(Base):
     upvote_diff: Mapped[Optional[int]] = mapped_column(default=0)
     upvote_view_ratio: Mapped[Optional[int]] = mapped_column(default=0)
     stars: Mapped[Optional[int]] = mapped_column(default=0)
+    followers_count: Mapped[Optional[int]] = mapped_column(default=0)
     date_updated = mapped_column(DateTime, nullable=True)
 
 
