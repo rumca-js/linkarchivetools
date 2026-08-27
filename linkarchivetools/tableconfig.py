@@ -187,3 +187,53 @@ def get_truncate_tables_internet():
         #"entrytransitionhistory",
     ]
     return tables
+
+
+def get_search_tables():
+    """
+    When producing for public
+    """
+    tables = [
+        "usersearchhistory",
+        "searchhistory",
+    ]
+    return tables
+
+
+def get_tags_tables():
+    """
+    When producing for internet
+    """
+    tables = [
+        "compactedtags",
+        "entrycompactedtags",
+        "usertags",
+        "usercompactedtags",
+    ]
+    return tables
+
+
+def get_visits_tables():
+    """
+    When producing for internet
+    """
+    tables = [
+        "userentrytransitionhistory",
+        "userentryvisithistory",
+        "entryvisithistory",
+        "entrytransitionhistory",
+    ]
+    return tables
+
+
+def get_source_tables():
+    """
+    When producing for public
+    """
+    tables = [
+        "sourcecategories",
+        "sourcesubcategories",
+        "sourcedatamodel",
+        "sourceoperationaldata",
+    ]
+    return tables

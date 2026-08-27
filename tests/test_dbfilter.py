@@ -190,3 +190,12 @@ class DbFilterTest(DbTestCase):
             input_searchview_count,
         )
 
+    def test_obfuscate(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        db_filter = DbFilter(input_db="input.db", output_db="output.db")
+        # Run filter
+        db_filter.obfuscate()
+
+        db_filter.close()

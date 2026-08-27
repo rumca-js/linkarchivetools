@@ -10,8 +10,12 @@ import time
 import shutil
 from pathlib import Path
 import argparse
+from sqlalchemy import (
+    create_engine,
+    Table,
+    MetaData,
+)
 
-from sqlalchemy import create_engine
 from .utils.reflected import ReflectedTable
 from .tableconfig import get_tables, get_truncate_tables_no_users, get_truncate_tables_internet
 
@@ -53,27 +57,29 @@ class DbFilter(object):
             self.connection.close()
             self.connection = None
 
-    def truncate_no_users(self):
+    def truncate_tables(self, tables):
         """
         Removes all users data
         """
         reflected_table = ReflectedTable(self.engine, self.connection)
 
-        truncate_tables = get_truncate_tables_no_users()
-
-        for table in truncate_tables:
+        for table in tables:
             reflected_table.truncate_table(table)
+
+    def truncate_no_users(self):
+        """
+        Removes all users data
+        """
+        truncate_tables = get_truncate_tables_no_users()
+        self.truncate_tables(truncate_tables)
 
     def truncate_internet(self):
         """
         Removes dynamic data not necessary for the internet
         """
-        reflected_table = ReflectedTable(self.engine, self.connection)
-
         truncate_tables = get_truncate_tables_internet()
 
-        for table in truncate_tables:
-            reflected_table.truncate_table(table)
+        self.truncate_tables(truncate_tables)
 
     def filter(self, conditions):
         table = ReflectedTable(self.engine, self.connection)
@@ -130,11 +136,13 @@ class DbFilter(object):
         """
         pass
 
-    def obfuscate(destination_engine):
+    def obfuscate(self):
         """
         Remove passwords from the database
         """
         table_name = 'user'
+
+        destination_engine = self.engine
 
         destination_metadata = MetaData()
         destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
