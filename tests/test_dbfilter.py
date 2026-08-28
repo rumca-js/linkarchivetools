@@ -18,14 +18,14 @@ class DbFilterTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
-        filter = DbFilter(input_db="input.db", output_db="output.db")
-        self.assertTrue(filter.is_valid())
+        db_filter = DbFilter(db="input.db")
+        self.assertTrue(db_filter.is_valid())
 
-        path = Path("output.db")
+        path = Path("input.db")
         self.assertTrue(path.is_file())
-        filter.close()
+        db_filter.close()
 
-    def test_filter_bookmarks(self):
+    def test_delete_entries_non_bookmarked(self):
         self.create_db("input.db")
         self.clean_out()
 
@@ -45,12 +45,13 @@ class DbFilterTest(DbTestCase):
             entry_table.insert_json(data2)
 
         # Run filter
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.filter_bookmarks()
+        db_filter = DbFilter(db="input.db")
+        # call tested function
+        db_filter.delete_entries_non_bookmarked()
         db_filter.close()
 
-        # Check output db
-        engine = create_engine("sqlite:///output.db")
+        # Check input db
+        engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
             entry_table = ReflectedEntryTable(engine, connection)
             self.assertEqual(entry_table.count(), 1)
@@ -58,7 +59,7 @@ class DbFilterTest(DbTestCase):
             entries = list(entry_table.get_entries())
             self.assertEqual(entries[0].link, "https://google.com")
 
-    def test_filter_votes(self):
+    def test_delete_entries_no_votes(self):
         self.create_db("input.db")
         self.clean_out()
 
@@ -76,18 +77,19 @@ class DbFilterTest(DbTestCase):
             data2["page_rating_votes"] = 0
             entry_table.insert_json(data2)
 
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.filter_votes()
+        db_filter = DbFilter(db="input.db")
+        # call tested function
+        db_filter.delete_entries_no_votes()
         db_filter.close()
 
-        engine = create_engine("sqlite:///output.db")
+        engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
             entry_table = ReflectedEntryTable(engine, connection)
             self.assertEqual(entry_table.count(), 1)
             entries = list(entry_table.get_entries())
             self.assertEqual(entries[0].link, "https://google.com")
 
-    def test_filter_redundant(self):
+    def test_delete_entries_redundant(self):
         self.create_db("input.db")
         self.clean_out()
 
@@ -113,11 +115,12 @@ class DbFilterTest(DbTestCase):
             data3["page_rating_votes"] = 0
             entry_table.insert_json(data3)
 
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.filter_redundant()
+        db_filter = DbFilter(db="input.db")
+        # call tested function
+        db_filter.delete_entries_redundant()
         db_filter.close()
 
-        engine = create_engine("sqlite:///output.db")
+        engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
             entry_table = ReflectedEntryTable(engine, connection)
             self.assertEqual(entry_table.count(), 2)
@@ -126,14 +129,14 @@ class DbFilterTest(DbTestCase):
             self.assertIn("https://yahoo.com", links)
             self.assertNotIn("https://bing.com", links)
 
-    def test_truncate_no_users(self):
+    def test_truncate_user_tables(self):
         self.create_db("input.db")
         self.clean_out()
 
-        input_browser_count = self.get_row_count("input.db", "browser")
+        #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
 
-        self.assertGreater(input_browser_count, 0)
+        #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
 
         input_compactedtags_count = self.get_row_count("input.db", "compactedtags")
@@ -142,30 +145,30 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.truncate_no_users()
+        db_filter = DbFilter(db="input.db")
+        db_filter.truncate_user_tables()
         db_filter.close()
 
-        self.assertEqual(self.get_row_count("output.db", "browser"), 0)
-        self.assertEqual(self.get_row_count("output.db", "userconfig"), 0)
+        #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
+        self.assertEqual(self.get_row_count("input.db", "userconfig"), 0)
 
         self.assertEqual(
-            self.get_row_count("output.db", "compactedtags"),
+            self.get_row_count("input.db", "compactedtags"),
             input_compactedtags_count,
         )
         self.assertEqual(
-            self.get_row_count("output.db", "searchview"),
+            self.get_row_count("input.db", "searchview"),
             input_searchview_count,
         )
 
-    def test_truncate_internet(self):
+    def test_truncate_dynamic_data(self):
         self.create_db("input.db")
         self.clean_out()
 
-        input_browser_count = self.get_row_count("input.db", "browser")
+        #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
 
-        self.assertGreater(input_browser_count, 0)
+        #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
 
         input_compactedtags_count = self.get_row_count("input.db", "compactedtags")
@@ -174,19 +177,51 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
-        db_filter.truncate_internet()
+        db_filter = DbFilter(db="input.db")
+        db_filter.truncate_dynamic_data()
         db_filter.close()
 
-        self.assertEqual(self.get_row_count("output.db", "browser"), 0)
-        self.assertTrue(self.get_row_count("output.db", "userconfig") > 0)
+        #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
+        self.assertTrue(self.get_row_count("input.db", "userconfig") > 0)
 
         self.assertEqual(
-            self.get_row_count("output.db", "compactedtags"),
+            self.get_row_count("input.db", "compactedtags"),
             input_compactedtags_count,
         )
         self.assertEqual(
-            self.get_row_count("output.db", "searchview"),
+            self.get_row_count("input.db", "searchview"),
+            input_searchview_count,
+        )
+
+    def test_truncate_configuration_tables(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        #input_browser_count = self.get_row_count("input.db", "browser")
+        input_userconfig_count = self.get_row_count("input.db", "userconfig")
+
+        #self.assertGreater(input_browser_count, 0)
+        self.assertGreater(input_userconfig_count, 0)
+
+        input_compactedtags_count = self.get_row_count("input.db", "compactedtags")
+        input_searchview_count = self.get_row_count("input.db", "searchview")
+
+        self.assertGreater(input_compactedtags_count, 0)
+        self.assertGreater(input_searchview_count, 0)
+
+        db_filter = DbFilter(db="input.db")
+        db_filter.truncate_configuration_tables()
+        db_filter.close()
+
+        #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
+        self.assertTrue(self.get_row_count("input.db", "userconfig") > 0)
+
+        self.assertEqual(
+            self.get_row_count("input.db", "compactedtags"),
+            input_compactedtags_count,
+        )
+        self.assertEqual(
+            self.get_row_count("input.db", "searchview"),
             input_searchview_count,
         )
 
@@ -194,8 +229,39 @@ class DbFilterTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
-        db_filter = DbFilter(input_db="input.db", output_db="output.db")
+        db_filter = DbFilter(db="input.db")
         # Run filter
         db_filter.obfuscate()
 
         db_filter.close()
+
+    def test_obfuscate__connection(self):
+        self.create_db("input.db")
+        self.clean_out()
+        self.truncate_table("input.db", "user")
+
+        users_count = self.get_row_count("input.db", "user")
+        self.assertEqual(users_count, 0)
+
+        user_id = self.add_user("input.db", "test")
+
+        users_count = self.get_row_count("input.db", "user")
+        self.assertEqual(users_count, 1)
+
+        engine = create_engine("sqlite:///input.db")
+        with engine.connect() as connection:
+            db_filter = DbFilter(engine=engine, connection=connection)
+            # Run filter
+            db_filter.obfuscate()
+
+            db_filter.close()
+
+        users_count = self.get_row_count("input.db", "user")
+        self.assertEqual(users_count, 1)
+
+        engine = create_engine("sqlite:///input.db")
+        with engine.connect() as connection:
+            users = ReflectedGenericTable(engine, connection, table_name="user")
+            users = users.get_where({})
+            for user in users:
+                print(user)

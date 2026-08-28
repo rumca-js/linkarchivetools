@@ -10,6 +10,7 @@ from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
    ReflectedEntryCompactedTags,
    ReflectedSocialData,
+   ReflectedGenericTable,
 )
 
 
@@ -34,6 +35,12 @@ class DbTestCase(unittest.TestCase):
 
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
+            table.truncate()
+
+    def truncate_table(self, file_name, table_name):
+        engine = create_engine(f"sqlite:///{file_name}")
+        with engine.connect() as connection:
+            table = ReflectedGenericTable(engine=engine, connection=connection, table_name="user")
             table.truncate()
 
     def clean_out(self):
@@ -120,3 +127,22 @@ class DbTestCase(unittest.TestCase):
         data["page_rating_votes"] = 80
         data["page_rating"] = 0
         return data
+
+    def add_user(self, file_name, username="testuser", password="testpassword"):
+        engine = create_engine(f"sqlite:///{file_name}")
+        with engine.connect() as connection:
+            table = ReflectedGenericTable(engine=engine, connection=connection, table_name="user")
+
+            data = {
+                    "username" : username,
+                    "password" : password,
+                    "first_name" : "",
+                    "last_name" : "",
+                    "email" : "testemail@test.com",
+                    "is_superuser" : False,
+                    "is_staff" : False,
+                    "is_active" : True,
+                    "date_joined" : datetime.now(),
+                    }
+            id = table.insert_json_data(data)
+            return id

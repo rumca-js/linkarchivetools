@@ -1,5 +1,5 @@
 def get_tables():
-    tables = [
+    tables = {
         "apikeys",                      # table containing API keys for server, access
         "applogging",                   # logger table
         "backgroundjob",                # jobs queue
@@ -39,7 +39,7 @@ def get_tables():
         "searchhistory",
         "entryvisithistory",
         "entrytransitionhistory",
-    ]
+    }
     return tables
 
 
@@ -47,7 +47,7 @@ def get_backup_tables():
     """
     Not all tables need to be backupped
     """
-    tables = [
+    tables = {
         "apikeys",
         #"applogging",
         #"backgroundjob",
@@ -87,40 +87,106 @@ def get_backup_tables():
         "searchhistory",
         "entryvisithistory",
         "entrytransitionhistory",
-    ]
+    }
     return tables
 
 
-def get_truncate_tables_no_users():
+def get_truncate_tables_setup_no_users():
     """
-    When producing for public
+    Returns tables to truncate if setup has no users
+    It does not fetch data - so sources are redundant?
     """
-    tables = [
-        "apikeys",
-        "applogging",
-        "backgroundjob",
-        "backgroundjobhistory",
-        "keywords",
-        "credentials",
+    tables = {
         "sourcecategories",
         "sourcesubcategories",
         "sourcedatamodel",
-        "sourceoperationaldata",
-        #"configurationentry",
-        #"linkdatamodel",
         "domains",
-        #"compactedtags",
-        #"entrycompactedtags",
         "browser",
         "entryrules",
         "dataexport",
         "gateway",
-        "modelfiles",
-        #"searchview",
-        #"socialdata",
-        "blockentry",
-        "blockentrylist",
+    }
 
+    tables = tables + get_personal_tables()
+    tables = tables + get_user_tables()
+    tables = tables + get_dynamic_tables()
+
+    return tables
+
+
+def get_dynamic_tables():
+    """
+    Removes dynamic data
+    """
+    tables = {
+        "applogging",
+        "backgroundjob",
+        "backgroundjobhistory",
+        "keywords",
+        "sourceoperationaldata",
+        "modelfiles",
+        "blockentry",
+    }
+    return tables
+
+
+def get_search_tables():
+    """
+    When producing for public
+    """
+    tables = {
+        "usersearchhistory",
+        "searchhistory",
+    }
+    return tables
+
+
+def get_tags_tables():
+    """
+    When producing for internet
+    """
+    tables = {
+        "compactedtags",
+        "entrycompactedtags",
+        "usertags",
+        "usercompactedtags",
+    }
+    return tables
+
+
+def get_visits_tables():
+    """
+    When producing for internet
+    """
+    tables = {
+        "userentrytransitionhistory",
+        "userentryvisithistory",
+        "entryvisithistory",
+        "entrytransitionhistory",
+    }
+    return tables
+
+
+def get_source_tables():
+    """
+    When producing for public
+    """
+    tables = {
+        "sourcecategories",
+        "sourcesubcategories",
+        "sourcedatamodel",
+        "sourceoperationaldata",
+    }
+    return tables
+
+
+def get_user_tables():
+    """
+    User tables
+    """
+    tables = {
+        "apikeys",
+        "credentials",
         "user",
         "readlater",
         "userconfig",
@@ -132,108 +198,31 @@ def get_truncate_tables_no_users():
         "usersearchhistory",
         "userentrytransitionhistory",
         "userentryvisithistory",
-
-        #"searchhistory",
-        #"entryvisithistory",
-        #"entrytransitionhistory",
-    ]
+    }
     return tables
 
 
-def get_truncate_tables_internet():
-    """
-    When producing for internet
-    """
-    tables = [
+def get_personal_tables():
+    tables = {
         "apikeys",
-        "applogging",
-        "backgroundjob",
-        "backgroundjobhistory",
-        "keywords",
         "credentials",
-        "sourcecategories",
-        "sourcesubcategories",
-        "sourcedatamodel",
-        "sourceoperationaldata",
+        "user",
+        "readlater",
+        "userconfig",
+    }
+    return tables
+
+
+def get_configuration_tables():
+    """
+    Return configuration entries that should not be used by other people
+    """
+    tables = {
+        "apikeys",
+        "credentials",
         #"configurationentry",
-        #"linkdatamodel",
-        #"domains",
-        #"compactedtags",
-        #"entrycompactedtags",
         "browser",
         #"entryrules",
         "dataexport",
-        "gateway",
-        #"modelfiles",
-        #"searchview",
-        #"socialdata",
-        "blockentry",
-        #"blockentrylist",
-
-        #"user",
-        "readlater",
-        #"userconfig",
-        #"usertags",
-        #"usercompactedtags",
-        #"uservotes",
-        #"usercomments",
-        #"userbookmarks",
-        #"usersearchhistory",
-        #"userentrytransitionhistory",
-        #"userentryvisithistory",
-
-        #"searchhistory",
-        #"entryvisithistory",
-        #"entrytransitionhistory",
-    ]
-    return tables
-
-
-def get_search_tables():
-    """
-    When producing for public
-    """
-    tables = [
-        "usersearchhistory",
-        "searchhistory",
-    ]
-    return tables
-
-
-def get_tags_tables():
-    """
-    When producing for internet
-    """
-    tables = [
-        "compactedtags",
-        "entrycompactedtags",
-        "usertags",
-        "usercompactedtags",
-    ]
-    return tables
-
-
-def get_visits_tables():
-    """
-    When producing for internet
-    """
-    tables = [
-        "userentrytransitionhistory",
-        "userentryvisithistory",
-        "entryvisithistory",
-        "entrytransitionhistory",
-    ]
-    return tables
-
-
-def get_source_tables():
-    """
-    When producing for public
-    """
-    tables = [
-        "sourcecategories",
-        "sourcesubcategories",
-        "sourcedatamodel",
-        "sourceoperationaldata",
-    ]
+    }
     return tables

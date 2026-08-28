@@ -16,8 +16,8 @@ from sqlalchemy import (
     MetaData,
 )
 
-from .utils.reflected import ReflectedTable
-from .tableconfig import get_tables, get_truncate_tables_no_users, get_truncate_tables_internet
+from linkarchive.utils.reflected import ReflectedTable
+from linkarchive.tableconfig import *
 
 
 class DbFilter(object):
@@ -25,27 +25,23 @@ class DbFilter(object):
     Filter class
     """
 
-    def __init__(self, input_db, output_db):
-        self.input_db = input_db
-        self.output_db = output_db
-        self.engine = None
-        self.connection = None
+    def __init__(self, db=None, engine=None, connection=None):
+        self.input_db = db
+        self.engine = engine
+        self.connection = connection
         self.setup()
 
     def setup(self):
-        path = Path(self.input_db)
-        if not path.exists():
-            print("File {} does not exist".format(path))
-            return
+        if not self.connection:
+            if self.input_db:
 
-        new_path = Path(self.output_db)
-        if new_path.exists():
-            new_path.unlink()
+                path = Path(self.input_db)
+                if not path.exists():
+                    print("File {} does not exist".format(path))
+                    return
 
-        shutil.copy(self.input_db, self.output_db)
-
-        self.engine = create_engine(f"sqlite:///{self.output_db}")
-        self.connection = self.engine.connect()
+                self.engine = create_engine(f"sqlite:///{self.input_db}")
+                self.connection = self.engine.connect()
 
     def is_valid(self) -> bool:
         if not self.engine:
@@ -57,6 +53,13 @@ class DbFilter(object):
             self.connection.close()
             self.connection = None
 
+    def truncate_all(self):
+        """
+        Truncates tables - all
+        """
+        truncate_tables = get_tables()
+        self.truncate_tables(truncate_tables)
+
     def truncate_tables(self, tables):
         """
         Removes all users data
@@ -66,22 +69,28 @@ class DbFilter(object):
         for table in tables:
             reflected_table.truncate_table(table)
 
-    def truncate_no_users(self):
+    def truncate_user_tables(self):
         """
-        Removes all users data
+        Removes all users tables
         """
-        truncate_tables = get_truncate_tables_no_users()
+        truncate_tables = get_user_tables()
         self.truncate_tables(truncate_tables)
 
-    def truncate_internet(self):
+    def truncate_dynamic_data(self):
         """
-        Removes dynamic data not necessary for the internet
+        Removes dynamic data
         """
-        truncate_tables = get_truncate_tables_internet()
-
+        truncate_tables = get_dynamic_tables()
         self.truncate_tables(truncate_tables)
 
-    def filter(self, conditions):
+    def truncate_configuration_tables(self):
+        """
+        Removes configuration tables probably not use by other people
+        """
+        truncate_tables = get_configuration_tables()
+        self.truncate_tables(truncate_tables)
+
+    def delete_entries_by_confition(self, conditions):
         table = ReflectedTable(self.engine, self.connection)
 
         sql_text = f"DELETE FROM linkdatamodel WHERE {conditions};"
@@ -90,7 +99,7 @@ class DbFilter(object):
         table.vacuum()
         table.close()
 
-    def filter_bookmarks(self):
+    def delete_entries_non_bookmarked(self):
         table = ReflectedTable(self.engine, self.connection)
 
         sql_text = f"DELETE FROM linkdatamodel WHERE bookmarked=False;"
@@ -99,7 +108,7 @@ class DbFilter(object):
         table.vacuum()
         table.close()
 
-    def filter_votes(self):
+    def delete_entries_no_votes(self):
         table = ReflectedTable(self.engine, self.connection)
 
         sql_text = f"DELETE FROM linkdatamodel WHERE page_rating_votes=0;"
@@ -107,7 +116,7 @@ class DbFilter(object):
         table.vacuum()
         table.close()
 
-    def filter_redundant(self):
+    def delete_entries_redundant(self):
         """
         Not bookmarked AND without votes are redundant
         """
@@ -118,60 +127,66 @@ class DbFilter(object):
         table.vacuum()
         table.close()
 
-    def cleanup_tables(self):
-        """
-        table = ReflectedGenericTable(self.engine, self.connection, "entrycompactedtags")
-        compacted = table.get_where({})
-        for row in compacted
-
-
-        entrycompactedtags
-        usertags
-        usercompactedtags
-        uservotes
-        usercomments
-        userbookmarks
-        userentrytransitionhistory
-        userentryvisithistory
-        """
-        pass
-
     def obfuscate(self):
         """
+        Does not remove user tables
+        TODO: should remove certain fields from configurationentry
+        """
+        self.obfuscate_user_table()
+
+        self.truncate_tables({"browser", "dataexport", "usersearchhistory", "apikeys", "credentials", "readlater"})
+
+    def obfuscate_user_table(self):
+        """
         Remove passwords from the database
+        TODO - implement if only connection was passed
         """
         table_name = 'user'
 
-        destination_engine = self.engine
+        if self.engine:
+            destination_engine = self.engine
 
-        destination_metadata = MetaData()
-        destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
+            destination_metadata = MetaData()
+            destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
 
-        columns = destination_table.columns.keys()
-        is_superuser_index = columns.index('is_superuser')
+            columns = destination_table.columns.keys()
+            is_superuser_index = columns.index('is_superuser')
 
-        with destination_engine.connect() as destination_connection:
-            result = destination_connection.execute(destination_table.select())
+            with destination_engine.connect() as destination_connection:
+                result = destination_connection.execute(destination_table.select())
 
-            for row in result:
-                update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
-                destination_connection.execute(update_stmt)
+                for row in result:
+                    update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
+                    destination_connection.execute(update_stmt)
 
-                if is_superuser_index and row[is_superuser_index]:
-                    update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
+                    update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(email='')
+                    destination_connection.execute(update_stmt)
 
-            destination_connection.commit()
+                    if is_superuser_index:
+                        if row[is_superuser_index]:
+                            update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
+                            destination_connection.execute(update_stmt)
+                        else:
+                            update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='non-admin')
+                            destination_connection.execute(update_stmt)
+
+                destination_connection.commit()
 
 
 def parse():
-    parser = argparse.ArgumentParser(description="Data analyzer program")
-    parser.add_argument("--db", default="places.db", help="DB to be scanned")
-    parser.add_argument("--output-db", default="new.db", help="DB to be created")
+    parser = argparse.ArgumentParser(description="Data filter program")
+    parser.add_argument("--db", default="places.db", help="DB to be filtered")
 
-    parser.add_argument("--bookmarked", action="store_true", help="export bookmarks")
-    parser.add_argument("--votes", action="store_true", help="export if votes is > 0")
-    parser.add_argument("--truncate-no-users", action="store_true", help="Truncates tables no users")
-    parser.add_argument("--truncate-internet", action="store_true", help="Truncates tables for public")
+    parser.add_argument("--bookmarked", action="store_true", help="Removes non bookmarked")
+    parser.add_argument("--votes", action="store_true", help="Removes entries without a vote")
+    parser.add_argument("--no-users", action="store_true", help="Prepares for setup with no users")
+    parser.add_argument("--obfuscate", action="store_true", help="Obfuscates private data")
+    parser.add_argument("--dynamic-data", action="store_true", help="Truncates dynamic tables")
+    parser.add_argument("--redundant", action="store_true", help="Removes entries that are redundant - not bookmarked, no votes")
+    parser.add_argument("--configuration", action="store_true", help="Removes uneceesary configuration")
+    parser.add_argument("--domains", action="store_true", help="Removes domains")
+    parser.add_argument("--search-data", action="store_true", help="Removes search data")
+    parser.add_argument("--visits-data", action="store_true", help="Removes visit data")
 
     parser.add_argument("-v", "--verbosity", help="Verbosity level")
 
@@ -184,21 +199,37 @@ def main():
     start_time = time.time()
     parser, args = parse()
 
-    thefilter = DbFilter(args.db, args.output_db)
+    thefilter = DbFilter(db=args.db)
     if not thefilter.is_valid():
         return
 
     entries_changed = False
-    if args.truncate_no_users:
-        thefilter.truncate_no_users()
-    if args.truncate_internet:
-        thefilter.truncate_internet()
+    if args.no_users:
+        entries_changed = True
+        thefilter.truncate_user_tables()
+    if args.obfuscate:
+        entries_changed = True
+        thefilter.obfuscate()
+    if args.dynamic_data:
+        entries_changed = True
+        thefilter.truncate_dynamic_data()
     if args.bookmarked:
         entries_changed = True
-        thefilter.filter_bookmarks()
+        thefilter.delete_entries_non_bookmarked()
     if args.votes:
         entries_changed = True
-        thefilter.filter_votes()
+        thefilter.delete_entries_no_votes()
+    if args.redundant:
+        entries_changed = True
+        thefilter.delete_entries_redundant()
+    if args.configuration_tables:
+        thefilter.truncate_configuration_tables()
+    if args.search_data:
+        thefilter.truncate_tables(get_search_tables())
+    if args.visits_data:
+        thefilter.truncate_tables(get_visits_tables())
+    if args.domains:
+        thefilter.truncate_tables({"domains"})
 
     if entries_changed:
         thefilter.cleanup_tables()

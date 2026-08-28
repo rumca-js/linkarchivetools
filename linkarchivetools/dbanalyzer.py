@@ -226,26 +226,33 @@ class YieldRowHandler(object):
 
 
 class DbAnalyzer(object):
-    def __init__(self, input_db, args=None):
+    def __init__(self, input_db=None, engine=None, connection=None, args=None):
         self.args = args
         self.result = None
-        self.engine = None
         self.input_db = input_db
+        self.engine = engine
+        self.connection = connection
 
     def print_summary(self, print_columns=False):
         db = self.input_db
 
-        if not os.path.isfile(db):
-            print("File does not exist:{}".format(db))
-            return
+        if self.engine:
+            if not os.path.isfile(db):
+                print("File does not exist:{}".format(db))
+                return
 
-        self.engine = create_engine("sqlite:///" + db)
-        with self.engine.connect() as connection:
-            r = ReflectedTable(self.engine, connection)
+            self.engine = create_engine("sqlite:///" + db)
+            with self.engine.connect() as connection:
+                r = ReflectedTable(self.engine, connection)
+                r.print_summary(print_columns)
+        elif self.engine and self.connection:
+            r = ReflectedTable(self.engine, self.connection)
             r.print_summary(print_columns)
+        else:
+            print("Could not print summary - missing database or connection")
 
     def search(self):
-        if self.is_db_scan():
+        if self.input_db:
             file = self.input_db
             if not os.path.isfile(file):
                 print("File does not exist:{}".format(file))
@@ -258,6 +265,8 @@ class DbAnalyzer(object):
             with self.engine.connect() as connection:
                 self.connection = connection
                 yield from self.perform_search()
+        elif self.engine and self.connection:
+            yield from self.perform_search()
         else:
             print("No database was specified")
 
@@ -280,47 +289,6 @@ class DbAnalyzer(object):
 
         print("Searching...")
         yield from searcher.search()
-
-    def get_entries(self):
-        if self.is_db_scan():
-            file = self.input_db
-            if not os.path.isfile(file):
-                print("File does not exist:{}".format(file))
-                return
-
-            print("Creating engine")
-            self.engine = create_engine("sqlite:///" + self.input_db)
-            print("Creating engine DONE")
-
-            with self.engine.connect() as connection:
-                self.connection = connection
-                yield from self.perform_get_entries()
-
-    def perform_get_entries(self):
-        row_handler = YieldRowHandler(args=self.args, engine=self.engine, connection=self.connection)
-
-        search = None
-        if self.args:
-            search = self.args.search
-
-        print("Starting alchemy")
-        searcher = AlchemySearch(
-            self.engine,
-            search,
-            row_handler=row_handler,
-            args=self.args,
-            connection=self.connection,
-        )
-        print("Starting alchemy DONE")
-
-        print("Searching...")
-        yield from searcher.search()
-
-    def is_db_scan(self):
-        if self.input_db:
-            return True
-
-        return False
 
 
 class Parser(object):

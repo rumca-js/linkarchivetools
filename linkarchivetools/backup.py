@@ -23,6 +23,7 @@ from sqlalchemy.orm import sessionmaker
 #from linkarchivetools.utils.reflected import *
 from linkarchivetools.utils.reflected import ReflectedTable
 from linkarchivetools.tableconfig import get_backup_tables, get_tables
+from linkarchivetools.dbfilter import DbFilter
 
 
 output_directory = Path(__file__).parents[1]
@@ -39,6 +40,7 @@ all_tables.append("applogging")
 all_tables.append("backgroundjob")
 all_tables.append("backgroundjobhistory")
 all_tables.append("keywords")
+
 
 def get_backup_directory(export_type):
     return output_directory / "data" / ("backup_" + export_type)
@@ -387,29 +389,6 @@ def copy_table(instance, table_name, source_engine, destination_engine, override
     session.close()
 
 
-def obfuscate_user_table(table_name, destination_engine):
-    """
-    Remove passwords from the database
-    """
-    destination_metadata = MetaData()
-    destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
-
-    columns = destination_table.columns.keys()
-    is_superuser_index = columns.index('is_superuser')
-
-    with destination_engine.connect() as destination_connection:
-        result = destination_connection.execute(destination_table.select())
-
-        for row in result:
-            update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(password='')
-            destination_connection.execute(update_stmt)
-
-            if is_superuser_index and row[is_superuser_index]:
-                update_stmt = destination_table.update().where(destination_table.c.id == row[0]).values(username='admin')
-
-        destination_connection.commit()
-
-
 def create_indexes(destination_engine, table_name, column_name):
     destination_metadata = MetaData()
     destination_table = Table(table_name, destination_metadata, autoload_with=destination_engine)
@@ -421,13 +400,11 @@ def create_indexes(destination_engine, table_name, column_name):
 
 
 def obfuscate_all(destination_engine):
-    obfuscate_user_table("user", destination_engine)
-
-    with destination_engine.connect() as connection:
-        r = ReflectedTable(engine=destination_engine, connection=connection)
-        r.truncate_table("dataexport")
-        r.truncate_table("usersearchhistory")
-        r.truncate_table("credentials")
+    """
+    Removed personal data
+    """
+    filter = DbFilter(engine=destination_engine)
+    filter.obfuscate()
 
 
 #### SQLite
