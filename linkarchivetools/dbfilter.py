@@ -16,8 +16,8 @@ from sqlalchemy import (
     MetaData,
 )
 
-from linkarchive.utils.reflected import ReflectedTable
-from linkarchive.tableconfig import *
+from linkarchivetools.utils.reflected import ReflectedTable
+from linkarchivetools.tableconfig import *
 
 
 class DbFilter(object):
@@ -42,6 +42,10 @@ class DbFilter(object):
 
                 self.engine = create_engine(f"sqlite:///{self.input_db}")
                 self.connection = self.engine.connect()
+            elif self.engine:
+                self.connection = self.engine.connect()
+            else:
+                print("Cannot establish connection for filtering")
 
     def is_valid(self) -> bool:
         if not self.engine:
