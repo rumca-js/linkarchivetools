@@ -236,7 +236,7 @@ class DbAnalyzer(object):
     def print_summary(self, print_columns=False):
         db = self.input_db
 
-        if self.engine:
+        if db:
             if not os.path.isfile(db):
                 print("File does not exist:{}".format(db))
                 return
