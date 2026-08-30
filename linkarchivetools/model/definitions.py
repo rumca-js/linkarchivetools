@@ -33,6 +33,9 @@ Base = declarative_base()
 
 
 class ApiKeys(Base):
+    """
+    Keys that allows users to access system
+    """
     __tablename__ = "apikeys"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -214,6 +217,20 @@ class ConfigurationEntry(Base):
     entries_dead_alpha: Mapped[float] = mapped_column(default=0.6)
 
     debug_mode: Mapped[bool] = mapped_column(default=False)
+
+
+class Credentials(Base):
+    __tablename__ = "credentials"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(1000), unique=True)  # credential name. github, or reddit etc.
+    credential_type: Mapped[str] = mapped_column(String(1000), nullable=True) # refresh token, auth token, etc
+    username: Mapped[str] = mapped_column(String(1000), nullable=True)
+    password: Mapped[str] = mapped_column(String(1000), nullable=True)
+    secret: Mapped[str] = mapped_column(String(1000), nullable=True)
+    token: Mapped[str] = mapped_column(String(1000), nullable=True)
+
+    user_id: Mapped[int]
 
 
 class DataExport(Base):
