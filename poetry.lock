@@ -1063,13 +1063,13 @@ files = [
 
 [[package]]
 name = "ua-generator"
-version = "2.1.3"
+version = "2.1.4"
 description = "A random user-agent generator"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ua_generator-2.1.3-py3-none-any.whl", hash = "sha256:c67dd772d03621b0f934fec3c0806dc51ef2be3cddba0fe65ea4b34ac02e080e"},
-    {file = "ua_generator-2.1.3.tar.gz", hash = "sha256:82f7f8fb46e91e79a97a0bc0db0484062413d2d952b30f06f0400a05656f9a78"},
+    {file = "ua_generator-2.1.4-py3-none-any.whl", hash = "sha256:822606a308f1097ce299ed6f26fc90c3377da44861f5a9d41c6529390b3df1d5"},
+    {file = "ua_generator-2.1.4.tar.gz", hash = "sha256:e3936b8cc87e04eddaab053104d2cac163e14cce8dc2ba7a02639c213e8dff57"},
 ]
 
 [[package]]
@@ -1102,13 +1102,13 @@ zstd = ["backports-zstd (>=1.0.0)"]
 
 [[package]]
 name = "webtoolkit"
-version = "0.1.64"
+version = "0.1.66"
 description = "Web tools and interfaces for Internet data processing."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "webtoolkit-0.1.64-py3-none-any.whl", hash = "sha256:45eb21d9a44a8833531783264d83b279ad812f201601cfcbecf577e9aebc78eb"},
-    {file = "webtoolkit-0.1.64.tar.gz", hash = "sha256:a058ee88cc93289c0426da6fd3c0112de5c30cebc72bf9eadef92532ea3d7508"},
+    {file = "webtoolkit-0.1.66-py3-none-any.whl", hash = "sha256:2025550e0c710331cc0a0a7dced19d39175a29a62be039d10576d93d7de08f81"},
+    {file = "webtoolkit-0.1.66.tar.gz", hash = "sha256:d4481ac97bcd18316414c96297e29c9466c4f9d20f044846351b75829793f535"},
 ]
 
 [package.dependencies]
@@ -1126,4 +1126,4 @@ url-cleaner = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "49409d7b7d6e2e2dffc9a1ff064d41463dc16d3be77d998e48b69634dc7d0c15"
+content-hash = "b63555c750a6d3b211449e78d5f4c5e796a363419fa5d61a505f9cc8c95c65ea"
