@@ -7,20 +7,20 @@ Can filter or analyze entries from https://github.com/rumca-js/Internet-Places-D
 # Tools
 
  - DbAnalyzer - provides analysis of the DB contents
+ - DbUpdate - modifies database. Can create missing tables, truncate tables.
  - Db2Feeds - converts database to DB of feeds
  - Db2JSON - converts database to JSON
- - DbFilter - filters database (only bookmarks? only votes?)
- - DbMerge - Merges database with other databse
  - JSON2Db - Converts JSON into datbase
- - Backup - makes backup of postgres tables
+ - DbMerge - Merges database with other databse
+ - backup.sh - create backup of Postgres tables
 
 # DbAnalyzer
 
 ```
 usage: dbanalyzer.py [-h] [--db DB] [--search SEARCH] [--order-by ORDER_BY] [--asc] [--desc]
-                     [--table TABLE] [--title] [--description] [--status] [--tags] [--social]
-                     [--date-published] [--source] [--summary] [--columns] [--rss] [--channels]
-                     [--json] [-i] [-v VERBOSITY]
+                     [--table TABLE] [--title] [--votes] [--description] [--status] [--tags]
+                     [--social] [--date-published] [--source] [--summary] [--columns] [--rss]
+                     [--channel] [--json] [-i] [-v VERBOSITY]
 
 Data analyzer program
 
@@ -33,6 +33,7 @@ options:
   --desc                order descending
   --table TABLE         Table name
   --title               displays title
+  --votes               displays votes
   --description         displays description
   --status              displays status
   --tags                displays tags
@@ -42,11 +43,43 @@ options:
   --summary             displays summary of tables
   --columns             displays summary of tables column names
   --rss                 displays RSS sources
-  --channels            displays channels
+  --channel             displays channels
   --json                JSON format
   -i, --ignore-case     Ignores case
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level
+```
+
+# DbUpdate
+
+```
+usage: dbupdate.py [-h] [--db DB] [--create-tables] [--truncate-tables TRUNCATE_TABLES]
+                   [--trunc-dynamic-data] [--trunc-configuration] [--trunc-search-data]
+                   [--trunc-visits-data] [--delete-non-bookmarked] [--delete-no-votes]
+                   [--delete-redundant] [--no-users] [--obfuscate] [-v VERBOSITY]
+
+DB manipulation program
+
+options:
+  -h, --help            show this help message and exit
+  --db DB               DB to be filtered
+  --create-tables       Creates tables. Even missing ones
+  --truncate-tables TRUNCATE_TABLES
+                        Truncate table(s). Pass table names
+  --trunc-dynamic-data  Truncates dynamic tables
+  --trunc-configuration
+                        Removes uneceesary configuration
+  --trunc-search-data   Removes all search data
+  --trunc-visits-data   Removes all visit data
+  --delete-non-bookmarked
+                        Removes non bookmarked
+  --delete-no-votes     Removes entries without a vote
+  --delete-redundant    Removes entries that are redundant - not bookmarked, no votes
+  --no-users            Prepares for setup with no users
+  --obfuscate           Obfuscates private data
+  -v VERBOSITY, --verbosity VERBOSITY
+                        Verbosity level
+
 ```
 
 # Db2Feeds
@@ -93,25 +126,6 @@ options:
                         Verbosity level
 ```
 
-# DbFilter
-
-```
-usage: dbfilter.py [-h] [--db DB] [--output-db OUTPUT_DB] [--bookmarked] [--votes] [--truncate]
-                   [-v VERBOSITY]
-
-Data analyzer program
-
-options:
-  -h, --help            show this help message and exit
-  --db DB               DB to be scanned
-  --output-db OUTPUT_DB
-                        DB to be created
-  --bookmarked          export bookmarks
-  --votes               export if votes is > 0
-  --truncate            Truncates tables for public
-  -v VERBOSITY, --verbosity VERBOSITY
-                        Verbosity level
-```
 
 # DbMerge
 

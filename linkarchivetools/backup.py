@@ -23,7 +23,7 @@ from sqlalchemy.orm import sessionmaker
 #from linkarchivetools.utils.reflected import *
 from linkarchivetools.utils.reflected import ReflectedTable
 from linkarchivetools.tableconfig import get_backup_tables, get_tables
-from linkarchivetools.dbfilter import DbFilter
+from linkarchivetools.dbupdate import DbUpdate
 
 
 output_directory = Path(__file__).parents[1]
@@ -403,8 +403,8 @@ def obfuscate_all(destination_engine):
     """
     Removed personal data
     """
-    filter = DbFilter(engine=destination_engine)
-    filter.obfuscate()
+    db_update = DbUpdate(engine=destination_engine)
+    db_update.obfuscate()
 
 
 #### SQLite

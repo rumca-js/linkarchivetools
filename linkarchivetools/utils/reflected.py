@@ -100,12 +100,16 @@ class ReflectedTable(object):
             return True
         return False
 
-    def get_column_names(self, table):
+    def get_column_names(self, table_name):
         inspector = inspect(self.engine)
 
-        columns = inspector.get_columns(table)
+        columns = inspector.get_columns(table_name)
         column_names = [column["name"] for column in columns]
         return column_names
+
+    def is_column(self, table_name, column_name):
+        names = self.get_column_names(table_name)
+        return column_name in names
 
     def row_to_json_data(self, row):
         data = dict(row._mapping)

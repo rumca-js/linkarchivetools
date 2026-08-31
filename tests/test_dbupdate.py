@@ -2,12 +2,12 @@ import unittest
 from pathlib import Path
 from sqlalchemy import create_engine
 
-from linkarchivetools import DbFilter
+from linkarchivetools import DbUpdate
 from linkarchivetools.utils.reflected import ReflectedGenericTable, ReflectedEntryTable
 from .dbtestcase import DbTestCase
 
 
-class DbFilterTest(DbTestCase):
+class DbUpdateTest(DbTestCase):
     def get_row_count(self, db_path, table_name):
         engine = create_engine(f"sqlite:///{db_path}")
         with engine.connect() as connection:
@@ -18,12 +18,12 @@ class DbFilterTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
-        db_filter = DbFilter(db="input.db")
-        self.assertTrue(db_filter.is_valid())
+        db_update = DbUpdate(db="input.db")
+        self.assertTrue(db_update.is_valid())
 
         path = Path("input.db")
         self.assertTrue(path.is_file())
-        db_filter.close()
+        db_update.close()
 
     def test_delete_entries_non_bookmarked(self):
         self.create_db("input.db")
@@ -45,10 +45,10 @@ class DbFilterTest(DbTestCase):
             entry_table.insert_json(data2)
 
         # Run filter
-        db_filter = DbFilter(db="input.db")
+        db_update = DbUpdate(db="input.db")
         # call tested function
-        db_filter.delete_entries_non_bookmarked()
-        db_filter.close()
+        db_update.delete_entries_non_bookmarked()
+        db_update.close()
 
         # Check input db
         engine = create_engine("sqlite:///input.db")
@@ -77,10 +77,10 @@ class DbFilterTest(DbTestCase):
             data2["page_rating_votes"] = 0
             entry_table.insert_json(data2)
 
-        db_filter = DbFilter(db="input.db")
+        db_update = DbUpdate(db="input.db")
         # call tested function
-        db_filter.delete_entries_no_votes()
-        db_filter.close()
+        db_update.delete_entries_no_votes()
+        db_update.close()
 
         engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
@@ -115,10 +115,10 @@ class DbFilterTest(DbTestCase):
             data3["page_rating_votes"] = 0
             entry_table.insert_json(data3)
 
-        db_filter = DbFilter(db="input.db")
+        db_update = DbUpdate(db="input.db")
         # call tested function
-        db_filter.delete_entries_redundant()
-        db_filter.close()
+        db_update.delete_entries_redundant()
+        db_update.close()
 
         engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
@@ -145,9 +145,9 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        db_filter = DbFilter(db="input.db")
-        db_filter.truncate_user_tables()
-        db_filter.close()
+        db_update = DbUpdate(db="input.db")
+        db_update.truncate_user_tables()
+        db_update.close()
 
         #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
         self.assertEqual(self.get_row_count("input.db", "userconfig"), 0)
@@ -177,9 +177,9 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        db_filter = DbFilter(db="input.db")
-        db_filter.truncate_dynamic_data()
-        db_filter.close()
+        db_update = DbUpdate(db="input.db")
+        db_update.truncate_dynamic_data()
+        db_update.close()
 
         #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
         self.assertTrue(self.get_row_count("input.db", "userconfig") > 0)
@@ -209,9 +209,9 @@ class DbFilterTest(DbTestCase):
         self.assertGreater(input_compactedtags_count, 0)
         self.assertGreater(input_searchview_count, 0)
 
-        db_filter = DbFilter(db="input.db")
-        db_filter.truncate_configuration_tables()
-        db_filter.close()
+        db_update = DbUpdate(db="input.db")
+        db_update.truncate_configuration_tables()
+        db_update.close()
 
         #self.assertEqual(self.get_row_count("input.db", "browser"), 0)
         self.assertTrue(self.get_row_count("input.db", "userconfig") > 0)
@@ -229,11 +229,11 @@ class DbFilterTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
-        db_filter = DbFilter(db="input.db")
+        db_update = DbUpdate(db="input.db")
         # Run filter
-        db_filter.obfuscate()
+        db_update.obfuscate()
 
-        db_filter.close()
+        db_update.close()
 
     def test_obfuscate__connection(self):
         self.create_db("input.db")
@@ -250,11 +250,11 @@ class DbFilterTest(DbTestCase):
 
         engine = create_engine("sqlite:///input.db")
         with engine.connect() as connection:
-            db_filter = DbFilter(engine=engine, connection=connection)
+            db_update = DbUpdate(engine=engine, connection=connection)
             # Run filter
-            db_filter.obfuscate()
+            db_update.obfuscate()
 
-            db_filter.close()
+            db_update.close()
 
         users_count = self.get_row_count("input.db", "user")
         self.assertEqual(users_count, 1)
@@ -265,3 +265,25 @@ class DbFilterTest(DbTestCase):
             users = users.get_where({})
             for user in users:
                 print(user)
+
+    def test_is_table(self):
+        self.create_db("input.db")
+        db_update = DbUpdate(db="input.db")
+        self.assertTrue(db_update.is_table("linkdatamodel"))
+        self.assertFalse(db_update.is_table("beetlebum"))
+
+    def test_is_column(self):
+        self.create_db("input.db")
+        db_update = DbUpdate(db="input.db")
+        self.assertTrue(db_update.is_column("linkdatamodel", "title"))
+        self.assertFalse(db_update.is_column("linkdatamodel", "beetlebum"))
+
+    def test_create_tables(self):
+        db_name = "unexpected-db-name.db"
+
+        db_update = DbUpdate(db=db_name)
+        db_update.create_tables()
+
+        path = Path(db_name)
+        self.assertTrue(path.is_file())
+        db_update.close()
