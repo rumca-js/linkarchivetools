@@ -3,13 +3,22 @@ Converts Database to information about RSS feeds.
 """
 
 import shutil
+import time
 import argparse
 from pathlib import Path
 from sqlalchemy import create_engine
 
 from webtoolkit import RemoteUrl, BaseUrl
 from linkarchivetools import tableconfig
+
 from .utils.reflected import *
+
+
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
 class Db2Feeds(object):
@@ -251,6 +260,8 @@ def main():
         print("File {} does not exist".format(path))
         return
 
+    start_time = time.time()
+
     reader = Db2Feeds(
         input_db=args.db,
         output_db=args.output_db,
@@ -259,6 +270,8 @@ def main():
         output_format=args.output_format,
     )
     reader.convert()
+
+    print_time_diff(start_time)
 
 
 if __name__ == "__main__":

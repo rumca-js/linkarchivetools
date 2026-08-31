@@ -15,7 +15,6 @@ class JSON2DbTest(unittest.TestCase):
             path.unlink()
 
         shutil.copy("example/bookmark_0.json", "input.json")
-        shutil.copy("example/db.db", "db.db")
 
     def test_init(self):
         self.copy_input()

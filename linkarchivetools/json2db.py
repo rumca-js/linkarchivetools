@@ -13,7 +13,15 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from dateutil import parser
 
-from .utils.reflected import *
+from .utils.reflected import ReflectedEntryTable
+from linkarchivetools.dbupdate import DbUpdate
+
+
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
 class DirReader(object):
@@ -58,9 +66,11 @@ class JSON2Db(object):
             self.files = []
 
     def convert(self):
-        #path = Path(self.output_db)
-        #if path.exists():
-        #    path.unlink()
+        path = Path(self.output_db)
+        if not path.exists():
+            db_update = DbUpdate(db=self.output_db)
+            db_update.create_tables()
+            db_update.close()
 
         self.engine = create_engine(f"sqlite:///{self.output_db}")
         with self.engine.connect() as connection:
@@ -189,8 +199,8 @@ class Parser(object):
 
         self.args = self.parser.parse_args()
 
-        if self.args.dir:
-            self.dir = self.args.dir
+        if self.args.input_dir:
+            self.dir = self.args.input_dir
         else:
             self.dir = None
 
@@ -206,27 +216,27 @@ class Parser(object):
 
 
 def main():
-    print("Starting processing")
     parser = Parser()
     parser.parse()
 
+    if not parser.args.input_file and not parser.args.input_dir:
+        print("No input file was specified")
+        return
+
     try:
+        print("Starting processing")
         start_time = time.time()
 
         c = JSON2Db(input_file = parser.args.input_file, input_dir=parser.args.input_dir, output_db = parser.args.output_db)
         c.convert()
 
-        elapsed_time_seconds = time.time() - start_time
-        elapsed_minutes = int(elapsed_time_seconds // 60)
-        elapsed_seconds = int(elapsed_time_seconds % 60)
-        print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
+        print_time_diff(start_time)
 
     except Exception as e:
         print("Exception: {}".format(e))
     except KeyboardInterrupt as e:
         print("Exception: {}".format(e))
 
-    db.close()
     print("Processing DONE")
 
 

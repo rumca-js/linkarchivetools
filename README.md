@@ -1,8 +1,13 @@
 # Link Database Tools
 
-Package provides tools that allow to filter databases produced by https://github.com/rumca-js/Django-link-archive.
+Package provides tools to manipulate awesome databases.
 
-Can filter or analyze entries from https://github.com/rumca-js/Internet-Places-Database.
+Provides awesome [database specification](https://github.com/rumca-js/linkarchivetools/blob/main/linkarchivetools/model/definitions.py)
+
+Example of awesome databases:
+ - https://github.com/rumca-js/Internet-Places-Database
+ - https://github.com/rumca-js/awesome-database-feeds
+ - https://github.com/rumca-js/awesome-database-top
 
 # Tools
 
@@ -11,8 +16,8 @@ Can filter or analyze entries from https://github.com/rumca-js/Internet-Places-D
  - Db2Feeds - converts database to DB of feeds
  - Db2JSON - converts database to JSON
  - JSON2Db - Converts JSON into datbase
- - DbMerge - Merges database with other databse
- - backup.sh - create backup of Postgres tables
+ - DbMerge - Merges a database with other databse
+ - backup.py - create backup of Postgres tables
 
 # DbAnalyzer
 
@@ -140,6 +145,10 @@ options:
                         DBs to be scanned. Delim ,
   --output OUTPUT       DB to be produced
 ```
+
+# JSON2Db
+
+JSON
 
 # Utils
 

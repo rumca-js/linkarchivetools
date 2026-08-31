@@ -20,6 +20,13 @@ from linkarchivetools.utils.reflected import ReflectedTable
 from linkarchivetools.tableconfig import *
 
 
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
+
+
 class DbUpdate(object):
     """
     Filter class
@@ -268,8 +275,7 @@ def main():
     update_controller.vacuum()
     update_controller.close()
 
-    end_time = time.time()
-    print(f"Done in {end_time}")
+    print_time_diff(start_time)
 
 
 if __name__ == "__main__":

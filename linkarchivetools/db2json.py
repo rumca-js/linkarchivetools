@@ -6,11 +6,19 @@ import os
 import sys
 import json
 import shutil
+import time
 from pathlib import Path
 import argparse
 
 from sqlalchemy import create_engine
 from .utils.reflected import *
+
+
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
 class Db2JSON(object):
@@ -183,6 +191,8 @@ def parse():
 def main():
     parser, args = parse()
 
+    start_time = time.time()
+
     f = Db2JSON(
         input_db=args.db,
         output_dir=args.output_dir,
@@ -190,6 +200,8 @@ def main():
         rows_max=args.rows_max,
     )
     f.convert()
+
+    print_time_diff(start_time)
 
 
 if __name__ == "__main__":

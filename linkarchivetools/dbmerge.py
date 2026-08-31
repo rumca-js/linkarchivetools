@@ -1,10 +1,18 @@
 import shutil
 import os
+import time
 from pathlib import Path
 from sqlalchemy import create_engine
 import argparse
 
 from .utils.reflected import *
+
+
+def print_time_diff(start_time):
+    elapsed_time_seconds = time.time() - start_time
+    elapsed_minutes = int(elapsed_time_seconds // 60)
+    elapsed_seconds = int(elapsed_time_seconds % 60)
+    print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
 
 class DbMerge(object):
@@ -123,7 +131,11 @@ def parse():
 def main():
     p, args = parse()
 
+    start_time = time.time()
+
     m = DbMerge()
+
+    print_time_diff(start_time)
 
 
 if __name__ == "__main__":
