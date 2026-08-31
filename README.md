@@ -19,13 +19,22 @@ Example of awesome databases:
  - DbMerge - Merges a database with other databse
  - backup.py - create backup of Postgres tables
 
-# DbAnalyzer
+# Installation
 
+pip install linkarchivetools
+
+# Utils
+
+Reflected tools - provides access table definitions.
+Model - model data. Classes that allow you to modify, read tables.
+
+# DbAnalyzer
 ```
-usage: dbanalyzer.py [-h] [--db DB] [--search SEARCH] [--order-by ORDER_BY] [--asc] [--desc]
-                     [--table TABLE] [--title] [--votes] [--description] [--status] [--tags]
-                     [--social] [--date-published] [--source] [--summary] [--columns] [--rss]
-                     [--channel] [--json] [-i] [-v VERBOSITY]
+usage: dbanalyzer.py [-h] [--db DB] [--search SEARCH] [--order-by ORDER_BY]
+                     [--asc] [--desc] [--table TABLE] [--title] [--votes]
+                     [--description] [--status] [--tags] [--social]
+                     [--date-published] [--source] [--summary] [--columns]
+                     [--rss] [--channel] [--json] [-i] [-v VERBOSITY]
 
 Data analyzer program
 
@@ -54,14 +63,14 @@ options:
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level
 ```
-
 # DbUpdate
-
 ```
-usage: dbupdate.py [-h] [--db DB] [--create-tables] [--truncate-tables TRUNCATE_TABLES]
-                   [--trunc-dynamic-data] [--trunc-configuration] [--trunc-search-data]
-                   [--trunc-visits-data] [--delete-non-bookmarked] [--delete-no-votes]
-                   [--delete-redundant] [--no-users] [--obfuscate] [-v VERBOSITY]
+usage: dbupdate.py [-h] [--db DB] [--create-tables]
+                   [--truncate-tables TRUNCATE_TABLES] [--trunc-dynamic-data]
+                   [--trunc-configuration] [--trunc-search-data]
+                   [--trunc-visits-data] [--delete-non-bookmarked]
+                   [--delete-no-votes] [--delete-redundant] [--no-users]
+                   [--obfuscate] [-v VERBOSITY]
 
 DB manipulation program
 
@@ -79,22 +88,21 @@ options:
   --delete-non-bookmarked
                         Removes non bookmarked
   --delete-no-votes     Removes entries without a vote
-  --delete-redundant    Removes entries that are redundant - not bookmarked, no votes
+  --delete-redundant    Removes entries that are redundant - not bookmarked,
+                        no votes
   --no-users            Prepares for setup with no users
   --obfuscate           Obfuscates private data
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level
-
 ```
-
 # Db2Feeds
-
 ```
-usage: db2feeds.py [-h] [--db DB] [--output-db OUTPUT_DB] [--update-rss] [--clean]
-                   [--read-internet-links] [--output-format OUTPUT_FORMAT]
+usage: db2feeds.py [-h] [--db DB] [--output-db OUTPUT_DB] [--update-rss]
+                   [--clean] [--read-internet-links]
+                   [--output-format OUTPUT_FORMAT]
                    [--crawling-server CRAWLING_SERVER]
 
-Data analyzer program
+Database links to feeds converter program
 
 options:
   -h, --help            show this help message and exit
@@ -104,20 +112,31 @@ options:
   --update-rss          Reads RSS to check it's title and properties
   --clean               If output db exists, then it is removed at start
   --read-internet-links
-                        Reads entries to check if contains RSS. Without it only calculated RSS are
-                        returned
+                        Reads entries to check if contains RSS. Without it
+                        only calculated RSS are returned
   --output-format OUTPUT_FORMAT
                         format of display. LINES, JSON, SQLITE
   --crawling-server CRAWLING_SERVER
                         Remote crawling server
 ```
-
-# Db2JSON
-
+# DbMerge
 ```
-usage: db2json.py [-h] [--db DB] [--output-dir OUTPUT_DIR] [--rows-max] [-f FORMAT] [-v VERBOSITY]
+usage: dbmerge.py [-h] [--input-dbs INPUT_DBS] [--output OUTPUT]
 
-Data analyzer program
+Databases merge program
+
+options:
+  -h, --help            show this help message and exit
+  --input-dbs INPUT_DBS
+                        DBs to be scanned. Delim ,
+  --output OUTPUT       DB to be produced
+```
+# Db2JSON
+```
+usage: db2json.py [-h] [--db DB] [--output-dir OUTPUT_DIR] [--rows-max]
+                  [-f FORMAT] [-v VERBOSITY]
+
+Database to JSON files converter
 
 options:
   -h, --help            show this help message and exit
@@ -130,31 +149,23 @@ options:
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level
 ```
-
-
-# DbMerge
-
+# JSON2Db
 ```
-usage: dbmerge.py [-h] [--input-dbs INPUT_DBS] [--output OUTPUT]
+usage: json2db.py [-h] [--input-file INPUT_FILE] [--input-dir INPUT_DIR]
+                  [--output-db OUTPUT_DB] [--preserve-id]
+                  [--vote-min VOTE_MIN] [--verbose]
 
-Data analyzer program
+Data converter program
 
 options:
   -h, --help            show this help message and exit
-  --input-dbs INPUT_DBS
-                        DBs to be scanned. Delim ,
-  --output OUTPUT       DB to be produced
+  --input-file INPUT_FILE
+                        File to be scanned
+  --input-dir INPUT_DIR
+                        Directory to be scanned
+  --output-db OUTPUT_DB
+                        Output db name
+  --preserve-id         Preserves ID of objects
+  --vote-min VOTE_MIN   Minimum amount of entry vote
+  --verbose             Shows more info
 ```
-
-# JSON2Db
-
-JSON
-
-# Utils
-
-Reflected tools - provides access table definitions.
-Model - model data. Classes that allow you to modify, read tables
-
-# Installation
-
-pip install linkarchivetools
