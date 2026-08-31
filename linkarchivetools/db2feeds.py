@@ -234,7 +234,7 @@ class Db2Feeds(object):
 
 
 def parse():
-    parser = argparse.ArgumentParser(description="Data analyzer program")
+    parser = argparse.ArgumentParser(description="Database links to feeds converter program")
     parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
     parser.add_argument("--output-db", help="File to be created")
     parser.add_argument("--update-rss",action="store_true", help="Reads RSS to check it's title and properties")

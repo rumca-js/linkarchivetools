@@ -119,7 +119,7 @@ class DbMerge(object):
 
 
 def parse():
-    parser = argparse.ArgumentParser(description="Data analyzer program")
+    parser = argparse.ArgumentParser(description="Databases merge program")
     parser.add_argument("--input-dbs", default="", help="DBs to be scanned. Delim ,")
     parser.add_argument("--output", default="feeds.db", help="DB to be produced")
 

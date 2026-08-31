@@ -174,7 +174,7 @@ class Db2JSON(object):
 
 
 def parse():
-    parser = argparse.ArgumentParser(description="Data analyzer program")
+    parser = argparse.ArgumentParser(description="Database to JSON files converter")
     parser.add_argument("--db", default="places.db", help="DB to be scanned")
     parser.add_argument("--output-dir", default="json", help="Output directory")
     parser.add_argument(
