@@ -118,18 +118,20 @@ class DbMerge(object):
         return True
 
 
-def parse():
-    parser = argparse.ArgumentParser(description="Databases merge program")
-    parser.add_argument("--input-dbs", default="", help="DBs to be scanned. Delim ,")
-    parser.add_argument("--output", default="feeds.db", help="DB to be produced")
+class Db2MergeParser(object):
+    def parse(self):
+        parser = argparse.ArgumentParser(description="Databases merge program")
+        parser.add_argument("--input-dbs", default="", help="DBs to be scanned. Delim ,")
+        parser.add_argument("--output", default="feeds.db", help="DB to be produced")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    return parser, args
+        return parser, args
 
 
 def main():
-    p, args = parse()
+    parser = Db2MergeParser()
+    p, args = parser.parse()
 
     start_time = time.time()
 

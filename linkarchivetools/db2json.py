@@ -173,23 +173,25 @@ class Db2JSON(object):
         self.close()
 
 
-def parse():
-    parser = argparse.ArgumentParser(description="Database to JSON files converter")
-    parser.add_argument("--db", default="places.db", help="DB to be scanned")
-    parser.add_argument("--output-dir", default="json", help="Output directory")
-    parser.add_argument(
-        "--rows-max", default=1000, action="store_true", help="Number of rows per file"
-    )
-    parser.add_argument("-f", "--format", default="entries", help="file name format")
-    parser.add_argument("-v", "--verbosity", help="Verbosity level")
+class Db2JSONParser(object):
+    def parse(self):
+        parser = argparse.ArgumentParser(description="Database to JSON files converter")
+        parser.add_argument("--db", default="places.db", help="DB to be scanned")
+        parser.add_argument("--output-dir", default="json", help="Output directory")
+        parser.add_argument(
+            "--rows-max", default=1000, action="store_true", help="Number of rows per file"
+        )
+        parser.add_argument("-f", "--format", default="entries", help="file name format")
+        parser.add_argument("-v", "--verbosity", help="Verbosity level")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    return parser, args
+        return parser, args
 
 
 def main():
-    parser, args = parse()
+    parser = Db2JSONParser()
+    parser, args = parser.parse()
 
     start_time = time.time()
 

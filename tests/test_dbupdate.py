@@ -269,21 +269,49 @@ class DbUpdateTest(DbTestCase):
     def test_is_table(self):
         self.create_db("input.db")
         db_update = DbUpdate(db="input.db")
+
+        # call tested function
         self.assertTrue(db_update.is_table("linkdatamodel"))
+        # call tested function
         self.assertFalse(db_update.is_table("beetlebum"))
 
     def test_is_column(self):
         self.create_db("input.db")
         db_update = DbUpdate(db="input.db")
+
+        # call tested function
         self.assertTrue(db_update.is_column("linkdatamodel", "title"))
+        # call tested function
         self.assertFalse(db_update.is_column("linkdatamodel", "beetlebum"))
 
     def test_create_tables(self):
         db_name = "unexpected-db-name.db"
 
         db_update = DbUpdate(db=db_name)
+
+        # call tested function
         db_update.create_tables()
 
         path = Path(db_name)
         self.assertTrue(path.is_file())
         db_update.close()
+
+    def test_insert_links(self):
+        self.create_db("input.db")
+        self.clean_out()
+        self.truncate_table("input.db", "linkdatamodel")
+
+        db_update = DbUpdate(db="input.db")
+
+        # call tested function
+        self.assertTrue(db_update.insert_links("http://youtube.com"))
+
+    def test_insert_source_urls(self):
+        self.create_db("input.db")
+        self.clean_out()
+        self.truncate_table("input.db", "sourcedatamodel")
+
+        db_update = DbUpdate(db="input.db")
+
+        # call tested function
+        self.assertTrue(db_update.insert_source_urls("http://youtube.com"))

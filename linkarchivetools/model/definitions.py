@@ -1,3 +1,7 @@
+"""
+Provided to be able to create tables in empty file
+"""
+
 from typing import Optional
 from sqlalchemy import (
     Table,

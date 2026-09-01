@@ -1,7 +1,9 @@
 """
-This file is mainly for SQLite.
+Provided mainly for SQLite.
 It will not open several connection, will use one.
 This allows us to handle nested calls of generators without any problems.
+Provides JSON interface for tables.
+Provides easy methods to truncate, count, run sql code.
 """
 from datetime import datetime, time
 from sqlalchemy import (
@@ -132,6 +134,9 @@ class ReflectedGenericTable(object):
 
     def get_table_name():
         return self.table_name
+
+    def close(self):
+        pass
 
     def get_table(self):
         if self.table is not None:
@@ -323,6 +328,13 @@ class ReflectedGenericTable(object):
         self.connection.execute(text(sql_text))
         self.connection.commit()
 
+    def is_set(self, json_data, aproperty):
+        if aproperty not in json_data:
+            return False
+        if json_data[aproperty] is None:
+            return False
+        return True
+
 
 class ReflectedEntryTable(ReflectedGenericTable):
     def get_table_name(self):
@@ -332,24 +344,26 @@ class ReflectedEntryTable(ReflectedGenericTable):
         if "link" not in entry_json:
             return
 
-        if "source_url" not in entry_json:
+        if not self.is_set(entry_json, "source_url"):
             entry_json["source_url"] = ""
-        if "permanent" not in entry_json:
+        if not self.is_set(entry_json, "permanent"):
             entry_json["permanent"] = False
-        if "bookmarked" not in entry_json:
+        if not self.is_set(entry_json, "bookmarked"):
             entry_json["bookmarked"] = False
-        if "status_code" not in entry_json:
+        if not self.is_set(entry_json, "status_code"):
             entry_json["status_code"] = 0
-        if "contents_type" not in entry_json:
+        if not self.is_set(entry_json, "contents_type"):
             entry_json["contents_type"] = 0
-        if "page_rating_contents" not in entry_json:
+        if not self.is_set(entry_json,"page_rating_contents"):
             entry_json["page_rating_contents"] = 0
-        if "page_rating_visits" not in entry_json:
+        if not self.is_set(entry_json,"page_rating_visits"):
             entry_json["page_rating_visits"] = 0
-        if "page_rating_votes" not in entry_json:
+        if not self.is_set(entry_json,"page_rating_votes"):
             entry_json["page_rating_votes"] = 0
-        if "page_rating" not in entry_json:
+        if not self.is_set(entry_json,"page_rating"):
             entry_json["page_rating"] = 0
+        if not self.is_set(entry_json,"age"):
+            entry_json["age"] = 0
 
         return self.insert_json_data(entry_json)
 
@@ -514,8 +528,44 @@ class ReflectedSourceTable(ReflectedGenericTable):
             yield source
 
     def insert_json(self, source_json):
-        if "url" not in source_json:
+        if not self.is_set(source_json, "url"):
             source_json["url"] = ""
+        if not self.is_set(source_json,"enabled"):
+            source_json["enabled"] = True
+        if not self.is_set(source_json,"source_type"):
+            source_json["source_type"] = ""
+        if not self.is_set(source_json,"title"):
+            source_json["title"] = ""
+        if not self.is_set(source_json,"category_name"):
+            source_json["category_name"] = ""
+        if not self.is_set(source_json,"subcategory_name"):
+            source_json["subcategory_name"] = ""
+        if not self.is_set(source_json,"export_to_cms"):
+            source_json["export_to_cms"] = False
+        if not self.is_set(source_json,"remove_after_days"):
+            source_json["remove_after_days"] = 0
+        if not self.is_set(source_json,"language"):
+            source_json["language"] = ""
+        if not self.is_set(source_json,"favicon"):
+            source_json["favicon"] = ""
+        if not self.is_set(source_json,"age"):
+            source_json["age"] = 0
+        if not self.is_set(source_json,"xpath"):
+            source_json["xpath"] = ""
+        if not self.is_set(source_json,"fetch_period"):
+            source_json["fetch_period"] = 0
+        if not self.is_set(source_json,"auto_tag"):
+            source_json["auto_tag"] = ""
+        if not self.is_set(source_json,"entries_backgroundcolor_alpha"):
+            source_json["entries_backgroundcolor_alpha"] = 0.0
+        if not self.is_set(source_json,"entries_backgroundcolor"):
+            source_json["entries_backgroundcolor"] = 0.0
+        if not self.is_set(source_json,"entries_alpha"):
+            source_json["entries_alpha"] = 0.0
+        if not self.is_set(source_json,"proxy_location"):
+            source_json["proxy_location"] = ""
+        if not self.is_set(source_json,"auto_update_favicon"):
+            source_json["auto_update_favicon"] = False
 
         return self.insert_json_data(source_json)
 

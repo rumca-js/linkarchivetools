@@ -13,6 +13,16 @@ class Sources(BaseTable):
         self.connection = connection
         self.set_table("sources_table")
 
+    def add(self, source_url, source_type=""):
+        if self.exists(source_url):
+            return
+
+        properties = {}
+        properties["url"] = source_url
+        properties["source_type"] = source_type
+
+        return self.connection.sources_table.insert_json(properties)
+
     def set(self, source_url, source_properties=None, source_type=""):
         link = source_url
 
@@ -24,13 +34,6 @@ class Sources(BaseTable):
             title = source_properties.get("title", "")
             language = source_properties.get("language", "")
             favicon = source_properties.get("thumbnail", "")
-
-        if not title:
-            title = ""
-        if not language:
-            language = ""
-        if not favicon:
-            favicon = ""
 
         source = self.get_with_url(link)
         if source:
@@ -45,27 +48,12 @@ class Sources(BaseTable):
 
             return self.connection.sources_table.update_json_data(source.id, data)
 
-        properties = {
-               "url": link,
-               "enabled" : True,
-               "source_type" : source_type,
-               "title" : title,
-               "category_name": "",
-               "subcategory_name": "",
-               "export_to_cms": False,
-               "remove_after_days": 5,
-               "language": language,
-               "age": 0,
-               "fetch_period": 0,
-               "auto_tag": "",
-               "entries_backgroundcolor_alpha": 1.0,
-               "entries_backgroundcolor": "",
-               "entries_alpha": 1.0,
-               "proxy_location": "",
-               "auto_update_favicon":False,
-               "xpath": "",
-               "favicon": favicon,
-       }
+        properties = {}
+        properties["url"] = link
+        properties["source_type"] = source_type
+        properties["title"] = title
+        properties["language"] = language
+        properties["favicon"] = favicon
 
         return self.connection.sources_table.insert_json(properties)
 

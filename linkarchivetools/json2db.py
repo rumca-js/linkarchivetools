@@ -181,7 +181,7 @@ class JSON2Db(object):
             print("Could not read file: {}".format(afile))
 
 
-class Parser(object):
+class JSON2DbParser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data converter program")
         self.parser.add_argument("--input-file", help="File to be scanned")
@@ -214,9 +214,11 @@ class Parser(object):
         else:
             self.vote_min = None
 
+        return self.parser, self.args
+
 
 def main():
-    parser = Parser()
+    parser = JSON2DbParser()
     parser.parse()
 
     if not parser.args.input_file and not parser.args.input_dir:

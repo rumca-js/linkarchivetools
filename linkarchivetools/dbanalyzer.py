@@ -291,7 +291,7 @@ class DbAnalyzer(object):
         yield from searcher.search()
 
 
-class Parser(object):
+class DbAnalyzerParser(object):
 
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data analyzer program")
@@ -357,11 +357,11 @@ class Parser(object):
 
         self.args = self.parser.parse_args()
 
-        return True
+        return self.parser, self.args
 
 
 def main():
-    p = Parser()
+    p = DbAnalyzerParser()
     if not p.parse():
         print("Could not parse options")
         return

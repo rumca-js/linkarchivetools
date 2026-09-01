@@ -233,27 +233,29 @@ class Db2Feeds(object):
             print("Unsupported output format")
 
 
-def parse():
-    parser = argparse.ArgumentParser(description="Database links to feeds converter program")
-    parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
-    parser.add_argument("--output-db", help="File to be created")
-    parser.add_argument("--update-rss",action="store_true", help="Reads RSS to check it's title and properties")
-    parser.add_argument("--clean",action="store_true", help="If output db exists, then it is removed at start")
-    parser.add_argument("--read-internet-links",action="store_true", help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
-    parser.add_argument(
-        "--output-format",
-        default="LINES",
-        help="format of display. LINES, JSON, SQLITE",
-    )
-    parser.add_argument("--crawling-server", default="", help="Remote crawling server")
+class Db2FeedsParser(object):
+    def parse(self):
+        parser = argparse.ArgumentParser(description="Database links to feeds converter program")
+        parser.add_argument("--db", default="catalog.db", help="DB to be scanned")
+        parser.add_argument("--output-db", help="File to be created")
+        parser.add_argument("--update-rss",action="store_true", help="Reads RSS to check it's title and properties")
+        parser.add_argument("--clean",action="store_true", help="If output db exists, then it is removed at start")
+        parser.add_argument("--read-internet-links",action="store_true", help="Reads entries to check if contains RSS. Without it only calculated RSS are returned")
+        parser.add_argument(
+            "--output-format",
+            default="LINES",
+            help="format of display. LINES, JSON, SQLITE",
+        )
+        parser.add_argument("--crawling-server", default="", help="Remote crawling server")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    return parser, args
+        return parser, args
 
 
 def main():
-    parser, args = parse()
+    parser = Db2FeedsParser()
+    parser, args = parser.parse()
 
     path = Path(args.db)
     if not path.exists():

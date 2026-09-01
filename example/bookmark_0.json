@@ -18,7 +18,7 @@
         "status_code": 200,
         "thumbnail": "https://www.bryanbraun.com/assets/images/logo.png",
         "title": "I keep making things out of checkboxes | Bryan Braun - Designer/Developer",
-        "age": null,
+        "age": 0,
         "id": 28241,
         "tags": [
             "project",

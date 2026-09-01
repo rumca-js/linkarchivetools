@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 
-from linkarchivetools.dbanalyzer import DbAnalyzer, Parser, main
+from linkarchivetools.dbanalyzer import main
 
 
 if __name__ == "__main__":

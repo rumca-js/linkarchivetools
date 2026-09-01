@@ -1,3 +1,6 @@
+"""
+Provides controllers for tables. Some business logic
+"""
 
 from .dbconnection import *
 from .entries import *

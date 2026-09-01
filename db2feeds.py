@@ -1,7 +1,7 @@
 import time
 from sqlalchemy import create_engine
 
-from linkarchivetools.dbupdate import main
+from linkarchivetools.db2feeds import main
 
 
 if __name__ == "__main__":

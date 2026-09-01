@@ -16,7 +16,11 @@ from sqlalchemy import (
     MetaData,
 )
 from linkarchivetools.model.definitions import create_tables
-from linkarchivetools.utils.reflected import ReflectedTable
+from linkarchivetools.utils.reflected import (
+    ReflectedTable,
+    ReflectedSourceTable,
+    ReflectedEntryTable,
+)
 from linkarchivetools.tableconfig import *
 
 
@@ -158,6 +162,30 @@ class DbUpdate(object):
         table.vacuum()
         table.close()
 
+    def insert_links(self, links):
+        table = ReflectedEntryTable(self.engine, self.connection)
+
+        for link in links:
+            json = {}
+            json["link"] = link
+            if not table.exists(link=link):
+                status = table.insert_json(json)
+
+        table.close
+        return True
+
+    def insert_source_urls(self, urls):
+        table = ReflectedSourceTable(self.engine, self.connection)
+
+        for url in urls:
+            json = {}
+            json["url"] = url
+            if not table.exists(url=url):
+                table.insert_json(json)
+
+        table.close
+        return True
+
     def obfuscate(self):
         """
         Does not remove user tables
@@ -204,73 +232,91 @@ class DbUpdate(object):
                 destination_connection.commit()
 
 
-def parse():
-    parser = argparse.ArgumentParser(description="DB manipulation program")
-    parser.add_argument("--db", help="DB to be filtered")
+class DbUpdaetParser():
+    def parse(self):
+        parser = argparse.ArgumentParser(description="DB manipulation program")
+        parser.add_argument("--db", help="DB to be filtered")
 
-    parser.add_argument("--create-tables", action="store_true", help="Creates tables. Even missing ones")
-    parser.add_argument("--truncate-tables", help="Truncate table(s). Pass table names")
+        parser.add_argument("--create-tables", action="store_true", help="Creates tables. Even missing ones")
+        parser.add_argument("--truncate-table", help="Truncate table")
+        parser.add_argument("--truncate-tables", help="Truncate tables")
 
-    parser.add_argument("--trunc-dynamic-data", action="store_true", help="Truncates dynamic tables")
-    parser.add_argument("--trunc-configuration", action="store_true", help="Removes uneceesary configuration")
-    parser.add_argument("--trunc-search-data", action="store_true", help="Removes all search data")
-    parser.add_argument("--trunc-visits-data", action="store_true", help="Removes all visit data")
-    parser.add_argument("--delete-non-bookmarked", action="store_true", help="Removes non bookmarked")
-    parser.add_argument("--delete-no-votes", action="store_true", help="Removes entries without a vote")
-    parser.add_argument("--delete-redundant", action="store_true", help="Removes entries that are redundant - not bookmarked, no votes")
+        parser.add_argument("--trunc-dynamic-data", action="store_true", help="Truncates dynamic tables")
+        parser.add_argument("--trunc-configuration", action="store_true", help="Removes uneceesary configuration")
+        parser.add_argument("--trunc-search-data", action="store_true", help="Removes all search data")
+        parser.add_argument("--trunc-visits-data", action="store_true", help="Removes all visit data")
+        parser.add_argument("--trunc-no-users", action="store_true", help="Prepares for setup with no users")
 
-    parser.add_argument("--no-users", action="store_true", help="Prepares for setup with no users")
-    parser.add_argument("--obfuscate", action="store_true", help="Obfuscates private data")
+        parser.add_argument("--delete-non-bookmarked", action="store_true", help="Removes non bookmarked")
+        parser.add_argument("--delete-no-votes", action="store_true", help="Removes entries without a vote")
+        parser.add_argument("--delete-redundant", action="store_true", help="Removes entries that are redundant - not bookmarked, no votes")
 
-    parser.add_argument("-v", "--verbosity", help="Verbosity level")
+        parser.add_argument("--insert-link", help="Inserts link")
+        parser.add_argument("--insert-links", help="Inserts links")
+        parser.add_argument("--insert-source-url", help="Inserts source urls")
+        parser.add_argument("--insert-source-urls", help="Inserts source urls")
 
-    args = parser.parse_args()
+        parser.add_argument("--obfuscate", action="store_true", help="Obfuscates private data")
 
-    return parser, args
+        parser.add_argument("-v", "--verbosity", help="Verbosity level")
+
+        args = parser.parse_args()
+
+        return parser, args
 
 
 def main():
     start_time = time.time()
-    parser, args = parse()
+    parser = DbUpdaetParser()
+    parser, args = parser.parse()
 
     update_controller = DbUpdate(db=args.db)
     if not update_controller.is_valid():
         return
 
-    entries_changed = False
     if args.create_tables:
-        entries_changed = True
         update_controller.create_tables()
+
     if args.truncate_tables:
-        entries_changed = True
-        update_controller.truncate_tables({args.truncate})
-    if args.obfuscate:
-        entries_changed = True
-        update_controller.obfuscate()
+        tables = args.truncate_tables.split(",")
+        update_controller.truncate_tables(set(tables))
+    if args.truncate_table:
+        update_controller.truncate_tables({args.truncate_table})
     if args.trunc_no_users:
-        entries_changed = True
         update_controller.truncate_user_tables()
     if args.trunc_dynamic_data:
-        entries_changed = True
         update_controller.truncate_dynamic_data()
-    if args.delete_non_bookmarked:
-        entries_changed = True
-        update_controller.delete_entries_non_bookmarked()
-    if args.delete_no_votes:
-        entries_changed = True
-        update_controller.delete_entries_no_votes()
-    if args.delete_redundant:
-        entries_changed = True
-        update_controller.delete_entries_redundant()
     if args.trunc_configuration_tables:
         update_controller.truncate_configuration_tables()
-    if args.search_data:
+    if args.trunc_search_data:
         update_controller.truncate_tables(get_search_tables())
     if args.trunc_visits_data:
         update_controller.truncate_tables(get_visits_tables())
 
-    if entries_changed:
-        update_controller.cleanup_tables()
+    if args.delete_non_bookmarked:
+        update_controller.delete_entries_non_bookmarked()
+    if args.delete_no_votes:
+        update_controller.delete_entries_no_votes()
+    if args.delete_redundant:
+        update_controller.delete_entries_redundant()
+
+    if args.obfuscate:
+        update_controller.obfuscate()
+
+    # inserts are after truncates, if one wants to clear search
+    # then to insert some
+
+    if args.insert_link:
+        update_controller.insert_links({args.insert_link})
+    if args.insert_links:
+        links = args.insert_links.split(",")
+        update_controller.insert_links(set(links))
+
+    if args.insert_source_url:
+        update_controller.insert_source_urls({args.insert_source_url})
+    if args.insert_source_urls:
+        urls = args.insert_source_urls.split(",")
+        update_controller.insert_source_urls(set(urls))
 
     update_controller.vacuum()
     update_controller.close()
