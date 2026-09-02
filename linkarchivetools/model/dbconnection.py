@@ -16,12 +16,18 @@ from linkarchivetools.utils.reflected import (
 
 
 class DbConnection(object):
-    def __init__(self, db_file):
+    def __init__(self, db_file=None, engine=None, connection=None):
         self.db_file = db_file
 
-        self.engine = DbConnection.create_engine(self.db_file)
+        if not engine:
+            self.engine = DbConnection.create_engine(self.db_file)
+        else:
+            self.engine = engine
 
-        self.connection = self.engine.connect()
+        if not connection:
+            self.connection = self.engine.connect()
+        else:
+            self.connection = connection
 
         sql_text = f"PRAGMA journal_mode=WAL;"
         self.connection.execute(text(sql_text))

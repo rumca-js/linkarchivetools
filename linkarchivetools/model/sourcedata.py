@@ -15,21 +15,25 @@ class SourceData(BaseTable):
         for op_data in op_datas:
             return op_data
 
-    def mark_read(self, source, url = None):
+    def mark_read(self, source, url_obj = None):
         op_data = self.get_source_data(source)
 
         new_data = {}
         new_data["date_fetched"] = datetime.now()
         new_data["source_obj_id"] = source.id
+        new_data["number_of_entries"] = 0
 
         # TODO fill correctly
         new_data["consecutive_errors"] = 0
         new_data["import_seconds"] = 0
-        new_data["number_of_entries"] = 0
 
-        if url:
-            new_data["page_hash"] = url.get_hash()
-            new_data["body_hash"] = url.get_body_hash()
+        if url_obj:
+            response = url_obj.get_response()
+
+            if response is not None:
+                new_data["page_hash"] = url_obj.get_hash()
+                new_data["body_hash"] = url_obj.get_body_hash()
+                new_data["number_of_entries"] = len(url_obj.get_entries())
 
         try:
             if op_data:

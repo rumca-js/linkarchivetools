@@ -364,6 +364,8 @@ class ReflectedEntryTable(ReflectedGenericTable):
             entry_json["page_rating"] = 0
         if not self.is_set(entry_json,"age"):
             entry_json["age"] = 0
+        if not self.is_set(entry_json,"manual_status_code"):
+            entry_json["manual_status_code"] = 0
 
         return self.insert_json_data(entry_json)
 

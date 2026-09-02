@@ -1,4 +1,6 @@
 from pathlib import Path
+from webtoolkit import BaseUrl
+
 from .sourcedata import SourceData
 from .entries import Entries
 from .basetable import BaseTable
@@ -46,7 +48,7 @@ class Sources(BaseTable):
             data["language"] = language
             data["source_type"] = source_type
 
-            return self.connection.sources_table.update_json_data(source.id, data)
+            return self.connection.sources_table.update_json_data(id=source.id, json_data=data)
 
         properties = {}
         properties["url"] = link
@@ -56,6 +58,61 @@ class Sources(BaseTable):
         properties["favicon"] = favicon
 
         return self.connection.sources_table.insert_json(properties)
+
+    def update(self, source, url_obj=None):
+        if not source.enabled:
+            return
+
+        if url_obj is None:
+            url_obj = BaseUrl(url = source.url)
+
+        url_obj.get_response()
+
+        source_properties = url_obj.get_properties()
+        if source_properties:
+            properties = {}
+            properties["title"] = source_properties["title"]
+            properties["favicon"] = source_properties["thumbnail"]
+            properties["language"] = source_properties["language"]
+            self.update_properties(source=source, properties=properties)
+
+    def update_all(self):
+        for source in self.get_table().get_where():
+            self.update(source=source)
+
+    def process_all(self):
+        for source in self.get_table().get_where():
+            self.process(source=source)
+
+    def process(self, source=None, id=None):
+        from .entries import Entries
+        from .sourcedata import SourceData
+
+        if source is None and id is not None:
+            source = self.get(id=id)
+
+        if source is None:
+            return
+
+        url_obj = BaseUrl(url = source.url)
+        self.update(source=source, url_obj=url_obj)
+
+        entry_controller = Entries(connection=self.connection)
+        entries = url_obj.get_entries()
+        for entry in entries:
+            entry_controller.add(entry_json=entry)
+
+        sd_controller = SourceData(connection=self.connection)
+        sd_controller.mark_read(source=source, url_obj=url_obj)
+
+    def update_properties(self, source, properties):
+        try:
+            entry_id = self.connection.sources_table.update_json_data(id=source.id, json_data=properties)
+            return entry_id
+        except Exception as E:
+            print(E)
+            print(properties)
+            raise
 
     def delete_entries(self, source):
         """

@@ -40,6 +40,12 @@ def get_tables():
         "entryvisithistory",
         "entrytransitionhistory",
     }
+
+    # to make sure, we have everything
+    tables = tables.union(get_backup_tables())
+    tables = tables.union(get_user_tables())
+    tables = tables.union(get_configuration_tables())
+
     return tables
 
 
@@ -107,9 +113,9 @@ def get_truncate_tables_setup_no_users():
         "gateway",
     }
 
-    tables = tables + get_personal_tables()
-    tables = tables + get_user_tables()
-    tables = tables + get_dynamic_tables()
+    tables = tables.union(get_personal_tables())
+    tables = tables.union(get_user_tables())
+    tables = tables.union(get_dynamic_tables())
 
     return tables
 

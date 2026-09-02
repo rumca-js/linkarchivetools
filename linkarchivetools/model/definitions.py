@@ -288,30 +288,39 @@ class LinkDataModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     link: Mapped[str] = mapped_column(String(30), unique=True)
+    source_url: Mapped[Optional[str]]
+
     title: Mapped[Optional[str]]
     description: Mapped[Optional[str]]
     thumbnail: Mapped[Optional[str]]
     language: Mapped[Optional[str]]
     age: Mapped[int] = mapped_column(default=0)
+
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
     date_published = mapped_column(DateTime(timezone=True), nullable=True)
     date_update_last = mapped_column(DateTime(timezone=True), nullable=True)
     date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
     date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
-    status_code: Mapped[int] = mapped_column(default=0)
-    page_rating: Mapped[int] = mapped_column(default=0)
-    page_rating_votes: Mapped[int] = mapped_column(default=0)
-    page_rating_contents: Mapped[int] = mapped_column(default=0)
+
     bookmarked: Mapped[bool] = mapped_column(default=False)
     permanent: Mapped[bool] = mapped_column(default=False)
+
     author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
-    source_url: Mapped[Optional[str]]
+
+    status_code: Mapped[int] = mapped_column(default=0)
+    manual_status_code: Mapped[int] = mapped_column(default=0)
     contents_type: Mapped[int] = mapped_column(default=0)
+
     page_rating_contents: Mapped[int] = mapped_column(default=0)
     page_rating_votes: Mapped[int] = mapped_column(default=0)
     page_rating_visits: Mapped[int] = mapped_column(default=0)
     page_rating: Mapped[int] = mapped_column(default=0)
+
+    contents_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
+    body_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
+    meta_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
+
     # advanced / foreign
     source_id: Mapped[Optional[int]]
 
@@ -382,21 +391,35 @@ class SourcesTable(Base):
     favicon: Mapped[Optional[str]]
     fetch_period: Mapped[Optional[int]]
     language: Mapped[Optional[str]]
-    proxy_location: Mapped[Optional[str]]
     remove_after_days: Mapped[Optional[int]]
     source_type: Mapped[Optional[str]]
     category_name: Mapped[Optional[str]]
     subcategory_name: Mapped[Optional[str]]
     auto_tag: Mapped[str] = mapped_column(String(1000), default="")
+    entries_backgroundcolor_alpha: Mapped[float] = mapped_column(default=0.0)
+    entries_backgroundcolor: Mapped[Optional[str]]
+    entries_alpha: Mapped[float] = mapped_column(default=0.0)
+    xpath: Mapped[Optional[str]]
+    proxy_location: Mapped[Optional[str]]
     auto_update_favicon: Mapped[bool] = mapped_column(default=True)
+    credentials_id: Mapped[Optional[int]] = mapped_column()
+    category_id: Mapped[Optional[int]] = mapped_column()
+    subcategory_id: Mapped[Optional[int]] = mapped_column()
 
 
 class SourceOperationalData(Base):
     __tablename__ = "sourceoperationaldata"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
     date_fetched = mapped_column(DateTime, nullable=True)
-    source: Mapped[int]
+    import_seconds: Mapped[Optional[int]]
+    number_of_entries: Mapped[Optional[int]]
+    page_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
+    body_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
+    consecutive_errors: Mapped[Optional[int]]
+
+    source_obj_id: Mapped[int]
 
 
 class UserTags(Base):
@@ -406,8 +429,8 @@ class UserTags(Base):
     date = mapped_column(DateTime)
     tag: Mapped[str] = mapped_column(String(1000))
 
-    entry_object: Mapped[Optional[int]]
-    user_object: Mapped[Optional[int]]
+    entry_id: Mapped[Optional[int]]
+    user_id: Mapped[Optional[int]]
 
 
 class UserBookmarks(Base):

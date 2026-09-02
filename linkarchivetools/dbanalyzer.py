@@ -12,6 +12,7 @@ import argparse
 import time
 import os
 import json
+from pathlib import Path
 from sqlalchemy import create_engine
 
 from webtoolkit import BaseUrl
@@ -22,7 +23,12 @@ from linkarchivetools.utils.alchemysearch import (
     AlchemyEquationEvaluator,
     AlchemySearch,
 )
-from linkarchivetools.model import entry_to_json
+from linkarchivetools.model import (
+    entry_to_json,
+    DbConnection,
+    Sources,
+    SourceData,
+)
 from linkarchivetools.utils.reflected import (
     ReflectedTable,
     ReflectedEntryTable,
@@ -66,7 +72,7 @@ class DisplayRowHandler(object):
                 link = feeds[0]
             else:
                 return
-        elif self.args.channels:
+        elif self.args.channel:
             url = BaseUrl(entry.link)
             urls = url.get_urls()
             if "channel_url" in urls:
@@ -108,6 +114,8 @@ class DisplayRowHandler(object):
         if self.args.title:
             if entry.title:
                 text += " " + entry.title
+            else:
+                text += " NO TITLE"
 
         if self.args.source:
             source_id = entry.source
@@ -115,7 +123,6 @@ class DisplayRowHandler(object):
                 r = ReflectedEntryTable(self.engine, self.connection)
                 source = r.get_source(source_id)
                 text += " [{}]".format(source.title)
-
         print(text)
 
         if self.args.date_published:
@@ -232,43 +239,31 @@ class DbAnalyzer(object):
         self.input_db = input_db
         self.engine = engine
         self.connection = connection
+        self.setup()
+
+    def setup(self):
+        if not self.connection:
+            if self.engine:
+                self.connection = self.engine.connect()
+            elif self.input_db:
+                path = Path(self.input_db)
+                if not path.exists():
+                    return
+
+                self.engine = create_engine(f"sqlite:///{self.input_db}")
+                self.connection = self.engine.connect()
+            else:
+                print("No db, no engine: Cannot establish connection for filtering")
 
     def print_summary(self, print_columns=False):
-        db = self.input_db
-
-        if db:
-            if not os.path.isfile(db):
-                print("File does not exist:{}".format(db))
-                return
-
-            self.engine = create_engine("sqlite:///" + db)
-            with self.engine.connect() as connection:
-                r = ReflectedTable(self.engine, connection)
-                r.print_summary(print_columns)
-        elif self.engine and self.connection:
+        if self.engine and self.connection:
             r = ReflectedTable(self.engine, self.connection)
             r.print_summary(print_columns)
         else:
             print("Could not print summary - missing database or connection")
 
     def search(self):
-        if self.input_db:
-            file = self.input_db
-            if not os.path.isfile(file):
-                print("File does not exist:{}".format(file))
-                return
-
-            print("Creating engine")
-            self.engine = create_engine("sqlite:///" + self.input_db)
-            print("Creating engine DONE")
-
-            with self.engine.connect() as connection:
-                self.connection = connection
-                yield from self.perform_search()
-        elif self.engine and self.connection:
-            yield from self.perform_search()
-        else:
-            print("No database was specified")
+        yield from self.perform_search()
 
     def perform_search(self):
         row_handler = DisplayRowHandler(args=self.args, engine=self.engine, connection=self.connection)
@@ -289,6 +284,19 @@ class DbAnalyzer(object):
 
         print("Searching...")
         yield from searcher.search()
+
+    def print_sources(self):
+        db_connection = DbConnection(engine=self.engine, connection=self.connection)
+        sources_controller = Sources(connection=db_connection)
+        for source in sources_controller.get_table().get_where():
+            text = f"Source:{source.id} {source.title}"
+            print(text)
+
+            sd_controller = SourceData(connection=db_connection)
+            data = sd_controller.get_source_data(source=source)
+            if data is not None:
+                text = f"Dynamic data: {data.page_hash} {data.body_hash}"
+                print(text)
 
 
 class DbAnalyzerParser(object):
@@ -349,6 +357,11 @@ class DbAnalyzerParser(object):
             action="store_true",
             help="JSON format",
         )
+        self.parser.add_argument(
+            "--print-sources",
+            action="store_true",
+            help="Lists sources",
+        )
 
         self.parser.add_argument(
             "-i", "--ignore-case", action="store_true", help="Ignores case"
@@ -368,11 +381,13 @@ def main():
 
     start_time = time.time()
 
-    m = DbAnalyzer(input_db=p.args.db, args=p.args)
+    db_analyzer = DbAnalyzer(input_db=p.args.db, args=p.args)
     if p.args.summary:
-        m.print_summary(p.args.columns)
+        db_analyzer.print_summary(p.args.columns)
+    elif p.args.print_sources:
+        db_analyzer.print_sources()
     else:
-        for _ in m.search():
+        for _ in db_analyzer.search():
             pass
 
     print_time_diff(start_time)
