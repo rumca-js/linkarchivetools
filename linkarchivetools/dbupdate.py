@@ -98,6 +98,11 @@ class DbUpdate(object):
             self.connection.close()
             self.connection = None
 
+    def recreate_table(self, table_name):
+        table = ReflectedTable(engine=self.engine, connection=self.connection)
+        table.drop_table(table_name)
+        self.create_tables()
+
     def truncate_all_tables(self):
         """
         Truncates tables - all
@@ -257,6 +262,7 @@ class DbUpdaetParser():
 
         # main
         parser.add_argument("--create-tables", action="store_true", help="Creates tables. Even missing ones")
+        parser.add_argument("--recreate-table", help="Recreate table")
 
         # truncate
         parser.add_argument("--truncate-table", help="Truncate table")
@@ -303,6 +309,8 @@ def main():
 
     if args.create_tables:
         update_controller.create_tables()
+    if args.recreate_table:
+        update_controller.recreate_table(args.recreate_table)
 
     if not update_controller.is_valid():
         return

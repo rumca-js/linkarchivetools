@@ -255,7 +255,7 @@ class DbAnalyzer(object):
             else:
                 print("No db, no engine: Cannot establish connection for filtering")
 
-    def print_summary(self, print_columns=False):
+    def print_tables(self, print_columns=False):
         if self.engine and self.connection:
             r = ReflectedTable(self.engine, self.connection)
             r.print_summary(print_columns)
@@ -335,7 +335,7 @@ class DbAnalyzerParser(object):
         )
 
         self.parser.add_argument(
-            "--summary", action="store_true", help="displays summary of tables"
+            "--tables", action="store_true", help="displays summary of tables"
         )
         self.parser.add_argument(
             "--columns",
@@ -382,8 +382,8 @@ def main():
     start_time = time.time()
 
     db_analyzer = DbAnalyzer(input_db=p.args.db, args=p.args)
-    if p.args.summary:
-        db_analyzer.print_summary(p.args.columns)
+    if p.args.tables:
+        db_analyzer.print_tables(p.args.columns)
     elif p.args.print_sources:
         db_analyzer.print_sources()
     else:

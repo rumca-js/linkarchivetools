@@ -43,6 +43,15 @@ class ReflectedTable(object):
         self.connection.execute(text(sql_text))
         self.connection.commit()
 
+    def drop_table(self, table_name):
+        if not self.is_table(table_name):
+            print(f"SQLite table does not exist: {table_name}")
+            return
+
+        sql_text = f"DROP TABLE {table_name};"
+        self.connection.execute(text(sql_text))
+        self.connection.commit()
+
     def create_index(self, table, column_name):
         index_name = f"idx_{table.name}_{column_name}"
         index = Index(index_name, getattr(table.c, column_name))
@@ -81,16 +90,16 @@ class ReflectedTable(object):
         ).scalar()
         return row_count
 
-    def print_summary(self, print_columns=False):
+    def print_tables(self, print_columns=False):
         tables = self.get_table_names()
 
         for table in tables:
             row_count = self.count(table)
-            print(f"Table: {table}, Row count: {row_count}")
-
-            if print_columns:
+            if not print_columns:
+                print(f"{table}, count: {row_count}")
+            else:
                 column_names = self.get_column_names(table)
-                print(f"Columns in {table}: {', '.join(column_names)}")
+                print(f"{table}: {', '.join(column_names)}")
 
     def get_table_names(self):
         inspector = inspect(self.engine)
@@ -302,13 +311,14 @@ class ReflectedGenericTable(object):
 
         return result.rowcount
 
-    def print_summary(self, print_columns=False):
+    def print_tables(self, print_columns=False):
         row_count = self.count()
-        print(f"Table: {self.table_name}, Row count: {row_count}")
 
-        if print_columns:
+        if not print_columns:
+            print(f"{self.table_name}, count: {row_count}")
+        else:
             column_names = self.get_column_names()
-            print(f"Columns in {self.table_name}: {', '.join(column_names)}")
+            print(f"{self.table_name}: {', '.join(column_names)}")
 
     def get_column_names(self):
         inspector = inspect(self.engine)
