@@ -350,10 +350,7 @@ class ReflectedEntryTable(ReflectedGenericTable):
     def get_table_name(self):
         return "linkdatamodel"
 
-    def insert_json(self, entry_json):
-        if "link" not in entry_json:
-            return
-
+    def enhance_json(self, entry_json):
         if not self.is_set(entry_json, "source_url"):
             entry_json["source_url"] = ""
         if not self.is_set(entry_json, "permanent"):
@@ -376,6 +373,13 @@ class ReflectedEntryTable(ReflectedGenericTable):
             entry_json["age"] = 0
         if not self.is_set(entry_json,"manual_status_code"):
             entry_json["manual_status_code"] = 0
+        return entry_json
+
+    def insert_json(self, entry_json):
+        if "link" not in entry_json:
+            return
+
+        entry_json = self.enhance_json(entry_json)
 
         return self.insert_json_data(entry_json)
 
@@ -539,7 +543,7 @@ class ReflectedSourceTable(ReflectedGenericTable):
         for source in result:
             yield source
 
-    def insert_json(self, source_json):
+    def enhance_json(self, source_json):
         if not self.is_set(source_json, "url"):
             source_json["url"] = ""
         if not self.is_set(source_json,"enabled"):
@@ -579,7 +583,15 @@ class ReflectedSourceTable(ReflectedGenericTable):
         if not self.is_set(source_json,"auto_update_favicon"):
             source_json["auto_update_favicon"] = False
 
+        return source_json
+
+    def insert_json(self, source_json):
+        source_json = self.enhance_json(source_json)
         return self.insert_json_data(source_json)
+
+    def update_json(self, id, source_json):
+        source_json = self.enhance_json(source_json)
+        return self.update_json_data(id, son_data=source_json)
 
     def exists(self, *, id=None, url=None):
         table = self.get_table()
@@ -664,6 +676,10 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
             return
 
         json_data = {}
+        json_data = self.enhance_json(json_data)
+        self.insert_json_data(json_data)
+
+    def enhance_json(self, json_data):
         json_data["instance_title"] = ""
         json_data["instance_description"] = ""
         json_data["instance_internet_location"] = ""
@@ -751,8 +767,7 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["entries_dead_alpha"] = 1.0
         json_data["debug_mode"] = False
         json_data["cleanup_time"] = datetime.now().time()
-
-        self.insert_json_data(json_data)
+        return json_data
 
 
 class ReflectedAppLogging(ReflectedGenericTable):

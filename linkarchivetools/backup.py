@@ -450,6 +450,7 @@ def run_db_copy_backup(run_info):
 
     for table in tables:
         table = table.replace(workspace + "_", "")
+        print(f"Running backup for {table}")
 
         source_table = get_engine_table(workspace, table, source_engine)
         create_destionation_table(table, source_table, destination_engine)
@@ -520,7 +521,9 @@ def backup_workspace(run_info):
         new_run_info["tables"] = []
         new_run_info["output_file"] = new_key
 
-        table_name = workspace + "_" + table
+        if table != "user":
+            table_name = workspace + "_" + table
+
         new_run_info["tables"].append(table_name)
 
         if new_run_info["format"] == "sqlite":
