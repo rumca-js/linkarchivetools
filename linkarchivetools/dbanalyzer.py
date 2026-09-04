@@ -258,7 +258,7 @@ class DbAnalyzer(object):
     def print_tables(self, print_columns=False):
         if self.engine and self.connection:
             r = ReflectedTable(self.engine, self.connection)
-            r.print_summary(print_columns)
+            r.print_tables(print_columns)
         else:
             print("Could not print summary - missing database or connection")
 

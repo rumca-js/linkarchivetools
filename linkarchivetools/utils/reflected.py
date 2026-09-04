@@ -660,6 +660,9 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         return result.first()
 
     def add_configuration(self):
+        if self.count() != 0:
+            return
+
         json_data = {}
         json_data["instance_title"] = ""
         json_data["instance_description"] = ""
@@ -687,11 +690,11 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
 
         json_data["accept_dead_links"] = False
         json_data["accept_ip_links"] = False
-        json_data["accept_domain_links"] = False
-        json_data["accept_non_domain_links"] = False
-        json_data["accept_unknown_links"] = False
-        #json_data["accept_onion_links"] = False
-        json_data["accept_same_hashes"] = False
+        json_data["accept_domain_links"] = True
+        json_data["accept_non_domain_links"] = True
+        json_data["accept_unknown_links"] = True
+        json_data["accept_onion_links"] = False
+        json_data["accept_same_hashes"] = True
 
         json_data["auto_crawl_sources"] = False
         json_data["auto_scan_new_entries"] = False
@@ -699,8 +702,8 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["new_entries_merge_data"] = False
         json_data["new_entries_use_clean_data"] = False
         json_data["new_entries_fetch_social_data"] = False
-        #json_data["browse_entries_fetch_social_data"] = False
-        #json_data["browse_entry_fetch_social_data"] = False
+        json_data["browse_entries_fetch_social_data"] = False
+        json_data["browse_entry_fetch_social_data"] = False
 
         json_data["entry_update_via_internet"] = False
         json_data["log_remove_entries"] = False
@@ -738,7 +741,7 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["small_icons"] = True
         json_data["local_icons"] = True
         #json_data["highlight_bookmarks"] = True
-        #json_data["click_behavior_modal_window"] = True
+        json_data["click_behavior_modal_window"] = True
         json_data["links_per_page"] = True
         json_data["sources_per_page"] = True
         json_data["max_links_per_page"] = True

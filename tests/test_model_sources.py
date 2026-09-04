@@ -1,7 +1,9 @@
+from pathlib import Path
 from linkarchivetools.model import (
    DbConnection,
    Sources,
 )
+from linkarchivetools.dbupdate import DbUpdate
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
 )
@@ -28,6 +30,23 @@ class SourcesTest(DbTestCase):
         connection = DbConnection("input.db")
 
         sources = Sources(connection=connection)
+        sources.truncate()
+
+        source_url = "https://google.com"
+
+        source_id = sources.set(source_url=source_url)
+        self.assertTrue(source_id is not None)
+        self.assertEqual(sources.count(), 1)
+
+        source = sources.get(source_id)
+        self.assertTrue(source is not None)
+
+    def test_set__clean_db(self):
+        self.create_clean_db("test.db")
+
+        self.connection = DbConnection("test.db")
+
+        sources = Sources(connection=self.connection)
         sources.truncate()
 
         source_url = "https://google.com"

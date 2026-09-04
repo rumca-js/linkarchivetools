@@ -5,6 +5,7 @@ import shutil
 from sqlalchemy import create_engine
 
 from linkarchivetools.model.definitions import create_tables
+from linkarchivetools.dbupdate import DbUpdate
 
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -36,6 +37,17 @@ class DbTestCase(unittest.TestCase):
         with engine.connect() as connection:
             table = ReflectedEntryTable(engine=engine, connection=connection)
             table.truncate()
+
+    def create_clean_db(self, file_name):
+        path = Path(file_name)
+        if path.exists():
+            path.unlink()
+            path.touch()
+        else:
+            path.touch()
+
+        db_update = DbUpdate(db=file_name)
+        db_update.create_tables()
 
     def truncate_table(self, file_name, table_name):
         engine = create_engine(f"sqlite:///{file_name}")

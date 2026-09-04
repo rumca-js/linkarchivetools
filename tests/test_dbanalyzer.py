@@ -15,22 +15,22 @@ class Db2AnalyzerTest(DbTestCase):
         analyzer = DbAnalyzer(input_db="input.db")
         self.assertTrue(True)
 
-    def test_print_summary(self):
+    def test_print_tables(self):
         self.create_db("input.db")
         self.add_entry_with_tags("input.db")
         args = SimpleNamespace(search=None, ignore_case=True, verbosity=0)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
-        analyzer.print_summary()
+        analyzer.print_tables()
         self.assertTrue(True)
 
-    def test_print_summary__print_columns(self):
+    def test_print_tables__print_columns(self):
         self.create_db("input.db")
         self.add_entry_with_tags("input.db")
         args = SimpleNamespace(search=None, ignore_case=True, verbosity=0)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
-        analyzer.print_summary(print_columns=True)
+        analyzer.print_tables(print_columns=True)
         self.assertTrue(True)
 
     def test_search__none(self):

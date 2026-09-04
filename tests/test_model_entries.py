@@ -1,7 +1,9 @@
+from pathlib import Path
 from linkarchivetools.model import (
    DbConnection,
    Entries,
 )
+from linkarchivetools.dbupdate import DbUpdate
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
 )
@@ -26,6 +28,23 @@ class EntriesTest(DbTestCase):
         connection = DbConnection("input.db")
 
         entries = Entries(connection=connection)
+        self.assertEqual(entries.count(), 0)
+
+        entry_json = {}
+        entry_json["link"] = "https://google.com"
+
+        # call tested function
+        new_id = entries.add(entry_json=entry_json)
+        self.assertTrue(new_id is not None)
+
+        self.assertEqual(entries.count(), 1)
+
+    def test_add__clean_db(self):
+        self.create_clean_db("test.db")
+
+        self.connection = DbConnection("test.db")
+
+        entries = Entries(connection=self.connection)
         self.assertEqual(entries.count(), 0)
 
         entry_json = {}
