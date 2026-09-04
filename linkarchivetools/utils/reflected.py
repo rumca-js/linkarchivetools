@@ -351,6 +351,8 @@ class ReflectedEntryTable(ReflectedGenericTable):
         return "linkdatamodel"
 
     def enhance_json(self, json_data):
+        #if not self.is_set(json_data, "link"):
+        #    json_data["link"] = ""
         if not self.is_set(json_data, "source_url"):
             json_data["source_url"] = ""
         if not self.is_set(json_data, "permanent"):
@@ -544,8 +546,8 @@ class ReflectedSourceTable(ReflectedGenericTable):
             yield source
 
     def enhance_json(self, json_data):
-        if not self.is_set(json_data, "url"):
-            json_data["url"] = ""
+        #if not self.is_set(json_data, "url"):
+        #    json_data["url"] = ""
         if not self.is_set(json_data,"enabled"):
             json_data["enabled"] = True
         if not self.is_set(json_data,"source_type"):
