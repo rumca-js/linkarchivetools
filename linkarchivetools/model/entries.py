@@ -30,7 +30,7 @@ class Entries(BaseTable):
         entry_json["date_created"] = datetime.now()
 
         try:
-            entry_id = self.connection.entries_table.insert_json(entry_json=entry_json)
+            entry_id = self.connection.entries_table.insert_json(json_data=entry_json)
             return entry_id
         except Exception as E:
             print(E)

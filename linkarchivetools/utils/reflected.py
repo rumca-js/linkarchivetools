@@ -350,38 +350,38 @@ class ReflectedEntryTable(ReflectedGenericTable):
     def get_table_name(self):
         return "linkdatamodel"
 
-    def enhance_json(self, entry_json):
-        if not self.is_set(entry_json, "source_url"):
-            entry_json["source_url"] = ""
-        if not self.is_set(entry_json, "permanent"):
-            entry_json["permanent"] = False
-        if not self.is_set(entry_json, "bookmarked"):
-            entry_json["bookmarked"] = False
-        if not self.is_set(entry_json, "status_code"):
-            entry_json["status_code"] = 0
-        if not self.is_set(entry_json, "contents_type"):
-            entry_json["contents_type"] = 0
-        if not self.is_set(entry_json,"page_rating_contents"):
-            entry_json["page_rating_contents"] = 0
-        if not self.is_set(entry_json,"page_rating_visits"):
-            entry_json["page_rating_visits"] = 0
-        if not self.is_set(entry_json,"page_rating_votes"):
-            entry_json["page_rating_votes"] = 0
-        if not self.is_set(entry_json,"page_rating"):
-            entry_json["page_rating"] = 0
-        if not self.is_set(entry_json,"age"):
-            entry_json["age"] = 0
-        if not self.is_set(entry_json,"manual_status_code"):
-            entry_json["manual_status_code"] = 0
-        return entry_json
+    def enhance_json(self, json_data):
+        if not self.is_set(json_data, "source_url"):
+            json_data["source_url"] = ""
+        if not self.is_set(json_data, "permanent"):
+            json_data["permanent"] = False
+        if not self.is_set(json_data, "bookmarked"):
+            json_data["bookmarked"] = False
+        if not self.is_set(json_data, "status_code"):
+            json_data["status_code"] = 0
+        if not self.is_set(json_data, "contents_type"):
+            json_data["contents_type"] = 0
+        if not self.is_set(json_data,"page_rating_contents"):
+            json_data["page_rating_contents"] = 0
+        if not self.is_set(json_data,"page_rating_visits"):
+            json_data["page_rating_visits"] = 0
+        if not self.is_set(json_data,"page_rating_votes"):
+            json_data["page_rating_votes"] = 0
+        if not self.is_set(json_data,"page_rating"):
+            json_data["page_rating"] = 0
+        if not self.is_set(json_data,"age"):
+            json_data["age"] = 0
+        if not self.is_set(json_data,"manual_status_code"):
+            json_data["manual_status_code"] = 0
+        return json_data
 
-    def insert_json(self, entry_json):
-        if "link" not in entry_json:
+    def insert_json(self, json_data):
+        if "link" not in json_data:
             return
 
-        entry_json = self.enhance_json(entry_json)
+        json_data = self.enhance_json(json_data)
 
-        return self.insert_json_data(entry_json)
+        return self.insert_json_data(json_data)
 
     def get_entries(self, limit:int|None=None, offset:int=0, page:int=None):
         destination_table = self.get_table()
@@ -543,55 +543,55 @@ class ReflectedSourceTable(ReflectedGenericTable):
         for source in result:
             yield source
 
-    def enhance_json(self, source_json):
-        if not self.is_set(source_json, "url"):
-            source_json["url"] = ""
-        if not self.is_set(source_json,"enabled"):
-            source_json["enabled"] = True
-        if not self.is_set(source_json,"source_type"):
-            source_json["source_type"] = ""
-        if not self.is_set(source_json,"title"):
-            source_json["title"] = ""
-        if not self.is_set(source_json,"category_name"):
-            source_json["category_name"] = ""
-        if not self.is_set(source_json,"subcategory_name"):
-            source_json["subcategory_name"] = ""
-        if not self.is_set(source_json,"export_to_cms"):
-            source_json["export_to_cms"] = False
-        if not self.is_set(source_json,"remove_after_days"):
-            source_json["remove_after_days"] = 0
-        if not self.is_set(source_json,"language"):
-            source_json["language"] = ""
-        if not self.is_set(source_json,"favicon"):
-            source_json["favicon"] = ""
-        if not self.is_set(source_json,"age"):
-            source_json["age"] = 0
-        if not self.is_set(source_json,"xpath"):
-            source_json["xpath"] = ""
-        if not self.is_set(source_json,"fetch_period"):
-            source_json["fetch_period"] = 0
-        if not self.is_set(source_json,"auto_tag"):
-            source_json["auto_tag"] = ""
-        if not self.is_set(source_json,"entries_backgroundcolor_alpha"):
-            source_json["entries_backgroundcolor_alpha"] = 0.0
-        if not self.is_set(source_json,"entries_backgroundcolor"):
-            source_json["entries_backgroundcolor"] = 0.0
-        if not self.is_set(source_json,"entries_alpha"):
-            source_json["entries_alpha"] = 0.0
-        if not self.is_set(source_json,"proxy_location"):
-            source_json["proxy_location"] = ""
-        if not self.is_set(source_json,"auto_update_favicon"):
-            source_json["auto_update_favicon"] = False
+    def enhance_json(self, json_data):
+        if not self.is_set(json_data, "url"):
+            json_data["url"] = ""
+        if not self.is_set(json_data,"enabled"):
+            json_data["enabled"] = True
+        if not self.is_set(json_data,"source_type"):
+            json_data["source_type"] = ""
+        if not self.is_set(json_data,"title"):
+            json_data["title"] = ""
+        if not self.is_set(json_data,"category_name"):
+            json_data["category_name"] = ""
+        if not self.is_set(json_data,"subcategory_name"):
+            json_data["subcategory_name"] = ""
+        if not self.is_set(json_data,"export_to_cms"):
+            json_data["export_to_cms"] = False
+        if not self.is_set(json_data,"remove_after_days"):
+            json_data["remove_after_days"] = 0
+        if not self.is_set(json_data,"language"):
+            json_data["language"] = ""
+        if not self.is_set(json_data,"favicon"):
+            json_data["favicon"] = ""
+        if not self.is_set(json_data,"age"):
+            json_data["age"] = 0
+        if not self.is_set(json_data,"xpath"):
+            json_data["xpath"] = ""
+        if not self.is_set(json_data,"fetch_period"):
+            json_data["fetch_period"] = 0
+        if not self.is_set(json_data,"auto_tag"):
+            json_data["auto_tag"] = ""
+        if not self.is_set(json_data,"entries_backgroundcolor_alpha"):
+            json_data["entries_backgroundcolor_alpha"] = 0.0
+        if not self.is_set(json_data,"entries_backgroundcolor"):
+            json_data["entries_backgroundcolor"] = 0.0
+        if not self.is_set(json_data,"entries_alpha"):
+            json_data["entries_alpha"] = 0.0
+        if not self.is_set(json_data,"proxy_location"):
+            json_data["proxy_location"] = ""
+        if not self.is_set(json_data,"auto_update_favicon"):
+            json_data["auto_update_favicon"] = False
 
-        return source_json
+        return json_data
 
-    def insert_json(self, source_json):
-        source_json = self.enhance_json(source_json)
-        return self.insert_json_data(source_json)
+    def insert_json(self, json_data):
+        json_data = self.enhance_json(json_data)
+        return self.insert_json_data(json_data)
 
-    def update_json(self, id, source_json):
-        source_json = self.enhance_json(source_json)
-        return self.update_json_data(id, son_data=source_json)
+    def update_json(self, id, json_data):
+        json_data = self.enhance_json(json_data)
+        return self.update_json_data(id, son_data=json_data)
 
     def exists(self, *, id=None, url=None):
         table = self.get_table()
