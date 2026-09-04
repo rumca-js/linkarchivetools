@@ -184,6 +184,7 @@ class ConfigurationEntry(Base):
     days_to_remove_stale_entries: Mapped[int] = mapped_column(default=0)
     days_to_check_std_entries: Mapped[int] = mapped_column(default=0)
     days_to_check_stale_entries: Mapped[int] = mapped_column(default=0)
+    days_to_remove_social_data: Mapped[int] = mapped_column(default=0)
     remove_entry_vote_threshold: Mapped[int] = mapped_column(default=1)
     number_of_update_entries: Mapped[int] = mapped_column(default=1)
 
