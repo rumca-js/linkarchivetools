@@ -591,7 +591,7 @@ class ReflectedSourceTable(ReflectedGenericTable):
 
     def update_json(self, id, json_data):
         json_data = self.enhance_json(json_data)
-        return self.update_json_data(id, son_data=json_data)
+        return self.update_json_data(id, json_data=json_data)
 
     def exists(self, *, id=None, url=None):
         table = self.get_table()
