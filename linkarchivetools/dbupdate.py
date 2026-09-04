@@ -31,6 +31,8 @@ from linkarchivetools.tableconfig import (
     get_user_tables,
     get_dynamic_tables,
     get_configuration_tables,
+    get_search_tables,
+    get_visits_tables,
 )
 
 
