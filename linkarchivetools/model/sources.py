@@ -48,7 +48,7 @@ class Sources(BaseTable):
             data["language"] = language
             data["source_type"] = source_type
 
-            return self.connection.sources_table.update_json_data(id=source.id, json_data=data)
+            return self.connection.sources_table.update_json(id=source.id, json_data=data)
 
         properties = {}
         properties["url"] = link
