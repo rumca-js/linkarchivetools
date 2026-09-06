@@ -202,7 +202,7 @@ def main():
     f = Db2JSON(
         input_db=args.db,
         output_dir=args.output_dir,
-        format=args.format,
+        format=args.file_name_prefix,
         rows_max=args.rows_max,
     )
     f.convert()
