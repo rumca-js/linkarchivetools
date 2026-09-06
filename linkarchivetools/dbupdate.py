@@ -179,6 +179,16 @@ class DbUpdate(object):
         table.vacuum()
         table.close()
 
+    def delete_entries_age(self):
+        """
+        """
+        table = ReflectedTable(engine=self.engine, connection=self.connection)
+
+        sql_text = "DELETE FROM linkdatamodel WHERE age>0;"
+        table.run_sql(sql_text)
+        table.vacuum()
+        table.close()
+
     def insert_links(self, links):
         table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
 
@@ -281,6 +291,7 @@ class DbUpdaetParser():
         parser.add_argument("--delete-non-bookmarked", action="store_true", help="Removes non bookmarked")
         parser.add_argument("--delete-no-votes", action="store_true", help="Removes entries without a vote")
         parser.add_argument("--delete-redundant", action="store_true", help="Removes entries that are redundant - not bookmarked, no votes")
+        parser.add_argument("--delete-age", action="store_true", help="Removes age related entries")
 
         # insert
         parser.add_argument("--insert-link", help="Inserts link")
@@ -341,6 +352,8 @@ def main():
         update_controller.delete_entries_no_votes()
     if args.delete_redundant:
         update_controller.delete_entries_redundant()
+    if args.delete_age:
+        update_controller.delete_entries_age()
 
     if args.obfuscate:
         update_controller.obfuscate()

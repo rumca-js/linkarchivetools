@@ -181,7 +181,7 @@ class Db2JSONParser(object):
         parser.add_argument(
             "--rows-max", default=1000, action="store_true", help="Number of rows per file"
         )
-        parser.add_argument("-f", "--format", default="entries", help="file name format")
+        parser.add_argument("-f", "--file-name-prefix", default="entries", help="file name prefix")
         parser.add_argument("-v", "--verbosity", help="Verbosity level")
 
         args = parser.parse_args()
