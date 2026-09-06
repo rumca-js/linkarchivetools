@@ -154,7 +154,7 @@ class DbUpdate(object):
     def delete_entries_non_bookmarked(self):
         table = ReflectedTable(engine=self.engine, connection=self.connection)
 
-        sql_text = f"DELETE FROM linkdatamodel WHERE bookmarked=False;"
+        sql_text = "DELETE FROM linkdatamodel WHERE bookmarked=False;"
         # TODO delete depnded things
         table.run_sql(sql_text)
         table.vacuum()
@@ -163,7 +163,7 @@ class DbUpdate(object):
     def delete_entries_no_votes(self):
         table = ReflectedTable(engine=self.engine, connection=self.connection)
 
-        sql_text = f"DELETE FROM linkdatamodel WHERE page_rating_votes=0;"
+        sql_text = "DELETE FROM linkdatamodel WHERE page_rating_votes<=0;"
         table.run_sql(sql_text)
         table.vacuum()
         table.close()
@@ -174,7 +174,7 @@ class DbUpdate(object):
         """
         table = ReflectedTable(engine=self.engine, connection=self.connection)
 
-        sql_text = f"DELETE FROM linkdatamodel WHERE bookmarked=False AND page_rating_votes=0;"
+        sql_text = "DELETE FROM linkdatamodel WHERE bookmarked=False AND page_rating_votes<=0;"
         table.run_sql(sql_text)
         table.vacuum()
         table.close()
