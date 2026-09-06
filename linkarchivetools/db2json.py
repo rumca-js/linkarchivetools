@@ -11,7 +11,11 @@ from pathlib import Path
 import argparse
 
 from sqlalchemy import create_engine
-from .utils.reflected import *
+from .utils.reflected import (
+    ReflectedSocialData,
+    ReflectedUserTags,
+    ReflectedEntryTable
+)
 
 
 def print_time_diff(start_time):
