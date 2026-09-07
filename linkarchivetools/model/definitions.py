@@ -69,8 +69,22 @@ class BackgroundJob(Base):
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
 
     priority: Mapped[int] = mapped_column(default=0)
-    errros: Mapped[int] = mapped_column(default=0)
+    errors: Mapped[int] = mapped_column(default=0)
     enabled: Mapped[bool] = mapped_column(default=True)
+
+    user_id: Mapped[Optional[int]]
+
+
+class BackgroundJobHistory(Base):
+    __tablename__ = "backgroundjobhistory"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    job: Mapped[str] = mapped_column(String(1000))
+    task: Mapped[Optional[str]]
+    subject: Mapped[str] = mapped_column(String(1000))
+    args: Mapped[Optional[str]]
+    date_created = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class BlockEntryList(Base):
@@ -86,7 +100,7 @@ class BlockEntry(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     url: Mapped[str] = mapped_column(String(1000), unique=True)
-    block_list_id: Mapped[int]
+    block_list_id: Mapped[Optional[int]]
 
 
 class Browser(Base):
@@ -211,7 +225,7 @@ class ConfigurationEntry(Base):
     small_icons: Mapped[bool] = mapped_column(default=False)
     local_icons: Mapped[bool] = mapped_column(default=False)
     highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
-    click_behavior_model_window: Mapped[bool] = mapped_column(default=False)
+    click_behavior_modal_window: Mapped[bool] = mapped_column(default=False)
     links_per_page: Mapped[int] = mapped_column(default=-100)
     sources_per_page: Mapped[int] = mapped_column(default=-100)
     max_links_per_page: Mapped[int] = mapped_column(default=-100)
@@ -263,6 +277,26 @@ class DataExport(Base):
     format_sources_opml: Mapped[bool] = mapped_column(default=False)
     output_zip: Mapped[bool] = mapped_column(default=False)
     output_sqlite: Mapped[bool] = mapped_column(default=False)
+
+
+class EntryRules(Base):
+    __tablename__ = "entryrules"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    priority: Mapped[int] = mapped_column(default=0)
+    rule_name: Mapped[str] = mapped_column(String(1000))
+    trigger_rule_name: Mapped[str] = mapped_column(String(1000))
+    trigger_rule_url: Mapped[str] = mapped_column(String(1000))
+    trigger_text: Mapped[str] = mapped_column(String(1000))
+    trigger_text_hits: Mapped[int] = mapped_column(default=0)
+    trigger_text_fields: Mapped[str] = mapped_column(String(1000))
+    block: Mapped[bool] = mapped_column(default=False)
+    trust: Mapped[bool] = mapped_column(default=False)
+    auto_tag: Mapped[str] = mapped_column(String(1000))
+    apply_age_limit: Mapped[int] = mapped_column(default=0)
+    script: Mapped[str] = mapped_column(String(1000), default="")
+    browser_id: Mapped[int] = mapped_column(default=0)
 
 
 class Gateway(Base):
@@ -340,7 +374,7 @@ class ReadLater(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     entry_id: Mapped[int]
-    user_id: Mapped[int]
+    user_id: Mapped[Optional[int]]
 
 
 class SearchView(Base):
@@ -423,6 +457,22 @@ class SourceOperationalData(Base):
     source_obj_id: Mapped[int]
 
 
+class EntryCompactedTags(Base):
+    __tablename__ = "entrycompactedtags"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    tag: Mapped[str] = mapped_column(String(1000))
+    entry_id: Mapped[Optional[int]]
+
+
+class CompactedTags(Base):
+    __tablename__ = "compactedtags"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    tag: Mapped[str] = mapped_column(String(1000))
+    count: Mapped[int] = mapped_column(default=0)
+
+
 class UserTags(Base):
     __tablename__ = "usertags"
 
@@ -502,6 +552,42 @@ class EntryVisitHistory(Base):
     visits: Mapped[Optional[int]] = mapped_column()
     date_last_visit = mapped_column(DateTime(timezone=True), nullable=True)
     entry_id: Mapped[Optional[int]] = mapped_column()
+
+
+class UserConfig(Base):
+    __tablename__ = "userconfig"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(500))
+    karma: Mapped[int] = mapped_column(default=0)
+    brith_date = mapped_column(DateTime(timezone=True), nullable=True)
+
+    display_style: Mapped[int] = mapped_column(default=-100)
+    display_type: Mapped[int] = mapped_column(default=-100)
+    show_icons: Mapped[bool] = mapped_column(default=False)
+    small_icons: Mapped[bool] = mapped_column(default=False)
+    thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
+    entries_direct_links: Mapped[bool] = mapped_column(default=False)
+    highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
+    click_behavior_modal_window: Mapped[bool] = mapped_column(default=False)
+    links_per_page: Mapped[int] = mapped_column(default=-100)
+    sources_per_page: Mapped[int] = mapped_column(default=-100)
+
+    debug_mode: Mapped[bool] = mapped_column(default=False)
+    user_id: Mapped[Optional[int]]
+
+
+class User(Base):
+    __tablename__ = "user"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(500))
+    password: Mapped[str] = mapped_column(String(500))
+    first_name: Mapped[str] = mapped_column(String(500))
+    last_name: Mapped[str] = mapped_column(String(500))
+    is_superuser: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
+    is_staff: Mapped[bool] = mapped_column(default=True)
+    email: Mapped[str] = mapped_column(String(500))
+    date_joined = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 def create_tables(engine):

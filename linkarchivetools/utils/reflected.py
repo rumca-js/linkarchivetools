@@ -697,6 +697,9 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["use_internal_scripts"] = False
         json_data["auto_store_thumbnails"] = False
         json_data["thread_memory_threshold"] = 0
+        json_data["display_style"] = ""
+        json_data["display_type"] = ""
+        json_data["entry_preview"] = False
 
         json_data["enable_keyword_support"] = False
         json_data["enable_domain_support"] = False
@@ -704,7 +707,7 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["enable_link_archiving"] = False
         json_data["enable_source_archiving"] = False
         json_data["enable_crawling"] = False
-        #json_data["enable_social_data"] = False
+        json_data["enable_social_data"] = False
 
         json_data["accept_dead_links"] = False
         json_data["accept_ip_links"] = False
@@ -722,6 +725,11 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["new_entries_fetch_social_data"] = False
         json_data["browse_entries_fetch_social_data"] = False
         json_data["browse_entry_fetch_social_data"] = False
+        json_data["entry_update_fetches_social_data"] = False
+        json_data["new_entries_download_audio"] = False
+        json_data["new_entries_download_video"] = False
+        json_data["entry_update_download_audio"] = False
+        json_data["entry_update_download_video"] = False
 
         json_data["entry_update_via_internet"] = False
         json_data["log_remove_entries"] = False
@@ -730,7 +738,6 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
 
         json_data["prefer_https_links"] = False
         json_data["prefer_non_www_links"] = False
-        json_data["keep_social_data"] = False
         json_data["sources_refresh_period"] = 0
         json_data["days_to_move_to_archive"] = 0
         json_data["days_to_remove_links"] = 0
@@ -758,7 +765,7 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["thumbnails_as_icons"] = True
         json_data["small_icons"] = True
         json_data["local_icons"] = True
-        #json_data["highlight_bookmarks"] = True
+        json_data["highlight_bookmarks"] = True
         json_data["click_behavior_modal_window"] = True
         json_data["links_per_page"] = True
         json_data["sources_per_page"] = True

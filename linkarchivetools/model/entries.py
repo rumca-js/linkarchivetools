@@ -78,6 +78,13 @@ class Entries(BaseTable):
     def delete(self, id):
         socialdata = SocialData(self.connection)
         socialdata.delete(entry_id = id)
+
+        self.connection.entryvisithistory.delete_where({"entry_id" : id})
+        self.connection.entrytransitionhistory.delete_where({"entry_from_id" : id})
+        self.connection.entrytransitionhistory.delete_where({"entry_to_id" : id})
+        self.connection.entrycompactedtags.delete_where({"entry_id" : id})
+        self.connection.readlater.delete_where({"entry_id" : id})
+
         self.connection.entries_table.delete(id=id)
 
     def get(self,id):

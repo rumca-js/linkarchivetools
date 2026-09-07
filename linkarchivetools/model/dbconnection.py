@@ -55,6 +55,10 @@ class DbConnection(object):
         self.entrycompactedtags = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entrycompactedtags")
         self.uservotes = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="uservotes")
         self.modelfiles = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="modelfiles")
+        self.entrycompactedtags = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entrycompactedtags")
+        self.entryvisithistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entryvisithistory")
+        self.entrytransitionhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entrytransitionhistory")
+        self.searchhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="searchhistory")
 
     def create_engine(db_file):
         engine = create_engine(f"sqlite:///{db_file}", connect_args={"check_same_thread": False})

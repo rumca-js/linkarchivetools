@@ -68,7 +68,7 @@ class EntryRules(BaseTable):
 
         return result
 
-    def add_entry_rule(self, entry_rule_url, block=True, trust=False, properties=None):
+    def add_entry_rule(self, entry_rule_url, block=True, trust=False, properties=None, name=None):
         entries = self.connection.entry_rules.get_where({"trigger_rule_url" : entry_rule_url})
         entry = next(entries, None)
 
@@ -79,6 +79,10 @@ class EntryRules(BaseTable):
                 data = {}
 
             data["trigger_rule_url"] = entry_rule_url
+            if name:
+                data["trigger_rule_name"] = name
+            else:
+                data["trigger_rule_name"] = ""
             data["enabled"] = True
             data["priority"] = 0
             data["rule_name"] = entry_rule_url
@@ -90,6 +94,7 @@ class EntryRules(BaseTable):
             data["auto_tag"] = ""
             data["apply_age_limit"] = 0
             data["browser_id"] = 0
+            data["script"] = ""
 
             return self.connection.entry_rules.insert_json_data(data)
 
