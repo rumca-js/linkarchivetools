@@ -592,7 +592,9 @@ class ReflectedSourceTable(ReflectedGenericTable):
         return self.insert_json_data(json_data)
 
     def update_json(self, id, json_data):
-        json_data = self.enhance_json(json_data)
+        """
+        Do not add default values, otherwise you will reset something you would not like to.
+        """
         return self.update_json_data(id, json_data=json_data)
 
     def exists(self, *, id=None, url=None):
