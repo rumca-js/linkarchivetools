@@ -454,7 +454,7 @@ class SourceOperationalData(Base):
     body_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
     consecutive_errors: Mapped[Optional[int]]
 
-    source_obj_id: Mapped[int]
+    source_id: Mapped[int]
 
 
 class EntryCompactedTags(Base):

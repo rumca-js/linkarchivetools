@@ -122,3 +122,24 @@ class EntriesTest(DbTestCase):
             entries_controller.delete(id=int(entry.id))
 
         self.assertEqual(entries_controller.count(), 0)
+
+    def test_cleanup(self):
+        self.create_db("input.db")
+        self.clean_out()
+
+        connection = DbConnection("input.db")
+
+        entries_controller = Entries(connection=connection)
+        self.assertEqual(entries_controller.count(), 0)
+
+        entry_json = {}
+        entry_json["link"] = "https://google.com"
+
+        new_id = entries_controller.add(entry_json=entry_json)
+        self.assertTrue(new_id is not None)
+        self.assertEqual(entries_controller.count(), 1)
+
+        # call tested function
+        entries_controller.cleanup()
+
+        self.assertEqual(entries_controller.count(), 1)

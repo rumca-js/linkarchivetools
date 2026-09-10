@@ -620,7 +620,7 @@ class ReflectedSourceOperationalData(ReflectedGenericTable):
     def get_for_source(self, source_id):
         destination_table = self.get_table()
 
-        stmt = select(destination_table).where(destination_table.c.source_obj_id == source_id)
+        stmt = select(destination_table).where(destination_table.c.source_id == source_id)
 
         result = self.connection.execute(stmt)
         return result.first()

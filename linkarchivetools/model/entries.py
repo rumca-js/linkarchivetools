@@ -102,12 +102,12 @@ class Entries(BaseTable):
         self.connection.entries_table.delete_where(conditions)
 
     def cleanup(self):
+        """
+        Removes invalid entries
+        """
         ids_to_remove = set()
         for entry in self.connection.entries_table.get_where():
             if entry.source_id is not None:
-                if not self.connection.sources_table.get(id=entry.source_id):
-                    ids_to_remove.add(entry.id)
-
-        for id in ids_to_remove:
-            self.connection.entries_table.delete(id=id)
-
+                properties = {}
+                properties["source_id"] = None
+                self.connection.entries_table.update_json_data(id=entry.id, json_data=properties)

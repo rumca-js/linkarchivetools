@@ -11,7 +11,7 @@ class SourceData(BaseTable):
         self.default_fetch_period_s = default_fetch_period_s
 
     def get_source_data(self, source):
-        op_datas = self.connection.sourceoperationaldata.get_where({"source_obj_id" : source.id})
+        op_datas = self.connection.sourceoperationaldata.get_where({"source_id" : source.id})
         for op_data in op_datas:
             return op_data
 
@@ -20,7 +20,7 @@ class SourceData(BaseTable):
 
         new_data = {}
         new_data["date_fetched"] = datetime.now()
-        new_data["source_obj_id"] = source.id
+        new_data["source_id"] = source.id
         new_data["number_of_entries"] = 0
 
         # TODO fill correctly
@@ -79,13 +79,13 @@ class SourceData(BaseTable):
         return 0
 
     def delete(self, source):
-        self.connection.sourceoperationaldata.delete_where({"source_obj_id" : source.id})
+        self.connection.sourceoperationaldata.delete_where({"source_id" : source.id})
 
     def cleanup(self):
         ids_to_remove = []
         op_datas = self.connection.sourceoperationaldata.get_where()
         for op_data in op_datas:
-            source = self.connection.sources_table.get(op_data.source_obj_id)
+            source = self.connection.sources_table.get(op_data.source_id)
             if not source:
                 ids_to_remove.append(op_data.id)
 
