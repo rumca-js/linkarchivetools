@@ -112,7 +112,7 @@ class Entries(BaseTable):
                 if not source:
                     properties = []
                     properties["source_id"] = None
-                    self.connection.entries_table.update_json_data(id=entry.id, properties)
+                    self.connection.entries_table.update_json_data(id=entry.id, json_data=properties)
 
                     #self.connection.entries_table.delete(id=entry.id)
 
