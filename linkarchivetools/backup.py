@@ -523,6 +523,8 @@ def backup_workspace(run_info):
 
         if table != "user":
             table_name = workspace + "_" + table
+        else:
+            table_name = table
 
         new_run_info["tables"].append(table_name)
 
