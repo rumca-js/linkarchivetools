@@ -7,6 +7,7 @@ import argparse
 
 from .utils.reflected import (
    ReflectedEntryTable,
+   EntryCopier,
 )
 
 
@@ -122,7 +123,7 @@ class DbMerge(object):
         return True
 
 
-class Db2MergeParser(object):
+class DbMergeParser(object):
     def parse(self):
         parser = argparse.ArgumentParser(description="Databases merge program")
         parser.add_argument("--input-dbs", default="", help="DBs to be scanned. Delim ,")
@@ -134,7 +135,7 @@ class Db2MergeParser(object):
 
 
 def main():
-    parser = Db2MergeParser()
+    parser = DbMergeParser()
     p, args = parser.parse()
 
     start_time = time.time()
