@@ -21,7 +21,7 @@ class DbMergeTest(DbTestCase):
         self.add_entry_with_tags("input1.db")
         self.add_entry_with_tags2("input2.db")
 
-        input_dbs = ["input1.db", "input2.db"]
+        input_dbs = "input1.db,input2.db"
 
         # call tested function
         merge = DbMerge(input_dbs=input_dbs, output_db="output.db")
@@ -37,7 +37,7 @@ class DbMergeTest(DbTestCase):
         self.add_entry_with_tags("input1.db")
         self.add_entry_with_tags2("input2.db")
 
-        input_dbs = ["input1.db", "input2.db"]
+        input_dbs = "input1.db,input2.db"
 
         merge = DbMerge(input_dbs=input_dbs, output_db="output.db")
         # call tested function
@@ -59,7 +59,7 @@ class DbMergeTest(DbTestCase):
         self.add_entry_with_tags("input1.db")
         self.add_entry_with_tags("input2.db")
 
-        input_dbs = ["input1.db", "input2.db"]
+        input_dbs = "input1.db,input2.db"
 
         merge = DbMerge(input_dbs=input_dbs, output_db="output.db")
         # call tested function

@@ -28,11 +28,13 @@ class DbMerge(object):
     ):
         """
         Constructor
-        @param read_internet_links Read links to find RSS feeds
-        @param update_feed Many things are copied from original entry.
-                          If this setting is true, feed entry fetches title, and other properties
+        @param input_dbs
+        @param output_db
         """
         self.input_dbs = input_dbs
+        if self.input_dbs.find(",") >= 0:
+            self.input_dbs = self.input_dbs.split(",")
+
         self.output_db = output_db
         self.verbose = verbose
 
@@ -135,7 +137,7 @@ def main():
 
     start_time = time.time()
 
-    m = DbMerge()
+    m = DbMerge(input_dbs=args.input_dbs, output_db=args.output)
 
     print_time_diff(start_time)
 
