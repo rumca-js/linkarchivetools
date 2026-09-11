@@ -5,7 +5,9 @@ from pathlib import Path
 from sqlalchemy import create_engine
 import argparse
 
-from .utils.reflected import *
+from .utils.reflected import (
+   ReflectedEntryTable,
+)
 
 
 def print_time_diff(start_time):
