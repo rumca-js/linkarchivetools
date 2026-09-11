@@ -140,6 +140,7 @@ def main():
     start_time = time.time()
 
     m = DbMerge(input_dbs=args.input_dbs, output_db=args.output_db)
+    m.convert()
 
     print_time_diff(start_time)
 
