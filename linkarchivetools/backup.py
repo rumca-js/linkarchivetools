@@ -452,6 +452,9 @@ def run_db_copy_backup(run_info):
         table = table.replace(workspace + "_", "")
         print(f"Running backup for {table}")
 
+        if table == "user":
+            workspace = "auth"
+
         source_table = get_engine_table(workspace, table, source_engine)
         create_destionation_table(table, source_table, destination_engine)
 
