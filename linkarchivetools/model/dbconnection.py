@@ -37,18 +37,19 @@ class DbConnection(object):
         self.sources_table = ReflectedSourceTable(engine=self.engine, connection=self.connection)
 
         self.configurationentry = ReflectedConfigurationEntry(engine=self.engine, connection=self.connection)
+        self.socialdata = ReflectedSocialData(engine=self.engine, connection=self.connection)
+        self.sourceoperationaldata = ReflectedSourceOperationalData(engine=self.engine, connection=self.connection)
+        self.entry_rules = ReflectedEntryRules(engine=self.engine, connection=self.connection)
+
+        # TODO these are obsolete know
         self.applogging = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="applogging")
         self.backgroundjob = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="backgroundjob")
         self.backgroundjobhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="backgroundjobhistory")
         self.blockentry = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="blockentry")
         self.blockentrylist = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="blockentrylist")
-
-        self.entry_rules = ReflectedEntryRules(engine=self.engine, connection=self.connection)
         self.readlater = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="readlater")
         self.searchview = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="searchview")
-        self.socialdata = ReflectedSocialData(engine=self.engine, connection=self.connection)
 
-        self.sourceoperationaldata = ReflectedSourceOperationalData(engine=self.engine, connection=self.connection)
         self.usertags = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="usertags")
         self.compactedtags = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="compactedtags")
         self.usercompactedtags = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="usercompactedtags")
@@ -85,6 +86,9 @@ class DbConnection(object):
 
         table = ReflectedTable(engine=self.engine, connection=self.connection)
         table.vacuum()
+
+    def get_table(self, table_name):
+        return ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name=table_name)
 
     def close(self):
         if self.connection:
