@@ -11,7 +11,12 @@ from sqlalchemy import create_engine
 from webtoolkit import RemoteUrl, BaseUrl
 from linkarchivetools import tableconfig
 
-from .utils.reflected import *
+from .utils.reflected import (
+    ReflectedEntryTable,
+    ReflectedEntryCompactedTags,
+    ReflectedSocialData,
+    ReflectedTable,
+)
 
 
 def print_time_diff(start_time):
