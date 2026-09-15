@@ -103,18 +103,17 @@ class Entries(BaseTable):
 
     def cleanup(self):
         """
-        Removes invalid entries
+        Cleans up invalid entries.
+        Should not be removed, just disconnected from invalid sources
         """
         ids_to_remove = set()
         for entry in self.connection.entries_table.get_where():
             if entry.source_id is not None:
                 source = self.connection.sources_table.get(id = entry.source_id)
                 if not source:
-                    properties = []
+                    properties = {}
                     properties["source_id"] = None
                     self.connection.entries_table.update_json_data(id=entry.id, json_data=properties)
-
-                    #self.connection.entries_table.delete(id=entry.id)
 
     def delete_invalid_sources(self):
         """
