@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from linkarchivetools.model import (
    DbConnection,
@@ -21,13 +22,12 @@ class EntriesTest(DbTestCase):
         entries = Entries(connection=connection)
         self.assertEqual(entries.count(), 0)
 
-    def test_add(self):
-        self.create_db("input.db")
-        self.clean_out()
+    def test_add__link(self):
+        self.create_clean_db("test.db")
 
-        connection = DbConnection("input.db")
+        self.connection = DbConnection("test.db")
 
-        entries = Entries(connection=connection)
+        entries = Entries(connection=self.connection)
         self.assertEqual(entries.count(), 0)
 
         entry_json = {}
@@ -39,7 +39,7 @@ class EntriesTest(DbTestCase):
 
         self.assertEqual(entries.count(), 1)
 
-    def test_add__clean_db(self):
+    def test_add__date_published(self):
         self.create_clean_db("test.db")
 
         self.connection = DbConnection("test.db")
@@ -49,6 +49,7 @@ class EntriesTest(DbTestCase):
 
         entry_json = {}
         entry_json["link"] = "https://google.com"
+        entry_json["date_published"] = datetime.now()
 
         # call tested function
         new_id = entries.add(entry_json=entry_json)

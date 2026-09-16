@@ -747,6 +747,7 @@ class ReflectedConfigurationEntry(ReflectedGenericTable):
         json_data["days_to_check_std_entries"] = 0
         json_data["days_to_check_stale_entries"] = 0
         json_data["days_to_remove_social_data"] = 0
+        json_data["days_inactivity_to_disable_source"] = 0
         json_data["remove_entry_vote_threshold"] = 0
         json_data["number_of_update_entries"] = 0
 

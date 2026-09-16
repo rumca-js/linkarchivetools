@@ -179,6 +179,7 @@ class ConfigurationEntry(Base):
     browse_entry_fetch_social_data: Mapped[bool] = mapped_column(default=False)
     entry_update_fetches_social_data: Mapped[bool] = mapped_column(default=False)
     entry_update_via_internet: Mapped[bool] = mapped_column(default=False)
+    days_inactivity_to_disable_source: Mapped[int] = mapped_column(default=0)
 
     log_remove_entries: Mapped[bool] = mapped_column(default=False)
     auto_create_sources: Mapped[bool] = mapped_column(default=False)
@@ -217,8 +218,9 @@ class ConfigurationEntry(Base):
     number_of_comments_per_day: Mapped[int] = mapped_column(default=-100)
 
     time_zone: Mapped[int] = mapped_column(default=-100)
-    display_style: Mapped[int] = mapped_column(default=-100)
-    display_type: Mapped[int] = mapped_column(default=-100)
+    display_style: Mapped[str] = mapped_column(default="")
+
+    display_type: Mapped[str] = mapped_column(default="")
     show_icons: Mapped[bool] = mapped_column(default=False)
     entry_preview: Mapped[bool] = mapped_column(default=True)            # allows to show preview to play entry
     thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
@@ -226,11 +228,11 @@ class ConfigurationEntry(Base):
     local_icons: Mapped[bool] = mapped_column(default=False)
     highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
     click_behavior_modal_window: Mapped[bool] = mapped_column(default=False)
-    links_per_page: Mapped[int] = mapped_column(default=-100)
-    sources_per_page: Mapped[int] = mapped_column(default=-100)
-    max_links_per_page: Mapped[int] = mapped_column(default=-100)
-    max_sources_per_page: Mapped[int] = mapped_column(default=-100)
-    max_number_of_related_links: Mapped[int] = mapped_column(default=-100)
+    links_per_page: Mapped[int] = mapped_column(default=100)
+    sources_per_page: Mapped[int] = mapped_column(default=100)
+    max_links_per_page: Mapped[int] = mapped_column(default=100)
+    max_sources_per_page: Mapped[int] = mapped_column(default=100)
+    max_number_of_related_links: Mapped[int] = mapped_column(default=100)
 
     entries_visit_alpha: Mapped[float] = mapped_column(default=0.6)
     entries_dead_alpha: Mapped[float] = mapped_column(default=0.6)
@@ -277,6 +279,17 @@ class DataExport(Base):
     format_sources_opml: Mapped[bool] = mapped_column(default=False)
     output_zip: Mapped[bool] = mapped_column(default=False)
     output_sqlite: Mapped[bool] = mapped_column(default=False)
+
+
+class Domains(Base):
+    __tablename__ = "domains"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    domain: Mapped[str] = mapped_column(String(1000))
+    main: Mapped[str] = mapped_column(String(200))
+    subdomain: Mapped[str] = mapped_column(String(200))
+    suffix: Mapped[str] = mapped_column(String(200))
+    tld: Mapped[str] = mapped_column(String(200))
 
 
 class EntryRules(Base):
@@ -559,18 +572,18 @@ class UserConfig(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(500))
     karma: Mapped[int] = mapped_column(default=0)
-    brith_date = mapped_column(DateTime(timezone=True), nullable=True)
+    birth_date = mapped_column(DateTime(timezone=True), nullable=True)
 
-    display_style: Mapped[int] = mapped_column(default=-100)
-    display_type: Mapped[int] = mapped_column(default=-100)
+    display_style: Mapped[str] = mapped_column(default="")
+    display_type: Mapped[str] = mapped_column(default="")
     show_icons: Mapped[bool] = mapped_column(default=False)
     small_icons: Mapped[bool] = mapped_column(default=False)
     thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
     entries_direct_links: Mapped[bool] = mapped_column(default=False)
     highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
     click_behavior_modal_window: Mapped[bool] = mapped_column(default=False)
-    links_per_page: Mapped[int] = mapped_column(default=-100)
-    sources_per_page: Mapped[int] = mapped_column(default=-100)
+    links_per_page: Mapped[int] = mapped_column(default=0)
+    sources_per_page: Mapped[int] = mapped_column(default=0)
 
     debug_mode: Mapped[bool] = mapped_column(default=False)
     user_id: Mapped[Optional[int]]

@@ -17,3 +17,4 @@ from .sourcedata import *
 from .checklater import *
 from .searchview import *
 from .blocklist import *
+from .userconfig import *

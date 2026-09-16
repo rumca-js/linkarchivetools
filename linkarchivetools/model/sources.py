@@ -76,6 +76,16 @@ class Sources(BaseTable):
             properties["language"] = source_properties["language"]
             self.update_properties(source=source, properties=properties)
 
+    def enable(self, source):
+        properties = {}
+        properties["enabled"] = True
+        self.update_properties(source=source, properties=properties)
+
+    def disable(self, source):
+        properties = {}
+        properties["enabled"] = False
+        self.update_properties(source=source, properties=properties)
+
     def update_all(self):
         for source in self.get_table().get_where():
             self.update(source=source)

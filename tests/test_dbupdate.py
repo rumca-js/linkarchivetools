@@ -3,6 +3,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 
 from linkarchivetools import DbUpdate
+from linkarchivetools.model import UserConfig
 from linkarchivetools.utils.reflected import ReflectedGenericTable, ReflectedEntryTable
 from .dbtestcase import DbTestCase
 
@@ -136,6 +137,8 @@ class DbUpdateTest(DbTestCase):
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
 
+        self.add_user("input.db", "test", "test")
+
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
 
@@ -168,6 +171,8 @@ class DbUpdateTest(DbTestCase):
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
 
+        self.add_user("input.db", "test", "test")
+
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
 
@@ -199,6 +204,8 @@ class DbUpdateTest(DbTestCase):
 
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
+
+        self.add_user("input.db", "test", "test")
 
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
