@@ -69,6 +69,24 @@ class SourceData(BaseTable):
 
         return True
 
+    def error(self, source):
+        errors = 0
+
+        source_data = self.get_source_data(source)
+        if source_data:
+            errors = source_data.consecutive_errors
+
+        errors += 1
+        
+        new_data = {}
+        new_data["consecutive_errors"] = errors
+
+        if source_data:
+            return self.connection.sourceoperationaldata.update_json_data(id=source_data.id, json_data=new_data)
+        else:
+            new_data["source_id"] = source.id
+            return self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
+
     def get_update_seconds(self, source):
         this_source_data = self.get_source_data(source)
         if this_source_data:

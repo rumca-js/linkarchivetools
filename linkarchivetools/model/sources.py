@@ -79,12 +79,16 @@ class Sources(BaseTable):
     def enable(self, source):
         properties = {}
         properties["enabled"] = True
-        self.update_properties(source=source, properties=properties)
+        return self.update_properties(source=source, properties=properties)
 
     def disable(self, source):
         properties = {}
         properties["enabled"] = False
-        self.update_properties(source=source, properties=properties)
+        return self.update_properties(source=source, properties=properties)
+
+    def error(self, source):
+        sd_controller = SourceData(connection=self.connection)
+        source_data = sd_controller.error(source)
 
     def update_all(self):
         for source in self.get_table().get_where():
