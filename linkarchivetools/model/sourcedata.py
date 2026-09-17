@@ -23,8 +23,6 @@ class SourceData(BaseTable):
         new_data["source_id"] = source.id
         new_data["number_of_entries"] = 0
 
-        # TODO fill correctly
-        new_data["consecutive_errors"] = 0
         new_data["import_seconds"] = 0
 
         if url_obj:
@@ -34,6 +32,11 @@ class SourceData(BaseTable):
                 new_data["page_hash"] = url_obj.get_hash()
                 new_data["body_hash"] = url_obj.get_body_hash()
                 new_data["number_of_entries"] = len(url_obj.get_entries())
+
+        if url_obj:
+            response = url_obj.get_response()
+            if response.is_valid():
+                new_data["consecutive_errors"] = 0
 
         try:
             if op_data:
