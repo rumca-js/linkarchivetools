@@ -6,6 +6,10 @@ from .basetable import BaseTable
 
 
 class Entries(BaseTable):
+    STATUS_UNDEFINED = 0
+    STATUS_DEAD = 500
+    STATUS_ACTIVE = 200
+
     def __init__(self, connection):
         self.connection = connection
         self.set_table("entries_table")

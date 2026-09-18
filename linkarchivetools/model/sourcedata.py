@@ -62,6 +62,8 @@ class SourceData(BaseTable):
         this_source_data = self.get_source_data(source)
         if this_source_data:
             date_fetched = this_source_data.date_fetched
+            if date_fetched is None:
+                return True
 
             fetch_period_s = self.default_fetch_period_s
             if source.fetch_period > 0:
