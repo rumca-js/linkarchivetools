@@ -299,7 +299,6 @@ class EntryRules(Base):
     enabled: Mapped[bool] = mapped_column(default=True)
     priority: Mapped[int] = mapped_column(default=0)
     rule_name: Mapped[str] = mapped_column(String(1000))
-    trigger_rule_name: Mapped[str] = mapped_column(String(1000))
     trigger_rule_url: Mapped[str] = mapped_column(String(1000))
     trigger_text: Mapped[str] = mapped_column(String(1000))
     trigger_text_hits: Mapped[int] = mapped_column(default=0)
