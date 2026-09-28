@@ -310,7 +310,7 @@ class EntryRules(Base):
     trust: Mapped[bool] = mapped_column(default=False)
     auto_tag: Mapped[str] = mapped_column(String(1000))
     apply_age_limit: Mapped[int] = mapped_column(default=0)
-    script: Mapped[str] = mapped_column(String(1000), default="")
+    script: Mapped[str] = mapped_column(String(1000), server_default="''")
     browser_id: Mapped[int] = mapped_column(default=0)
 
 
