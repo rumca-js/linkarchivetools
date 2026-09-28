@@ -80,9 +80,9 @@ class EntryRules(BaseTable):
 
             data["trigger_rule_url"] = entry_rule_url
             if name:
-                data["trigger_rule_name"] = name
+                data["rule_name"] = name
             else:
-                data["trigger_rule_name"] = ""
+                data["rule_name"] = ""
             data["enabled"] = True
             data["priority"] = 0
             data["rule_name"] = entry_rule_url

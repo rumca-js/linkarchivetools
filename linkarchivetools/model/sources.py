@@ -28,14 +28,14 @@ class Sources(BaseTable):
     def set(self, source_url, source_properties=None, source_type=""):
         link = source_url
 
-        title = ""
-        language = ""
-        favicon = ""
+        title = None
+        language = None
+        favicon = None
 
         if source_properties:
-            title = source_properties.get("title", "")
-            language = source_properties.get("language", "")
-            favicon = source_properties.get("thumbnail", "")
+            title = source_properties.get("title", None)
+            language = source_properties.get("language", None)
+            favicon = source_properties.get("thumbnail", None)
 
         source = self.get_with_url(link)
         if source:
@@ -43,9 +43,13 @@ class Sources(BaseTable):
             """
             data = {}
 
-            data["title"] = title
-            data["favicon"] = favicon
-            data["language"] = language
+            if title:
+                data["title"] = title
+            if favicon:
+                data["favicon"] = favicon
+            if language:
+                data["language"] = language
+
             data["source_type"] = source_type
 
             return self.connection.sources_table.update_json(id=source.id, json_data=data)
@@ -53,9 +57,18 @@ class Sources(BaseTable):
         properties = {}
         properties["url"] = link
         properties["source_type"] = source_type
-        properties["title"] = title
-        properties["language"] = language
-        properties["favicon"] = favicon
+        if title:
+            properties["title"] = title
+        else:
+            properties["title"] = ""
+        if language:
+            properties["language"] = language
+        else:
+            properties["language"] = ""
+        if favicon:
+            properties["favicon"] = favicon
+        else:
+            properties["favicon"] = ""
 
         return self.connection.sources_table.insert_json(properties)
 

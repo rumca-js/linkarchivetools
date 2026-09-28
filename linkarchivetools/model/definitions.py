@@ -1,5 +1,8 @@
 """
 Provided to be able to create tables in empty file
+
+This produces tables that could be used outside of python, and outside of sqlalchemy.
+Meaning default values need to be 'server_defaults'.
 """
 
 from typing import Optional
@@ -53,7 +56,7 @@ class AppLogging(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     info_text: Mapped[str] = mapped_column(String(2000))
     detail_text: Mapped[Optional[str]] = mapped_column(String(2000))
-    level: Mapped[int] = mapped_column(default=0)
+    level: Mapped[int] = mapped_column(server_default="0")
     date = mapped_column(DateTime(timezone=True), nullable=True)
 
 
@@ -68,9 +71,9 @@ class BackgroundJob(Base):
     args: Mapped[Optional[str]]
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
 
-    priority: Mapped[int] = mapped_column(default=0)
-    errors: Mapped[int] = mapped_column(default=0)
-    enabled: Mapped[bool] = mapped_column(default=True)
+    priority: Mapped[int] = mapped_column(server_default="0")
+    errors: Mapped[int] = mapped_column(server_default="0")
+    enabled: Mapped[bool] = mapped_column(server_default="1")
 
     user_id: Mapped[Optional[int]]
 
@@ -92,7 +95,7 @@ class BlockEntryList(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     url: Mapped[str] = mapped_column(String(1000), unique=True)
-    processed: Mapped[bool] = mapped_column(default=False)
+    processed: Mapped[bool] = mapped_column(server_default="0")
 
 
 class BlockEntry(Base):
@@ -107,18 +110,18 @@ class Browser(Base):
     __tablename__ = "browser"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    enabled: Mapped[bool] = mapped_column(default=True)
+    enabled: Mapped[bool] = mapped_column(server_default="1")
     name: Mapped[Optional[str]] = mapped_column(String(2000)) # name of browser, could be crawler_name
-    priority: Mapped[int] = mapped_column(default=0)
-    ignore_errors: Mapped[bool] = mapped_column(default=False)
+    priority: Mapped[int] = mapped_column(server_default="0")
+    ignore_errors: Mapped[bool] = mapped_column(server_default="0")
     user_agent: Mapped[Optional[str]] = mapped_column(String(2000))
     request_headers: Mapped[Optional[str]] = mapped_column(String(2000))
-    timeout_s: Mapped[int] = mapped_column(default=0)
-    delay_s: Mapped[int] = mapped_column(default=0)
-    ssl_verify: Mapped[bool] = mapped_column(default=False)
-    respect_robots_txt: Mapped[bool] = mapped_column(default=False)
+    timeout_s: Mapped[int] = mapped_column(server_default="0")
+    delay_s: Mapped[int] = mapped_column(server_default="0")
+    ssl_verify: Mapped[bool] = mapped_column(server_default="0")
+    respect_robots_txt: Mapped[bool] = mapped_column(server_default="0")
     accept_types: Mapped[Optional[str]] = mapped_column(String(2000))
-    bytes_limit: Mapped[int] = mapped_column(default=0)
+    bytes_limit: Mapped[int] = mapped_column(server_default="0")
     http_proxy: Mapped[Optional[str]] = mapped_column(String(2000))
     https_proxy: Mapped[Optional[str]] = mapped_column(String(2000))
     settings: Mapped[Optional[str]] = mapped_column(String(2000)) # obsolete
@@ -139,19 +142,19 @@ class ConfigurationEntry(Base):
     view_access_type: Mapped[Optional[str]] = mapped_column(String(100))
     download_access_type: Mapped[Optional[str]] = mapped_column(String(100))
     add_access_type: Mapped[Optional[str]] = mapped_column(String(100))
-    logging_level: Mapped[int] = mapped_column(default=0)
-    initialized: Mapped[bool] = mapped_column(default=False)
+    logging_level: Mapped[int] = mapped_column(sever_default="0")
+    initialized: Mapped[bool] = mapped_column(server_default="0")
     initialization_type: Mapped[Optional[str]] = mapped_column(String(100))
-    enable_background_jobs: Mapped[bool] = mapped_column(default=True)
-    block_job_queue: Mapped[bool] = mapped_column(default=False)
-    use_internal_scripts: Mapped[bool] = mapped_column(default=False)
+    enable_background_jobs: Mapped[bool] = mapped_column(server_default="1")
+    block_job_queue: Mapped[bool] = mapped_column(server_default="0")
+    use_internal_scripts: Mapped[bool] = mapped_column(server_default="0")
     cleanup_time = mapped_column(Time(), nullable=True) # TODO /Datetime?
 
     data_import_path: Mapped[Optional[str]] = mapped_column(String(2000))
     data_export_path: Mapped[Optional[str]] = mapped_column(String(2000))
     download_path: Mapped[Optional[str]] = mapped_column(String(2000))
-    auto_store_thumbnails: Mapped[bool] = mapped_column(default=False)
-    thread_memory_threshold: Mapped[int] = mapped_column(default=0)
+    auto_store_thumbnails: Mapped[bool] = mapped_column(server_default="0")
+    thread_memory_threshold: Mapped[int] = mapped_column(server_default="0")
 
     enable_keyword_support: Mapped[bool] = mapped_column(default=False)
     enable_domain_support: Mapped[bool] = mapped_column(default=False)
