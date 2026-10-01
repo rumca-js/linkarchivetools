@@ -297,6 +297,9 @@ class Domains(Base):
 
 
 class EntryRules(Base):
+    """
+    source_id - set if rule applies to a source
+    """
     __tablename__ = "entryrules"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -313,6 +316,8 @@ class EntryRules(Base):
     apply_age_limit: Mapped[int] = mapped_column(server_default="0")
     script: Mapped[str] = mapped_column(String(1000), server_default="''")
     browser_id: Mapped[int] = mapped_column(server_default="0")
+
+    source_id: Mapped[Optional[int]]
 
 
 class Gateway(Base):
