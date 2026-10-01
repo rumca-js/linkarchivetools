@@ -18,3 +18,4 @@ from .checklater import *
 from .searchview import *
 from .blocklist import *
 from .userconfig import *
+from .entryvisits import *

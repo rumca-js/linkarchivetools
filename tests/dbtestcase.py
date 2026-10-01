@@ -79,6 +79,8 @@ class DbTestCase(unittest.TestCase):
             table = ReflectedEntryTable(engine=engine, connection=connection)
             entry_id = table.insert_json(data)
 
+            return entry_id
+
     def add_entry_with_tags2(self, file_name):
         engine = create_engine(f"sqlite:///{file_name}")
         with engine.connect() as connection:
@@ -105,6 +107,8 @@ class DbTestCase(unittest.TestCase):
             data = self.get_default_entry_data(url="https://linkedin.com")
             table = ReflectedEntryTable(engine=engine, connection=connection)
             entry_id = table.insert_json(data)
+
+            return entry_id
 
     def get_default_entry_data(self, url):
         data = {}
