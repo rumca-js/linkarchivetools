@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from .configurationentry import ConfigurationEntry
 from .basetable import BaseTable
 
 
@@ -50,6 +51,10 @@ class EntryVisitHistoryTable(BaseTable):
             return visit
 
     def visited(self, entry):
+        config_row = ConfigurationEntry(connection=self.connection).get()
+        if not config_row.track_user_navigation:
+            return
+
         last_entry = self.get_last_visit_entry()
 
         visit = self.get_entry_visit(entry)

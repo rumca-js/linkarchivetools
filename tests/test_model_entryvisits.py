@@ -3,6 +3,7 @@ from linkarchivetools.model import (
    EntryVisitHistoryTable,
    EntryTransitionHistoryTable,
    Entries,
+   ConfigurationEntry,
 )
 
 from .dbtestcase import DbTestCase
@@ -30,6 +31,8 @@ class CheckLaterTest(DbTestCase):
         return entry
 
     def test_constructor(self):
+        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+
         # call tested function
         visits = EntryVisitHistoryTable(connection=self.connection)
         visits.truncate()
@@ -40,6 +43,8 @@ class CheckLaterTest(DbTestCase):
         self.assertEqual(transitions.count(), 0)
 
     def test_visited(self):
+        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+
         visits = EntryVisitHistoryTable(connection=self.connection)
         visits.truncate()
 
@@ -56,6 +61,8 @@ class CheckLaterTest(DbTestCase):
         self.assertEqual(transitions.count(), 0)
 
     def test_visited_two(self):
+        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+
         visits = EntryVisitHistoryTable(connection=self.connection)
         visits.truncate()
 
