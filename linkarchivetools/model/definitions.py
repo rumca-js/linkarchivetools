@@ -434,30 +434,46 @@ class SocialData(Base):
 
 
 class SourcesTable(Base):
+    """
+    age - age limit for users. Some sources might be 18+
+    language - language of source. Could be propagated to its entries
+    fetch_period - how often source is refreshed
+    auto_tag - entries should receive these tags automatically
+    auto_update_favicon - source should update favicon, when new one is received
+    notify_new_entries - usefule for e-mail sources
+    proxy_location - if you have a proxy to check on that source, but want to keep
+                     source as reference data
+    days_to_remove_entries - remove entries after specified number of days. 0 means do not remove
+    """
     __tablename__ = "sourcedatamodel"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    enabled: Mapped[bool] = mapped_column(default=True)
+    enabled: Mapped[bool] = mapped_column(server_default="true")
     url: Mapped[str] = mapped_column(unique=True)
     title: Mapped[Optional[str]]
-    age: Mapped[int] = mapped_column(default=0)
-    category_id: Mapped[Optional[int]]
-    subcategory_id: Mapped[Optional[int]]
-    export_to_cms: Mapped[bool] = mapped_column(default=True)
-    favicon: Mapped[Optional[str]]
-    fetch_period: Mapped[Optional[int]]
-    language: Mapped[Optional[str]]
-    remove_after_days: Mapped[Optional[int]]
     source_type: Mapped[Optional[str]]
     category_name: Mapped[Optional[str]]
     subcategory_name: Mapped[Optional[str]]
-    auto_tag: Mapped[str] = mapped_column(String(1000), default="")
-    entries_backgroundcolor_alpha: Mapped[float] = mapped_column(default=0.0)
-    entries_backgroundcolor: Mapped[Optional[str]]
-    entries_alpha: Mapped[float] = mapped_column(default=0.0)
+    export_to_cms: Mapped[bool] = mapped_column(server_default="true")
+    favicon: Mapped[Optional[str]]
+    fetch_period: Mapped[Optional[int]]
+    age: Mapped[int] = mapped_column(server_default="0")
+    language: Mapped[Optional[str]]
+    days_to_remove_entries: Mapped[Optional[int]]
+    auto_tag: Mapped[str] = mapped_column(String(1000), server_default="''")
+    auto_update_favicon: Mapped[bool] = mapped_column(server_default="true")
+    auto_add_to_read_later: Mapped[bool] = mapped_column(server_default="false")
     xpath: Mapped[Optional[str]]
     proxy_location: Mapped[Optional[str]]
-    auto_update_favicon: Mapped[bool] = mapped_column(default=True)
+    notify_new_entries: Mapped[bool] = mapped_column(server_default="false") 
+    notify_errors: Mapped[bool] = mapped_column(server_default="false") 
+    entries_backgroundcolor_alpha: Mapped[float] = mapped_column(server_default="0")
+    entries_backgroundcolor: Mapped[Optional[str]]
+    entries_alpha: Mapped[float] = mapped_column(server_default="0")
+
+    # legacy - will be removed
+    remove_after_days: Mapped[Optional[int]]
+
     credentials_id: Mapped[Optional[int]] = mapped_column()
     category_id: Mapped[Optional[int]] = mapped_column()
     subcategory_id: Mapped[Optional[int]] = mapped_column()
