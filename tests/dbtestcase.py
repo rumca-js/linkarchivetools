@@ -132,5 +132,5 @@ class DbTestCase(unittest.TestCase):
             db_connection = DbConnection(engine=engine,connection=connection)
             config = UserConfig(connection=db_connection)
             user_id = config.add_user(username, password)
-            config.add_config(user_id)
+            config_id = config.add_config(user_id)
             return user_id

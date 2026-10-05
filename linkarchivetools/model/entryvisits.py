@@ -43,21 +43,29 @@ class EntryVisitHistoryTable(BaseTable):
         for visit in visits:
             return visit
 
-    def get_last_visit_entry(self):
+    def get_last_visit(self):
         table = self.get_table().get_table()
 
         visits = self.get_where({}, order_by=[table.c.date_last_visit.desc()])
         for visit in visits:
             return visit
 
+    def get_last_visit_entry(self):
+        from .entries import Entries
+        visit = self.get_last_visit()
+        if visit:
+            entries = Entries(self.connection)
+            return entries.get(id=visit.entry_id)
+
     def visited(self, entry):
         config_row = ConfigurationEntry(connection=self.connection).get()
         if not config_row.track_user_navigation:
             return
 
+        visit = self.get_entry_visit(entry)
+        last_visit = self.get_last_visit() # has to be captured before we add visit
         last_entry = self.get_last_visit_entry()
 
-        visit = self.get_entry_visit(entry)
         if not visit:
             counter = 1
 
@@ -68,7 +76,7 @@ class EntryVisitHistoryTable(BaseTable):
 
             status = self.get_table().insert_json_data(json_data=json_data)
         else:
-            counter = visit.visits
+            counter = visit.visits + 1
 
             json_data = {}
             json_data["visits"] = counter
@@ -76,7 +84,15 @@ class EntryVisitHistoryTable(BaseTable):
 
             status = self.get_table().update_json_data(json_data=json_data)
 
+        if last_visit:
+            diff = datetime.now() - last_visit.date_last_visit
+            if diff.total_seconds() > 3600:
+                return status
+
         if last_entry and entry:
+            if last_entry.id == entry.id:
+                return status
+
             transitions = EntryTransitionHistoryTable(self.connection)
             transitions.transition(last_entry, entry)
 

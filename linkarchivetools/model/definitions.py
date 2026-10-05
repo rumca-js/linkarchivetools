@@ -485,6 +485,7 @@ class SourceOperationalData(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
     date_fetched = mapped_column(DateTime, nullable=True)
+    date_successful_fetch = mapped_column(DateTime, nullable=True)
     import_seconds: Mapped[Optional[int]]
     number_of_entries: Mapped[Optional[int]]
     page_hash: Mapped[bytes | None] = mapped_column(LargeBinary)

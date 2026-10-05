@@ -37,6 +37,7 @@ class SourceData(BaseTable):
             response = url_obj.get_response()
             if response.is_valid():
                 new_data["consecutive_errors"] = 0
+                new_data["date_successful_fetch"] = datetime.now()
 
         try:
             if op_data:
@@ -56,6 +57,16 @@ class SourceData(BaseTable):
             return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
 
     def is_update_needed(self, source):
+        """
+         - if there is no fetch data - it is time for update
+         - if it was fetched earlier than minute ago, it is not time for an update
+         - if last successful fetch was not in fetch_period, it is time to update
+
+         Scenarios:
+          - youtube sometimes break RSS feeds for a long period of time. We can swamp
+            it with requests, might be too often
+          - there is some problem with RSS, should be fetched again, so consecutive check after 10 minutes could be benficial
+        """
         if not source.enabled:
             return False
 
@@ -69,7 +80,18 @@ class SourceData(BaseTable):
             if source.fetch_period > 0:
                 fetch_period_s = source.fetch_period
 
-            if datetime.now() - date_fetched < timedelta(seconds=fetch_period_s):
+            min10 = 10*60
+
+            diff_fetch = datetime.now() - date_fetched
+            if fetch_period_s > min10 and diff_fetch.total_seconds() < min10:  # 10 minutes
+                return False
+
+            date_successful_fetch = this_source_data.date_successful_fetch
+            if date_successful_fetch is None:
+                return True
+
+            diff_successful_fetch = datetime.now() - date_successful_fetch
+            if diff_successful_fetch < timedelta(seconds=fetch_period_s):
                 return False
 
         return True

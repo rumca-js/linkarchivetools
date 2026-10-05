@@ -7,11 +7,13 @@ from .entries import Entries
 class UserConfig(BaseTable):
     def __init__(self, connection):
         self.connection = connection
-        self.set_table("readlater")
+        self.set_table("userconfig")
 
     def get_user(self, user_id):
         user_table = self.connection.get_table("user")
-        return user_table.get_where({"id" : user_id})
+        users = user_table.get_where({"id" : user_id})
+        for user in users:
+            return user
 
     def get_config(self, user_id):
         for row in self.get_table().get_where({"user_id" : user_id}):
@@ -20,7 +22,7 @@ class UserConfig(BaseTable):
     def add_config(self, user_id):
         json_data = {}
 
-        user = self.get_config(user_id)
+        user = self.get_user(user_id)
         if not user:
             return
 
@@ -40,7 +42,8 @@ class UserConfig(BaseTable):
         json_data["debug_mode"] = False
         json_data["user_id"] = user_id
 
-        return self.get_table().insert_json_data(json_data=json_data)
+        user_table = self.connection.get_table("userconfig")
+        return user_table.insert_json_data(json_data=json_data)
 
     def add_user(self, username="testuser", password="testpassword"):
         user_table = self.connection.get_table("user")

@@ -3,7 +3,13 @@ from pathlib import Path
 from sqlalchemy import create_engine
 
 from linkarchivetools import DbUpdate
-from linkarchivetools.model import UserConfig
+from linkarchivetools.model import (
+   DbConnection,
+   Entries,
+   EntryTags,
+   SearchView,
+   UserConfig,
+)
 from linkarchivetools.utils.reflected import ReflectedGenericTable, ReflectedEntryTable
 from .dbtestcase import DbTestCase
 
@@ -134,10 +140,19 @@ class DbUpdateTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
+        self.add_user("input.db", "test", "test")
+        engine = create_engine("sqlite:///input.db")
+        with engine.connect() as connection:
+            db_connection = DbConnection(engine=engine, connection=connection)
+            entries = Entries(connection=db_connection)
+            entry_id = entries.add(entry_json={"link" : "https://google.com"})
+            tags = EntryTags(connection=db_connection)
+            tags.set(entry_id = entry_id, tags="tags")
+            view = SearchView(connection=db_connection)
+            view.add()
+
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
-
-        self.add_user("input.db", "test", "test")
 
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
@@ -149,6 +164,7 @@ class DbUpdateTest(DbTestCase):
         self.assertGreater(input_searchview_count, 0)
 
         db_update = DbUpdate(db="input.db")
+        # call tested function
         db_update.truncate_user_tables()
         db_update.close()
 
@@ -168,10 +184,19 @@ class DbUpdateTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
+        self.add_user("input.db", "test", "test")
+        engine = create_engine("sqlite:///input.db")
+        with engine.connect() as connection:
+            db_connection = DbConnection(engine=engine, connection=connection)
+            entries = Entries(connection=db_connection)
+            entry_id = entries.add(entry_json={"link" : "https://google.com"})
+            tags = EntryTags(connection=db_connection)
+            tags.set(entry_id = entry_id, tags="tags")
+            view = SearchView(connection=db_connection)
+            view.add()
+
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
-
-        self.add_user("input.db", "test", "test")
 
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
@@ -183,6 +208,7 @@ class DbUpdateTest(DbTestCase):
         self.assertGreater(input_searchview_count, 0)
 
         db_update = DbUpdate(db="input.db")
+        # call tested function
         db_update.truncate_dynamic_data()
         db_update.close()
 
@@ -202,10 +228,19 @@ class DbUpdateTest(DbTestCase):
         self.create_db("input.db")
         self.clean_out()
 
+        self.add_user("input.db", "test", "test")
+        engine = create_engine("sqlite:///input.db")
+        with engine.connect() as connection:
+            db_connection = DbConnection(engine=engine, connection=connection)
+            entries = Entries(connection=db_connection)
+            entry_id = entries.add(entry_json={"link" : "https://google.com"})
+            tags = EntryTags(connection=db_connection)
+            tags.set(entry_id = entry_id, tags="tags")
+            view = SearchView(connection=db_connection)
+            view.add()
+
         #input_browser_count = self.get_row_count("input.db", "browser")
         input_userconfig_count = self.get_row_count("input.db", "userconfig")
-
-        self.add_user("input.db", "test", "test")
 
         #self.assertGreater(input_browser_count, 0)
         self.assertGreater(input_userconfig_count, 0)
