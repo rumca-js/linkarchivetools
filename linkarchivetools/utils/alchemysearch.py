@@ -112,16 +112,16 @@ class AlchemySearch(object):
             yield row
 
     def get_destination_table(self):
-        destination_metadata = MetaData()
-
         if self.args and self.args.table:
-            self.destination_table = Table(
-                self.args.table, destination_metadata, autoload_with=self.db
-            )
+            self.table_name = self.args.table
         else:
-            self.destination_table = Table(
-                "linkdatamodel", destination_metadata, autoload_with=self.db
-            )
+            self.table_name = "linkdatamodel"
+
+        self.destination_table = self.get_meta_table(self.table_name)
+
+    def get_meta_table(self, table_name):
+        metadata = MetaData()
+        return Table(table_name, metadata, autoload_with=self.db)
 
     def get_query_conditions(self):
         ignore_case = False
@@ -162,11 +162,40 @@ class AlchemySearch(object):
             order_by_clause = order_by_column.asc()
 
         # Use select() for SQLAlchemy Core
-        stmt = (
-            select(self.destination_table)
-            .where(combined_query_conditions)
-            .order_by(order_by_clause)
-        )
+        if self.table_name == "linkdatamodel":
+            tags_table = self.get_meta_table("entrycompactedtags")
+            social_data = self.get_meta_table("socialdata")
+            sources = self.get_meta_table("sourcedatamodel")
+
+            stmt = (
+                select(self.destination_table,
+                       *[
+                           col.label(f"tags_{col.name}")
+                           for col in tags_table.c
+                       ],
+                       *[
+                           col.label(f"social_{col.name}")
+                           for col in social_data.c
+                       ],
+                       *[
+                           col.label(f"source_{col.name}")
+                           for col in sources.c
+                       ]
+                       )
+
+                .outerjoin(tags_table, self.destination_table.c.id == tags_table.c.entry_id)
+                .outerjoin(social_data, self.destination_table.c.id == social_data.c.entry_id)
+                .outerjoin(sources, self.destination_table.c.source_id == sources.c.id)
+
+                .where(combined_query_conditions)
+                .order_by(order_by_clause)
+            )
+        else:
+            stmt = (
+                select(self.destination_table)
+                .where(combined_query_conditions)
+                .order_by(order_by_clause)
+            )
 
         # Execute the query
         result = self.connection.execute(stmt)

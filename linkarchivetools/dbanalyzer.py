@@ -31,9 +31,6 @@ from linkarchivetools.model import (
 )
 from linkarchivetools.utils.reflected import (
     ReflectedTable,
-    ReflectedEntryTable,
-    ReflectedUserTags,
-    ReflectedSocialData,
 )
 
 
@@ -118,11 +115,8 @@ class DisplayRowHandler(object):
                 text += " NO TITLE"
 
         if self.args.source:
-            source_id = entry.source
-            if source_id:
-                r = ReflectedEntryTable(self.engine, self.connection)
-                source = r.get_source(source_id)
-                text += " [{}]".format(source.title)
+            if entry.source_title:
+                text += " [{}]".format(entry.source_title)
         print(text)
 
         if self.args.date_published:
@@ -136,16 +130,11 @@ class DisplayRowHandler(object):
                 print(description)
 
         if self.args.tags:
-            tags_table = ReflectedUserTags(self.engine, self.connection)
-            tags = tags_table.get_tags_string(entry.id)
-            if tags and tags != "":
-                self.print_tags(tags)
+            if entry.tags_tag and entry.tags_tag != "":
+                self.print_tags(entry.tags_tag)
 
         if self.args.social:
-            social_table = ReflectedSocialData(self.engine, self.connection)
-            social = social_table.get(entry.id)
-            if social is not None:
-                self.print_social(social)
+            self.print_social(entry)
 
         if self.args.status:
             print(entry.status_code)
@@ -153,36 +142,36 @@ class DisplayRowHandler(object):
     def print_tags(self, tags):
         print(tags)
 
-    def print_social(self, social):
+    def print_social(self, entry):
         if (
-            social.view_count is not None
-            and social.thumbs_up is not None
-            and social.thumbs_down is not None
+            entry.social_view_count is not None
+            and entry.social_thumbs_up is not None
+            and entry.social_thumbs_down is not None
         ):
             print(
-                f"V:{social.view_count} TU:{social.thumbs_up} TD:{social.thumbs_down}"
+                f"V:{entry.social_view_count} TU:{entry.social_thumbs_up} TD:{entry.social_thumbs_down}"
             )
         else:
-            if social.view_count:
-                print(f"F:{social.view_count}")
+            if entry.social_view_count:
+                print(f"F:{entry.social_view_count}")
 
-            if social.thumbs_up:
-                print(f"F:{social.thumbs_up}")
+            if entry.social_thumbs_up:
+                print(f"F:{entry.social_thumbs_up}")
 
-            if social.thumbs_down:
-                print(f"F:{social.thumbs_down}")
+            if entry.social_thumbs_down:
+                print(f"F:{entry.social_thumbs_down}")
 
-            if social.upvote_diff:
-                print(f"S:{social.upvote_diff}")
+            if entry.social_upvote_diff:
+                print(f"S:{entry.social_upvote_diff}")
 
-            if social.upvote_ratio:
-                print(f"S:{social.upvote_ratio}")
+            if entry.social_upvote_ratio:
+                print(f"S:{entry.social_upvote_ratio}")
 
-            if social.followers_count:
-                print(f"F:{social.followers_count}")
+            if entry.social_followers_count:
+                print(f"F:{entry.social_followers_count}")
 
-            if social.stars:
-                print(f"S:{social.stars}")
+            if entry.social_stars:
+                print(f"S:{entry.social_stars}")
 
     def get_time_diff(self):
         return time.time() - self.start_time
