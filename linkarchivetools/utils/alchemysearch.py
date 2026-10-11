@@ -102,6 +102,10 @@ class AlchemySearch(object):
 
         self.args = args
 
+        self.order_by_column_name = "id"
+        if self.args and self.args.order_by:
+            self.order_by_column_name = self.args.order_by
+
         self.get_destination_table()
 
     def search(self):
@@ -137,19 +141,16 @@ class AlchemySearch(object):
         combined_query_conditions = search.get_combined_query()
         return combined_query_conditions
 
-    def get_filtered_objects(self):
-        combined_query_conditions = self.get_query_conditions()
-
-        rows = []
-
-        order_by_column_name = "id"
-        if self.args and self.args.order_by:
-            order_by_column_name = self.args.order_by
-
-        order_by_column = getattr(self.destination_table.c, order_by_column_name, None)
+    def get_order_by_column(self):
+        order_by_column = getattr(self.destination_table.c, self.order_by_column_name, None)
 
         if order_by_column is None:
             raise AttributeError(f"Invalid order_by column: {self.args.order_by}")
+
+        return order_by_column
+
+    def get_order_by_clause(self):
+        order_by_column = self.get_order_by_column()
 
         if self.args:
             # Determine sorting order
@@ -160,6 +161,14 @@ class AlchemySearch(object):
             )
         else:
             order_by_clause = order_by_column.asc()
+
+        return order_by_clause
+
+    def get_filtered_objects(self):
+        combined_query_conditions = self.get_query_conditions()
+        order_by_clause = self.get_order_by_clause()
+
+        rows = []
 
         # Use select() for SQLAlchemy Core
         if self.table_name == "linkdatamodel":

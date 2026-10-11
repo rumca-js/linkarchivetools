@@ -12,6 +12,7 @@ class Db2AnalyzerTest(DbTestCase):
         self.create_db("input.db")
         self.add_entry_with_tags("input.db")
 
+        # call tested function
         analyzer = DbAnalyzer(input_db="input.db")
         self.assertTrue(True)
 
@@ -21,6 +22,7 @@ class Db2AnalyzerTest(DbTestCase):
         args = SimpleNamespace(search=None, ignore_case=True, verbosity=0)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
+        # call tested function
         analyzer.print_tables()
         self.assertTrue(True)
 
@@ -30,6 +32,7 @@ class Db2AnalyzerTest(DbTestCase):
         args = SimpleNamespace(search=None, ignore_case=True, verbosity=0)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
+        # call tested function
         analyzer.print_tables(print_columns=True)
         self.assertTrue(True)
 
@@ -39,15 +42,21 @@ class Db2AnalyzerTest(DbTestCase):
         args = {}
 
         analyzer = DbAnalyzer(input_db="input.db")
-        analyzer.search()
+        # call tested function
+        for item in analyzer.search():
+            pass
+
         self.assertTrue(True)
 
     def test_search__search(self):
         self.create_db("input.db")
         self.add_entry_with_tags("input.db")
         search = "*youtube.com*"
-        args = SimpleNamespace(search=search, ignore_case = True, verbosity=0, table=False, order_by=None, asc=True, desc=False)
+        args = SimpleNamespace(search=search, ignore_case = True, verbosity=0, table=False, order_by=None, asc=True, desc=False, json=False)
 
         analyzer = DbAnalyzer(input_db="input.db", args=args)
-        analyzer.search()
+        # call tested function
+        for item in analyzer.search():
+            pass
+
         self.assertTrue(True)
