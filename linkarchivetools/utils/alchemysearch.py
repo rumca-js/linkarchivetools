@@ -102,9 +102,14 @@ class AlchemySearch(object):
 
         self.args = args
 
-        self.order_by_column_name = "id"
+        if self.args and self.args.table:
+            self.table_name = self.args.table
+        else:
+            self.table_name = "linkdatamodel"
+
+        self.order_by_column_names = ["id"]
         if self.args and self.args.order_by:
-            self.order_by_column_name = self.args.order_by
+            self.order_by_column_names = [self.args.order_by]
 
         self.get_destination_table()
 
@@ -116,12 +121,12 @@ class AlchemySearch(object):
             yield row
 
     def get_destination_table(self):
-        if self.args and self.args.table:
-            self.table_name = self.args.table
-        else:
-            self.table_name = "linkdatamodel"
-
-        self.destination_table = self.get_meta_table(self.table_name)
+        # no _ char
+        self.tables = {}
+        self.tables["tags"] = self.get_meta_table("entrycompactedtags")
+        self.tables["social"] = self.get_meta_table("socialdata")
+        self.tables["source"] = self.get_meta_table("sourcedatamodel")
+        self.tables["linkdatamodel"] = self.get_meta_table("linkdatamodel")
 
     def get_meta_table(self, table_name):
         metadata = MetaData()
@@ -132,7 +137,7 @@ class AlchemySearch(object):
         if self.args and self.args.ignore_case:
             ignore_case = True
 
-        symbol_evaluator = AlchemySymbolEvaluator(self.destination_table, ignore_case)
+        symbol_evaluator = AlchemySymbolEvaluator(self.tables["linkdatamodel"], ignore_case)
         equation_evaluator = AlchemyEquationEvaluator(
             self.search_term, symbol_evaluator
         )
@@ -141,11 +146,21 @@ class AlchemySearch(object):
         combined_query_conditions = search.get_combined_query()
         return combined_query_conditions
 
+    def get_table_column_name(self, order_by_thing):
+        split = order_by_thing.split("__")
+        if len(split) > 1:
+            return split[0], split[1]
+        if len(split) == 1:
+            return self.table_name, split[0]
+        return self.table_name, None
+
     def get_order_by_column(self):
-        order_by_column = getattr(self.destination_table.c, self.order_by_column_name, None)
+        table_name, column_name = self.get_table_column_name(self.order_by_column_names[0])
+
+        order_by_column = getattr(self.tables[table_name].c, column_name, None)
 
         if order_by_column is None:
-            raise AttributeError(f"Invalid order_by column: {self.args.order_by}")
+            raise AttributeError(f"Invalid order_by column: {self.order_by_column_names}")
 
         return order_by_column
 
@@ -172,12 +187,13 @@ class AlchemySearch(object):
 
         # Use select() for SQLAlchemy Core
         if self.table_name == "linkdatamodel":
-            tags_table = self.get_meta_table("entrycompactedtags")
-            social_data = self.get_meta_table("socialdata")
-            sources = self.get_meta_table("sourcedatamodel")
+            tags_table = self.tables["tags"]
+            social_data = self.tables["social"]
+            sources = self.tables["source"]
+            linktable = self.tables["linkdatamodel"]
 
             stmt = (
-                select(self.destination_table,
+                select(linktable,
                        *[
                            col.label(f"tags_{col.name}")
                            for col in tags_table.c
@@ -192,16 +208,16 @@ class AlchemySearch(object):
                        ]
                        )
 
-                .outerjoin(tags_table, self.destination_table.c.id == tags_table.c.entry_id)
-                .outerjoin(social_data, self.destination_table.c.id == social_data.c.entry_id)
-                .outerjoin(sources, self.destination_table.c.source_id == sources.c.id)
+                .outerjoin(tags_table, linktable.c.id == tags_table.c.entry_id)
+                .outerjoin(social_data, linktable.c.id == social_data.c.entry_id)
+                .outerjoin(sources, linktable.c.source_id == sources.c.id)
 
                 .where(combined_query_conditions)
                 .order_by(order_by_clause)
             )
         else:
             stmt = (
-                select(self.destination_table)
+                select(linktable)
                 .where(combined_query_conditions)
                 .order_by(order_by_clause)
             )
