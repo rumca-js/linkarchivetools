@@ -12,47 +12,53 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
     return 1 if true
     """
 
-    def __init__(self, table, ignore_case=False):
-        self.table = table
+    def __init__(self, tables, ignore_case=False):
+        self.tables = tables
         self.ignore_case = ignore_case
 
     def evaluate_complex_symbol(self, symbol, condition_data):
         # TODO make todo check if symbol exists in table?
 
+        table_name, column_name = self.get_table_column_name(condition_data[0])
+        if table_name:
+            table = self.tables[table_name]
+        else:
+            table = self.tables["linkdatamodel"]
+
         if condition_data[1] == "==":
             if self.ignore_case:
-                column = self.table.c[condition_data[0]]
+                column = table.c[column_name]
                 return func.lower(column) == condition_data[2].lower()
             else:
-                return self.table.c[condition_data[0]] == condition_data[2]
+                return table.c[column_name] == condition_data[2]
 
         if condition_data[1] == "!=":
             if self.ignore_case:
-                column = self.table.c[condition_data[0]]
+                column = table.c[column_name]
                 return func.lower(column) != condition_data[2].lower()
             else:
-                return self.table.c[condition_data[0]] != condition_data[2]
+                return table.c[column_name] != condition_data[2]
 
         if condition_data[1] == ">":
-            return self.table.c[condition_data[0]] > condition_data[2]
+            return table.c[column_name] > condition_data[2]
 
         if condition_data[1] == "<":
-            return self.table.c[condition_data[0]] < condition_data[2]
+            return table.c[column_name] < condition_data[2]
 
         if condition_data[1] == ">=":
-            return self.table.c[condition_data[0]] >= condition_data[2]
+            return table.c[column_name] >= condition_data[2]
 
         if condition_data[1] == "<=":
-            return self.table.c[condition_data[0]] <= condition_data[2]
+            return table.c[column_name] <= condition_data[2]
 
         if condition_data[1] == "=":
             symbol = condition_data[2]
             symbol = symbol.replace("*", "%")
 
             if self.ignore_case:
-                return self.table.c[condition_data[0]].ilike(symbol)
+                return table.c[column_name].ilike(symbol)
             else:
-                return self.table.c[condition_data[0]].like(symbol)
+                return table.c[column_name].like(symbol)
 
         raise IOError("Unsupported operator")
 
@@ -60,20 +66,30 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
         """
         TODO we could check by default if entry link == symbol, or sth
         """
+        table = self.tables["linkdatamodel"]
+
         if self.ignore_case:
             symbol = symbol.replace("*", "%")
             return or_(
-                self.table.c["link"].ilike(symbol),
-                self.table.c["title"].ilike(symbol),
-                self.table.c["description"].ilike(symbol),
+                table.c["link"].ilike(symbol),
+                table.c["title"].ilike(symbol),
+                table.c["description"].ilike(symbol),
             )
         else:
             symbol = symbol.replace("*", "%")
             return or_(
-                self.table.c["link"].like(symbol),
-                self.table.c["title"].like(symbol),
-                self.table.c["description"].like(symbol),
+                table.c["link"].like(symbol),
+                table.c["title"].like(symbol),
+                table.c["description"].like(symbol),
             )
+
+    def get_table_column_name(self, input_text):
+        split = input_text.split("__")
+        if len(split) > 1:
+            return split[0], split[1]
+        if len(split) == 1:
+            return None, input_text
+        return None, None
 
 
 class AlchemyEquationEvaluator(EquationEvaluator):
@@ -137,7 +153,7 @@ class AlchemySearch(object):
         if self.args and self.args.ignore_case:
             ignore_case = True
 
-        symbol_evaluator = AlchemySymbolEvaluator(self.tables["linkdatamodel"], ignore_case)
+        symbol_evaluator = AlchemySymbolEvaluator(self.tables, ignore_case)
         equation_evaluator = AlchemyEquationEvaluator(
             self.search_term, symbol_evaluator
         )
@@ -195,15 +211,15 @@ class AlchemySearch(object):
             stmt = (
                 select(linktable,
                        *[
-                           col.label(f"tags_{col.name}")
+                           col.label(f"tags__{col.name}")
                            for col in tags_table.c
                        ],
                        *[
-                           col.label(f"social_{col.name}")
+                           col.label(f"social__{col.name}")
                            for col in social_data.c
                        ],
                        *[
-                           col.label(f"source_{col.name}")
+                           col.label(f"source__{col.name}")
                            for col in sources.c
                        ]
                        )

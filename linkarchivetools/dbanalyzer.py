@@ -79,7 +79,21 @@ class DisplayRowHandler(object):
         return link
 
     def print_entry_json(self, entry):
-        json_data = entry_to_json(entry)
+        json_data = {}
+
+        if self.args.title:
+            json_data["title"] = entry.title
+        if self.args.description:
+            json_data["description"] = entry.description
+        if self.args.status:
+            json_data["status_code"] = entry.status_code
+        if self.args.date_created:
+            json_data["date_created"] = entry.date_created
+        if self.args.date_published:
+            json_data["date_published"] = entry.date_published
+
+        if len(json_data) == 0:
+            json_data = entry_to_json(entry)
 
         link = self.get_entry_link(entry)
         if not link:
@@ -261,7 +275,9 @@ class DbAnalyzer(object):
         if self.args:
             search = self.args.search
 
-        print("Starting alchemy")
+        if self.args.verbosity > 1:
+            print("Starting alchemy")
+
         searcher = AlchemySearch(
             self.engine,
             search,
@@ -269,9 +285,13 @@ class DbAnalyzer(object):
             args=self.args,
             connection=self.connection,
         )
-        print("Starting alchemy DONE")
 
-        print("Searching...")
+        if self.args.verbosity > 1:
+            print("Starting alchemy DONE")
+
+        if self.args.verbosity > 1:
+            print("Searching...")
+
         yield from searcher.search()
 
     def print_sources(self):
@@ -304,25 +324,6 @@ class DbAnalyzerParser(object):
         self.parser.add_argument("--desc", action="store_true", help="order descending")
         self.parser.add_argument("--table", default="linkdatamodel", help="Table name")
 
-        self.parser.add_argument("--title", action="store_true", help="displays title")
-        self.parser.add_argument("--votes", action="store_true", help="displays votes")
-        self.parser.add_argument(
-            "--description", action="store_true", help="displays description"
-        )
-        self.parser.add_argument(
-            "--status", action="store_true", help="displays status"
-        )
-        self.parser.add_argument("--tags", action="store_true", help="displays tags")
-        self.parser.add_argument(
-            "--social", action="store_true", help="displays social data"
-        )
-        self.parser.add_argument(
-            "--date-published", action="store_true", help="displays date-published"
-        )
-        self.parser.add_argument(
-            "--source", action="store_true", help="displays source"
-        )
-
         self.parser.add_argument(
             "--tables", action="store_true", help="displays summary of tables"
         )
@@ -331,6 +332,17 @@ class DbAnalyzerParser(object):
             action="store_true",
             help="displays summary of tables column names",
         )
+        self.parser.add_argument(
+            "--print-sources",
+            action="store_true",
+            help="Lists sources",
+        )
+
+        self.parser.add_argument(
+            "-i", "--ignore-case", action="store_true", help="Ignores case"
+        )
+
+        # display type switches
         self.parser.add_argument(
             "--rss",
             action="store_true",
@@ -346,15 +358,31 @@ class DbAnalyzerParser(object):
             action="store_true",
             help="JSON format",
         )
+
+        # display switches
+        self.parser.add_argument("--title", action="store_true", help="displays title")
+        self.parser.add_argument("--votes", action="store_true", help="displays votes")
         self.parser.add_argument(
-            "--print-sources",
-            action="store_true",
-            help="Lists sources",
+            "--description", action="store_true", help="displays description"
+        )
+        self.parser.add_argument(
+            "--status", action="store_true", help="displays status"
+        )
+        self.parser.add_argument("--tags", action="store_true", help="displays tags")
+        self.parser.add_argument(
+            "--social", action="store_true", help="displays social data"
+        )
+        self.parser.add_argument(
+            "--date-created", action="store_true", help="displays date-created"
+        )
+        self.parser.add_argument(
+            "--date-published", action="store_true", help="displays date-published"
+        )
+        self.parser.add_argument(
+            "--source", action="store_true", help="displays source"
         )
 
-        self.parser.add_argument(
-            "-i", "--ignore-case", action="store_true", help="Ignores case"
-        )
+        # other
         self.parser.add_argument("-v", "--verbosity",  type=int, default = 1, help="Verbosity level")
 
         self.args = self.parser.parse_args()
@@ -379,7 +407,8 @@ def main():
         for _ in db_analyzer.search():
             pass
 
-    print_time_diff(start_time)
+    if p.args.verbosity > 1:
+        print_time_diff(start_time)
 
 
 if __name__ == "__main__":
