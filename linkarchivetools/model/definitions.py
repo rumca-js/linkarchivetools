@@ -232,6 +232,7 @@ class ConfigurationEntry(Base):
     local_icons: Mapped[bool] = mapped_column(server_default="false")
     highlight_bookmarks: Mapped[bool] = mapped_column(server_default="false")
     click_behavior_modal_window: Mapped[bool] = mapped_column(server_default="false")
+    entries_direct_links: Mapped[bool] = mapped_column(server_default="false")
     links_per_page: Mapped[int] = mapped_column(server_default="100")
     sources_per_page: Mapped[int] = mapped_column(server_default="100")
     max_links_per_page: Mapped[int] = mapped_column(server_default="100")
