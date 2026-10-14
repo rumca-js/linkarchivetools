@@ -603,7 +603,7 @@ class UserConfig(Base):
     display_type: Mapped[str] = mapped_column(server_default="")
     show_icons: Mapped[bool] = mapped_column(server_default="false")
     small_icons: Mapped[bool] = mapped_column(server_default="false")
-    thumbnails_as_icons: Mapped[bool] = mapped_column(sever_default="false")
+    thumbnails_as_icons: Mapped[bool] = mapped_column(server_default="false")
     entries_direct_links: Mapped[bool] = mapped_column(server_default="false")
     highlight_bookmarks: Mapped[bool] = mapped_column(server_default="false")
     click_behavior_modal_window: Mapped[bool] = mapped_column(server_default="false")
