@@ -594,10 +594,14 @@ class EntryVisitHistory(Base):
 
 class SystemOperation(Base):
     """
+    Should be used to indicate if job processing threads are alive
+
     CHECK_TYPE_INTERNET = "Internet"
     CHECK_TYPE_CRAWLING_SERVER = "CrawlingServer"
     """
+    __tablename__ = "systemoperation"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
     thread_id: Mapped[str] = mapped_column(String(500), server_default="")
     check_type: Mapped[str] = mapped_column(String(500), server_default="")
