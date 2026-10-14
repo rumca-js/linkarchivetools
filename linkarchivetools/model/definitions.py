@@ -350,7 +350,7 @@ class LinkDataModel(Base):
     description: Mapped[Optional[str]]
     thumbnail: Mapped[Optional[str]]
     language: Mapped[Optional[str]]
-    age: Mapped[int] = mapped_column(default=0)
+    age: Mapped[int] = mapped_column(server_default='0')
 
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
     date_published = mapped_column(DateTime(timezone=True), nullable=True)
@@ -358,20 +358,20 @@ class LinkDataModel(Base):
     date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
     date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
 
-    bookmarked: Mapped[bool] = mapped_column(default=False)
-    permanent: Mapped[bool] = mapped_column(default=False)
+    bookmarked: Mapped[bool] = mapped_column(server_default="false")
+    permanent: Mapped[bool] = mapped_column(server_default="false")
 
     author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
 
-    status_code: Mapped[int] = mapped_column(default=0)
-    manual_status_code: Mapped[int] = mapped_column(default=0)
-    contents_type: Mapped[int] = mapped_column(default=0)
+    status_code: Mapped[int] = mapped_column(server_default='0')
+    manual_status_code: Mapped[int] = mapped_column(server_default='0')
+    contents_type: Mapped[int] = mapped_column(server_default='0')
 
-    page_rating_contents: Mapped[int] = mapped_column(default=0)
-    page_rating_votes: Mapped[int] = mapped_column(default=0)
-    page_rating_visits: Mapped[int] = mapped_column(default=0)
-    page_rating: Mapped[int] = mapped_column(default=0)
+    page_rating_contents: Mapped[int] = mapped_column(server_default='0')
+    page_rating_votes: Mapped[int] = mapped_column(server_default='0')
+    page_rating_visits: Mapped[int] = mapped_column(server_default='0')
+    page_rating: Mapped[int] = mapped_column(server_default='0')
 
     contents_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
     body_hash: Mapped[bytes | None] = mapped_column(LargeBinary)
@@ -537,7 +537,7 @@ class UserVotes(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
     user: Mapped[str] = mapped_column(String(1000))
-    vote: Mapped[int] = mapped_column(default=0)
+    vote: Mapped[int] = mapped_column(server_default='0')
 
     entry_object: Mapped[Optional[int]]
     user_object: Mapped[Optional[int]]
@@ -596,21 +596,21 @@ class UserConfig(Base):
     __tablename__ = "userconfig"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(500))
-    karma: Mapped[int] = mapped_column(default=0)
+    karma: Mapped[int] = mapped_column(server_default='0')
     birth_date = mapped_column(DateTime(timezone=True), nullable=True)
 
-    display_style: Mapped[str] = mapped_column(default="")
-    display_type: Mapped[str] = mapped_column(default="")
-    show_icons: Mapped[bool] = mapped_column(default=False)
-    small_icons: Mapped[bool] = mapped_column(default=False)
-    thumbnails_as_icons: Mapped[bool] = mapped_column(default=False)
-    entries_direct_links: Mapped[bool] = mapped_column(default=False)
-    highlight_bookmarks: Mapped[bool] = mapped_column(default=False)
-    click_behavior_modal_window: Mapped[bool] = mapped_column(default=False)
-    links_per_page: Mapped[int] = mapped_column(default=0)
-    sources_per_page: Mapped[int] = mapped_column(default=0)
+    display_style: Mapped[str] = mapped_column(server_default="")
+    display_type: Mapped[str] = mapped_column(server_default="")
+    show_icons: Mapped[bool] = mapped_column(server_default="false")
+    small_icons: Mapped[bool] = mapped_column(server_default="false")
+    thumbnails_as_icons: Mapped[bool] = mapped_column(sever_default="false")
+    entries_direct_links: Mapped[bool] = mapped_column(server_default="false")
+    highlight_bookmarks: Mapped[bool] = mapped_column(server_default="false")
+    click_behavior_modal_window: Mapped[bool] = mapped_column(server_default="false")
+    links_per_page: Mapped[int] = mapped_column(server_default='0')
+    sources_per_page: Mapped[int] = mapped_column(server_default='0')
 
-    debug_mode: Mapped[bool] = mapped_column(default=False)
+    debug_mode: Mapped[bool] = mapped_column(server_default='false')
     user_id: Mapped[Optional[int]]
 
 
@@ -621,9 +621,9 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(500))
     first_name: Mapped[str] = mapped_column(String(500))
     last_name: Mapped[str] = mapped_column(String(500))
-    is_superuser: Mapped[bool] = mapped_column(default=False)
-    is_active: Mapped[bool] = mapped_column(default=True)
-    is_staff: Mapped[bool] = mapped_column(default=True)
+    is_superuser: Mapped[bool] = mapped_column(server_default='false')
+    is_active: Mapped[bool] = mapped_column(server_default='true')
+    is_staff: Mapped[bool] = mapped_column(server_default='true')
     email: Mapped[str] = mapped_column(String(500))
     date_joined = mapped_column(DateTime(timezone=True), nullable=True)
 
