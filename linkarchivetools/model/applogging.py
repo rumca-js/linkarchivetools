@@ -17,6 +17,7 @@ class AppLogging(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("applogging")
+        self.table = self.get_reflected_table("applogging")
 
     def create_entry(self, info_text, detail_text="", level=INFO, stack=False):
         if len(info_text) > 1900:
@@ -30,7 +31,7 @@ class AppLogging(BaseTable):
         json_data["level"] = level
         json_data["date"] = datetime.now()
 
-        self.connection.applogging.insert_json_data(json_data)
+        self.table.insert_json_data(json_data)
 
         self.cleanup_overflow()
 
@@ -38,13 +39,13 @@ class AppLogging(BaseTable):
         """
         Cleans up
         """
-        count_elements = self.connection.applogging.count()
+        count_elements = self.table.count()
         if count_elements > AppLogging.get_max_log_entries():
             diff = count_elements - AppLogging.get_max_log_entries()
 
-            rows = self.connection.applogging.get_where(order_by=[self.connection.applogging.get_table().c.date.asc()], limit=diff)
+            rows = self.table.get_where(order_by=[self.table.c.date.asc()], limit=diff)
             for row in rows:
-                self.connection.applogging.delete(id=row.id)
+                self.table.delete(id=row.id)
 
     def get_max_log_entries():
         return 2000

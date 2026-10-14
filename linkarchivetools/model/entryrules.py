@@ -24,6 +24,7 @@ class EntryRules(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("entry_rules")
+        self.table = self.get_reflected_table("entryrules")
 
     def is_url_blocked(self, url, source=None) -> bool:
         rules = self.get_rules_for(url=url,source=source)
@@ -63,7 +64,7 @@ class EntryRules(BaseTable):
 
         conditions = {"enabled" : True}
 
-        rules = list(self.connection.entry_rules.get_where(conditions, limit=10000))
+        rules = list(self.table.get_where(conditions, limit=10000))
         for rule_row in rules:
            if not rule_row.enabled:
                continue
@@ -76,7 +77,7 @@ class EntryRules(BaseTable):
         return result
 
     def add_entry_rule(self, entry_rule_url, block=True, trust=False, properties=None, name=None, source_id=None):
-        entries = self.connection.entry_rules.get_where({"trigger_rule_url" : entry_rule_url})
+        entries = self.table.get_where({"trigger_rule_url" : entry_rule_url})
         entry = next(entries, None)
 
         if not entry:
@@ -105,7 +106,7 @@ class EntryRules(BaseTable):
             if source_id:
                 data["source_id"] = source_id
 
-            return self.connection.entry_rules.insert_json_data(data)
+            return self.table.insert_json_data(data)
 
     def add_entry_rules(self, raw_input):
         entry_rule_urls = read_line_things(raw_input)
@@ -113,6 +114,6 @@ class EntryRules(BaseTable):
             self.add_entry_rule(entry_rule_url)
 
     def set_entry_rules(self, raw_input):
-        self.connection.entry_rules.truncate()
+        self.table.truncate()
 
         self.add_entry_rules(raw_input)

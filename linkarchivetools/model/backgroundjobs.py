@@ -43,6 +43,7 @@ class BackgroundJob(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("backgroundjob")
+        self.table = self.get_reflected_table("backgroundjob")
 
     def create_single_job(self, job_name, subject="", args="", user=None, cfg=None):
 
@@ -63,24 +64,24 @@ class BackgroundJob(BaseTable):
             json_data["date_created"] = datetime.now()
             json_data["user_id"] = 0
 
-            return self.connection.backgroundjob.insert_json_data(json_data)
+            return self.table.insert_json_data(json_data)
 
     def is_job(self, job_name, subject=None):
-        table = self.connection.backgroundjob.get_table()
+        table = self.table.get_table()
 
         if subject:
             conditions = and_(table.c.job==job_name, table.c.subject==subject)
         else:
             conditions = and_(table.c.job==job_name)
 
-        jobs = self.connection.backgroundjob.get_where_ex(conditions=conditions)
+        jobs = self.table.get_where_ex(conditions=conditions)
         for job in jobs:
             return True
 
         return False
 
     def get(self, id):
-        return self.connection.backgroundjob.get(id=id)
+        return self.table.get(id=id)
 
     def get_cfg(id, self):
         job = self.get(id)

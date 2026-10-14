@@ -1,3 +1,7 @@
+from sqlalchemy import MetaData, Table
+from linkarchivetools.utils.reflected import (
+    ReflectedGenericTable,
+)
 
 class BaseTable(object):
     def __init__(self, connection):
@@ -12,6 +16,17 @@ class BaseTable(object):
 
     def get_table(self):
         return getattr(self.connection, self.table_name)
+
+    def get_meta_table(self, table_name):
+        engine = self.connection.engine
+        metadata = MetaData()
+        return Table(table_name, metadata, autoload_with=engine)
+
+    def get_reflected_table(self, table_name):
+        engine = self.connection.engine
+        connection = self.connection.connection
+
+        return ReflectedGenericTable(engine=engine, connection=connection, table_name=table_name)
 
     def truncate(self):
         self.get_table().truncate()
