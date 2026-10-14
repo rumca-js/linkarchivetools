@@ -592,6 +592,18 @@ class EntryVisitHistory(Base):
     entry_id: Mapped[Optional[int]] = mapped_column()
 
 
+class SystemOperation(Base):
+    """
+    CHECK_TYPE_INTERNET = "Internet"
+    CHECK_TYPE_CRAWLING_SERVER = "CrawlingServer"
+    """
+
+    date_created = mapped_column(DateTime(timezone=True), nullable=True)
+    thread_id: Mapped[str] = mapped_column(String(500), server_default="")
+    check_type: Mapped[str] = mapped_column(String(500), server_default="")
+    status: Mapped[bool] = mapped_column(server_default="true") 
+
+
 class UserConfig(Base):
     __tablename__ = "userconfig"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
