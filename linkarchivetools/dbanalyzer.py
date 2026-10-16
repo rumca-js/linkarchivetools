@@ -27,7 +27,7 @@ from linkarchivetools.model import (
     entry_to_json,
     DbConnection,
     Sources,
-    SourceData,
+    SourceDataService,
 )
 from linkarchivetools.utils.reflected import (
     ReflectedTable,
@@ -301,7 +301,7 @@ class DbAnalyzer(object):
             text = f"Source:{source.id} {source.title}"
             print(text)
 
-            sd_controller = SourceData(connection=db_connection)
+            sd_controller = SourceDataService(connection=db_connection)
             data = sd_controller.get_source_data(source=source)
             if data is not None:
                 text = f"Dynamic data: {data.page_hash} {data.body_hash}"

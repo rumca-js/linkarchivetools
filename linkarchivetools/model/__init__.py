@@ -19,3 +19,5 @@ from .searchview import *
 from .blocklist import *
 from .userconfig import *
 from .entryvisits import *
+
+from .definitions import *

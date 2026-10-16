@@ -144,6 +144,10 @@ class ReflectedGenericTable(object):
     def get_table_name():
         return self.table_name
 
+    def is_valid(self):
+        reflected_table = ReflectedTable(engine=self.engine, connection=self.connection)
+        return reflected_table.is_table(self.table_name)
+
     def close(self):
         pass
 
@@ -158,9 +162,12 @@ class ReflectedGenericTable(object):
         return self.table
 
     def truncate(self):
-        sql_text = f"DELETE FROM {self.table_name};"
-        self.connection.execute(text(sql_text))
-        self.connection.commit()
+        if self.table_name:
+            sql_text = f"DELETE FROM {self.table_name};"
+            self.connection.execute(text(sql_text))
+            self.connection.commit()
+        else:
+            raise IOError("No table name")
 
     def enable_sqlite_wal(self):
         sql_text = f"PRAGMA journal_mode=WAL;"

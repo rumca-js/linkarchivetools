@@ -4,9 +4,9 @@ from linkarchivetools.utils.reflected import (
 )
 
 class BaseTable(object):
-    def __init__(self, connection):
+    def __init__(self, connection, table_name=None):
         self.connection = connection
-        self.table_name = None
+        self.table_name = table_name
 
     def set_table(self, table_name):
         """
@@ -15,7 +15,7 @@ class BaseTable(object):
         self.table_name = table_name
 
     def get_table(self):
-        return getattr(self.connection, self.table_name)
+        return self.get_reflected_table(self.table_name)
 
     def get_meta_table(self, table_name):
         engine = self.connection.engine

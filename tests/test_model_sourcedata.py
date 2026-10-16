@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from linkarchivetools.model import (
    DbConnection,
    Sources,
-   SourceData,
+   SourceDataService,
 )
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -23,7 +23,7 @@ class SourceDataTest(DbTestCase):
         sources.truncate()
 
         # call tested function
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         self.assertEqual(sources.count(), 0)
@@ -48,7 +48,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         # call tested function
@@ -80,7 +80,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         # call tested function
@@ -105,7 +105,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         sc_controller.mark_read(source)
@@ -134,7 +134,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         data_id = sc_controller.mark_read(source)
@@ -168,7 +168,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         data_id = sc_controller.mark_read(source)
@@ -203,7 +203,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         data_id = sc_controller.mark_read(source)
@@ -237,7 +237,7 @@ class SourceDataTest(DbTestCase):
         self.assertTrue(source is not None)
         self.assertEqual(sources.count(), 1)
 
-        sc_controller = SourceData(connection=connection)
+        sc_controller = SourceDataService(connection=connection)
         sc_controller.truncate()
 
         sc_controller.mark_read(source)

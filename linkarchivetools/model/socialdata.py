@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 from .basetable import BaseTable
 
 
-class SocialData(BaseTable):
+class SocialDataService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("socialdata")
 
     def get(self, entry_id):
-        social_datas = self.connection.socialdata.get_where({"entry_id" : entry_id})
+        social_datas = self.get_table().get_where({"entry_id" : entry_id})
         for social_data in social_datas:
             return social_data
 
@@ -29,9 +29,9 @@ class SocialData(BaseTable):
             return
 
         if existing_social_data:
-            self.connection.socialdata.update_json_data(id=existing_social_data.id, json_data=social_data)
+            self.get_table().update_json_data(id=existing_social_data.id, json_data=social_data)
         else:
-            self.connection.socialdata.insert_json_data(json_data=social_data)
+            self.get_table().insert_json_data(json_data=social_data)
 
     def is_valid(self, social_data_json):
         valid = False
@@ -41,10 +41,10 @@ class SocialData(BaseTable):
         return valid
 
     def delete(self, entry_id):
-        self.connection.socialdata.delete_where({"entry_id" : entry_id})
+        self.get_table().delete_where({"entry_id" : entry_id})
 
     def cleanup(self):
-        social_data_container = self.connection.socialdata.get_where({})
+        social_data_container = self.get_table().get_where({})
         # TODO  cannot import entries
         #for social_data in social_data_container:
         #    entry = Entries.get(id=social_data.entry_id)

@@ -13,6 +13,7 @@ from linkarchivetools.utils.reflected import (
    ReflectedGenericTable,
    ReflectedSocialData,
 )
+from linkarchivetools.tableconfig import get_tables
 
 
 class DbConnection(object):
@@ -33,6 +34,7 @@ class DbConnection(object):
         self.connection.execute(text(sql_text))
         self.connection.commit()
 
+        """
         self.entries_table = ReflectedEntryTable(engine=self.engine, connection=self.connection)
         self.sources_table = ReflectedSourceTable(engine=self.engine, connection=self.connection)
 
@@ -60,29 +62,20 @@ class DbConnection(object):
         self.entryvisithistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entryvisithistory")
         self.entrytransitionhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="entrytransitionhistory")
         self.searchhistory = ReflectedGenericTable(engine=self.engine, connection=self.connection, table_name="searchhistory")
+        """
 
     def create_engine(db_file):
         engine = create_engine(f"sqlite:///{db_file}", connect_args={"check_same_thread": False})
         return engine
 
     def truncate(self):
-        self.entries_table.truncate()
-        self.sources_table.truncate()
-        self.configurationentry.truncate()
-        self.applogging.truncate()
-        self.backgroundjob.truncate()
-        self.backgroundjobhistory.truncate()
-        self.blockentry.truncate()
-        self.blockentrylist.truncate()
-        self.entry_rules.truncate()
-        self.readlater.truncate()
-        self.searchview.truncate()
-        self.socialdata.truncate()
-        self.sourceoperationaldata.truncate()
-        self.usertags.truncate()
-        self.compactedtags.truncate()
-        self.entrycompactedtags.truncate()
-        self.uservotes.truncate()
+        from .basetable import BaseTable
+        table_names = get_tables()
+        for table_name in table_names:
+            table = BaseTable(connection=self, table_name=table_name)
+            reflected_table = table.get_reflected_table(table_name)
+            if reflected_table.is_valid():
+                reflected_table.truncate()
 
         table = ReflectedTable(engine=self.engine, connection=self.connection)
         table.vacuum()

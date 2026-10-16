@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   BlockEntry,
+   BlockEntryService,
 )
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -16,7 +16,7 @@ class BlockEntryTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        block_list = BlockEntry(connection=connection)
+        block_list = BlockEntryService(connection=connection)
         block_list.truncate()
 
         # call tested function
@@ -28,7 +28,7 @@ class BlockEntryTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        block_list = BlockEntry(connection=connection)
+        block_list = BlockEntryService(connection=connection)
         block_list.truncate()
 
         # call tested function
@@ -41,7 +41,7 @@ class BlockEntryTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        block_list = BlockEntry(connection=connection)
+        block_list = BlockEntryService(connection=connection)
         block_list.truncate()
         block_list.add("https://google.com")
         self.assertEqual(block_list.count(), 1)

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from linkarchivetools.model import (
    DbConnection,
-   BackgroundJob,
+   BackgroundJobService,
 )
 
 from .dbtestcase import DbTestCase
@@ -15,7 +15,7 @@ class BackgroundJobTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        jobs = BackgroundJob(connection=connection)
+        jobs = BackgroundJobService(connection=connection)
         jobs.truncate()
 
         self.assertEqual(jobs.count(), 0)
@@ -26,7 +26,7 @@ class BackgroundJobTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        jobs = BackgroundJob(connection=connection)
+        jobs = BackgroundJobService(connection=connection)
         jobs.truncate()
 
         json_data = {}
@@ -48,7 +48,7 @@ class BackgroundJobTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        jobs = BackgroundJob(connection=connection)
+        jobs = BackgroundJobService(connection=connection)
         jobs.truncate()
 
         # call tested function
@@ -63,7 +63,7 @@ class BackgroundJobTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        jobs = BackgroundJob(connection=connection)
+        jobs = BackgroundJobService(connection=connection)
         jobs.truncate()
 
         job_id = jobs.create_single_job(job_name="test-job", subject="test subject")
@@ -82,7 +82,7 @@ class BackgroundJobTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        jobs = BackgroundJob(connection=connection)
+        jobs = BackgroundJobService(connection=connection)
         jobs.truncate()
 
         job_id = jobs.create_single_job(job_name="test-job", subject="test subject")

@@ -39,9 +39,9 @@ class Db2AnalyzerTest(DbTestCase):
     def test_search__none(self):
         self.create_db("input.db")
         self.add_entry_with_tags("input.db")
-        args = {}
+        args = SimpleNamespace(search=None, ignore_case = True, verbosity=1, table=False, order_by=None, asc=True, desc=False, json=False, rss=False, channel=False, title=False, description=False, votes=False, social=False, tags=False, source=False, date_created=False, date_published=False, status=False)
 
-        analyzer = DbAnalyzer(input_db="input.db")
+        analyzer = DbAnalyzer(input_db="input.db", args=args)
         # call tested function
         for item in analyzer.search():
             pass

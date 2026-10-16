@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   SocialData,
+   SocialDataService,
    Entries,
 )
 from linkarchivetools.utils.reflected import (
@@ -17,7 +17,7 @@ class SocialDataTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        socialdata = SocialData(connection=connection)
+        socialdata = SocialDataService(connection=connection)
         socialdata.truncate()
 
         self.assertEqual(socialdata.count(), 0)
@@ -38,7 +38,7 @@ class SocialDataTest(DbTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertTrue(entry_id is not None)
 
-        socialdata = SocialData(connection=connection)
+        socialdata = SocialDataService(connection=connection)
         socialdata.truncate()
 
         social_data_json = {}

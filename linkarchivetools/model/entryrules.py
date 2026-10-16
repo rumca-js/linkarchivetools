@@ -2,7 +2,6 @@ from pathlib import Path
 from datetime import datetime
 import re
 
-from .sourcedata import SourceData
 from .sources import Sources
 from .basetable import BaseTable
 
@@ -20,10 +19,10 @@ def read_line_things(input_text):
     return sources
 
 
-class EntryRules(BaseTable):
+class EntryRulesService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
-        self.set_table("entry_rules")
+        self.set_table("entryrules")
         self.table = self.get_reflected_table("entryrules")
 
     def is_url_blocked(self, url, source=None) -> bool:

@@ -1,15 +1,15 @@
 from linkarchivetools.model import (
    DbConnection,
-   EntryVisitHistoryTable,
-   EntryTransitionHistoryTable,
+   EntryVisitHistoryService,
+   EntryTransitionHistoryService,
    Entries,
-   ConfigurationEntry,
+   ConfigurationEntryService,
 )
 
 from .dbtestcase import DbTestCase
 
 
-class CheckLaterTest(DbTestCase):
+class EntryTransitionHistoryServiceTest(DbTestCase):
     def setUp(self):
         self.create_db("input.db")
         self.clean_out()
@@ -31,25 +31,25 @@ class CheckLaterTest(DbTestCase):
         return entry
 
     def test_constructor(self):
-        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+        ConfigurationEntryService(self.connection).update({"track_user_navigation" : True})
 
         # call tested function
-        visits = EntryVisitHistoryTable(connection=self.connection)
+        visits = EntryVisitHistoryService(connection=self.connection)
         visits.truncate()
 
         self.assertEqual(visits.count(), 0)
 
-        transitions = EntryTransitionHistoryTable(connection=self.connection)
+        transitions = EntryTransitionHistoryService(connection=self.connection)
         self.assertEqual(transitions.count(), 0)
 
     def test_visited(self):
-        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+        ConfigurationEntryService(self.connection).update({"track_user_navigation" : True})
 
-        visits = EntryVisitHistoryTable(connection=self.connection)
+        visits = EntryVisitHistoryService(connection=self.connection)
         visits.truncate()
 
         self.assertEqual(visits.count(), 0)
-        transitions = EntryTransitionHistoryTable(connection=self.connection)
+        transitions = EntryTransitionHistoryService(connection=self.connection)
         self.assertEqual(transitions.count(), 0)
 
         entry = self.add_entry()
@@ -61,13 +61,13 @@ class CheckLaterTest(DbTestCase):
         self.assertEqual(transitions.count(), 0)
 
     def test_visited_two(self):
-        ConfigurationEntry(self.connection).update({"track_user_navigation" : True})
+        ConfigurationEntryService(self.connection).update({"track_user_navigation" : True})
 
-        visits = EntryVisitHistoryTable(connection=self.connection)
+        visits = EntryVisitHistoryService(connection=self.connection)
         visits.truncate()
 
         self.assertEqual(visits.count(), 0)
-        transitions = EntryTransitionHistoryTable(connection=self.connection)
+        transitions = EntryTransitionHistoryService(connection=self.connection)
         self.assertEqual(transitions.count(), 0)
 
         entry_google = self.add_entry("https://google.com")

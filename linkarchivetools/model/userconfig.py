@@ -4,7 +4,7 @@ from .basetable import BaseTable
 from .entries import Entries
 
 
-class UserConfig(BaseTable):
+class UserConfigService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("userconfig")

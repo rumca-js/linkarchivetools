@@ -1,7 +1,7 @@
 from pathlib import Path
 from webtoolkit import BaseUrl
 
-from .sourcedata import SourceData
+from .sourcedata import SourceDataService
 from .entries import Entries
 from .basetable import BaseTable
 
@@ -13,7 +13,7 @@ class Sources(BaseTable):
 
     def __init__(self, connection):
         self.connection = connection
-        self.set_table("sources_table")
+        self.set_table("sourcedatamodel")
 
     def add(self, source_url, source_type=""):
         if self.exists(source_url):
@@ -23,7 +23,7 @@ class Sources(BaseTable):
         properties["url"] = source_url
         properties["source_type"] = source_type
 
-        return self.connection.sources_table.insert_json(properties)
+        return self.get_table().insert_json_data(properties)
 
     def set(self, source_url, source_properties=None, source_type=""):
         link = source_url
@@ -52,7 +52,7 @@ class Sources(BaseTable):
 
             data["source_type"] = source_type
 
-            return self.connection.sources_table.update_json(id=source.id, json_data=data)
+            return self.get_table().update_json_data(id=source.id, json_data=data)
 
         properties = {}
         properties["url"] = link
@@ -70,7 +70,7 @@ class Sources(BaseTable):
         else:
             properties["favicon"] = ""
 
-        return self.connection.sources_table.insert_json(properties)
+        return self.get_table().insert_json_data(properties)
 
     def update(self, source, url_obj=None):
         if not source.enabled:
@@ -100,7 +100,7 @@ class Sources(BaseTable):
         return self.update_properties(source=source, properties=properties)
 
     def error(self, source):
-        sd_controller = SourceData(connection=self.connection)
+        sd_controller = SourceDataService(connection=self.connection)
         source_data = sd_controller.error(source)
 
     def update_all(self):
@@ -113,7 +113,6 @@ class Sources(BaseTable):
 
     def process(self, source=None, id=None):
         from .entries import Entries
-        from .sourcedata import SourceData
 
         if source is None and id is not None:
             source = self.get(id=id)
@@ -129,12 +128,12 @@ class Sources(BaseTable):
         for entry in entries:
             entry_controller.add(entry_json=entry)
 
-        sd_controller = SourceData(connection=self.connection)
+        sd_controller = SourceDataService(connection=self.connection)
         sd_controller.mark_read(source=source, url_obj=url_obj)
 
     def update_properties(self, source, properties):
         try:
-            entry_id = self.connection.sources_table.update_json_data(id=source.id, json_data=properties)
+            entry_id = self.get_table().update_json_data(id=source.id, json_data=properties)
             return entry_id
         except Exception as E:
             print(E)
@@ -153,22 +152,22 @@ class Sources(BaseTable):
 
         self.delete_entries(source)
 
-        sources_data = SourceData(connection=self.connection)
+        sources_data = SourceDataService(connection=self.connection)
         sources_data.delete(source)
 
-        self.connection.sources_table.delete(id=id)
+        self.get_table().delete(id=id)
 
     def get(self,id):
-        return self.connection.sources_table.get(id=id)
+        return self.get_table().get(id=id)
 
     def get_with_url(self,source_url):
-        for source in self.connection.sources_table.get_where({"url":source_url}):
+        for source in self.get_table().get_where({"url":source_url}):
             return source
 
     def exists(self, source_url):
         link = source_url
 
-        for source in self.connection.sources_table.get_where({"url":link}):
+        for source in self.get_table().get_where({"url":link}):
             return True
 
         return False

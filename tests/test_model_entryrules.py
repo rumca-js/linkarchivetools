@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   EntryRules,
+   EntryRulesService,
 )
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -15,7 +15,7 @@ class EntryRulesTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        rules = EntryRules(connection=connection)
+        rules = EntryRulesService(connection=connection)
 
         # call tested function
         self.assertEqual(rules.count(), 0)
@@ -25,7 +25,7 @@ class EntryRulesTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        rules = EntryRules(connection=connection)
+        rules = EntryRulesService(connection=connection)
 
         # call tested function
         rules.add_entry_rule("https://google.com")
@@ -36,7 +36,7 @@ class EntryRulesTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        rules = EntryRules(connection=connection)
+        rules = EntryRulesService(connection=connection)
 
         rules.add_entry_rule("https://google.com", block=True)
         self.assertEqual(rules.count(), 1)
@@ -50,7 +50,7 @@ class EntryRulesTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        rules_controller = EntryRules(connection=connection)
+        rules_controller = EntryRulesService(connection=connection)
 
         rules_controller.add_entry_rule("https://google.com", block=True)
         self.assertEqual(rules_controller.count(), 1)

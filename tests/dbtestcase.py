@@ -5,7 +5,7 @@ import shutil
 from sqlalchemy import create_engine
 
 from linkarchivetools.model.definitions import create_tables
-from linkarchivetools.model import DbConnection, UserConfig
+from linkarchivetools.model import DbConnection, UserConfigService
 from linkarchivetools.dbupdate import DbUpdate
 
 from linkarchivetools.utils.reflected import (
@@ -130,7 +130,7 @@ class DbTestCase(unittest.TestCase):
         engine = create_engine(f"sqlite:///{file_name}")
         with engine.connect() as connection:
             db_connection = DbConnection(engine=engine,connection=connection)
-            config = UserConfig(connection=db_connection)
+            config = UserConfigService(connection=db_connection)
             user_id = config.add_user(username, password)
             config_id = config.add_config(user_id)
             return user_id

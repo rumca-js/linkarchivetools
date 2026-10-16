@@ -4,9 +4,10 @@ TODO remove hardcoded values
 import traceback
 from datetime import datetime
 from .basetable import BaseTable
+from .definitions import AppLogging
 
 
-class AppLogging(BaseTable):
+class AppLoggingService(BaseTable):
     DEBUG = 10
     INFO = 20
     WARNING = 30
@@ -40,6 +41,7 @@ class AppLogging(BaseTable):
         Cleans up
         """
         count_elements = self.table.count()
+
         if count_elements > AppLogging.get_max_log_entries():
             diff = count_elements - AppLogging.get_max_log_entries()
 

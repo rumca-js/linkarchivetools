@@ -2,7 +2,7 @@ from pathlib import Path
 from linkarchivetools.model import (
    DbConnection,
    Sources,
-   SourceData,
+   SourceDataService,
 )
 from linkarchivetools.dbupdate import DbUpdate
 from linkarchivetools.utils.reflected import (
@@ -159,7 +159,7 @@ class SourcesTest(DbTestCase):
         sources = Sources(connection=connection)
         sources.truncate()
 
-        sd_controller = SourceData(connection=connection)
+        sd_controller = SourceDataService(connection=connection)
 
         source_url = "https://google.com"
 

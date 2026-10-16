@@ -1,7 +1,7 @@
 from datetime import datetime
 from webtoolkit import BaseUrl
 
-from .socialdata import SocialData
+from .socialdata import SocialDataService
 from .basetable import BaseTable
 
 
@@ -12,10 +12,10 @@ class Entries(BaseTable):
 
     def __init__(self, connection):
         self.connection = connection
-        self.set_table("entries_table")
+        self.set_table("linkdatamodel")
 
     def add(self, entry_json, source=None):
-        if self.connection.entries_table.exists(link=entry_json["link"]):
+        if self.exists(link=entry_json["link"]):
             return
 
         if source:
@@ -34,7 +34,7 @@ class Entries(BaseTable):
         entry_json["date_created"] = datetime.now()
 
         try:
-            entry_id = self.connection.entries_table.insert_json(json_data=entry_json)
+            entry_id = self.get_table().insert_json_data(json_data=entry_json)
             return entry_id
         except Exception as E:
             print(E)
@@ -72,7 +72,7 @@ class Entries(BaseTable):
 
     def update_properties(self, entry, properties):
         try:
-            self.connection.entries_table.update_json_data(id=entry.id, json_data=properties)
+            self.get_table().update_json_data(id=entry.id, json_data=properties)
             return True
         except Exception as E:
             print(E)
@@ -80,30 +80,34 @@ class Entries(BaseTable):
             raise
 
     def delete(self, id):
-        socialdata = SocialData(self.connection)
+        socialdata = SocialDataService(self.connection)
         socialdata.delete(entry_id = id)
+        
+        entryvisithistory = self.get_reflected_table("entryvisithistory")
+        entrytransitionhistory = self.get_reflected_table("entrytransitionhistory")
+        entrycompactedtags = self.get_reflected_table("entrycompactedtags")
+        readlater = self.get_reflected_table("readlater")
 
-        self.connection.entryvisithistory.delete_where({"entry_id" : id})
-        self.connection.entrytransitionhistory.delete_where({"entry_from_id" : id})
-        self.connection.entrytransitionhistory.delete_where({"entry_to_id" : id})
-        self.connection.entrycompactedtags.delete_where({"entry_id" : id})
-        self.connection.readlater.delete_where({"entry_id" : id})
+        entryvisithistory.delete_where({"entry_id" : id})
+        entrytransitionhistory.delete_where({"entry_from_id" : id})
+        entrytransitionhistory.delete_where({"entry_to_id" : id})
+        entrycompactedtags.delete_where({"entry_id" : id})
+        readlater.delete_where({"entry_id" : id})
 
-        self.connection.entries_table.delete(id=id)
+        self.get_table().delete(id=id)
 
     def get(self,id):
-        return self.connection.entries_table.get(id=id)
+        return self.get_table().get(id=id)
 
-    def exists(self,link=None):
-        return self.connection.entries_table.exists(link=link)
+    def exists(self, link):
+        for entry in self.get_table().get_where({"link" : link}):
+            return True
+        return False
 
     def delete_where(self, conditions):
-        entries = self.connection.entries_table.get_where(conditions)
+        entries = self.get_table().get_where(conditions)
         for entry in entries:
-            socialdata = SocialData(self.connection)
-            socialdata.delete(entry_id = entry.id)
-
-        self.connection.entries_table.delete_where(conditions)
+            self.delete(entry.id)
 
     def cleanup(self):
         """
@@ -111,21 +115,29 @@ class Entries(BaseTable):
         Should not be removed, just disconnected from invalid sources
         """
         ids_to_remove = set()
-        for entry in self.connection.entries_table.get_where():
+
+        table = self.get_table()
+        source_table = self.get_reflected_table("sourcedatamodel")
+
+        for entry in table.get_where():
             if entry.source_id is not None:
-                source = self.connection.sources_table.get(id = entry.source_id)
+                source = source_table.get(id = entry.source_id)
                 if not source:
                     properties = {}
                     properties["source_id"] = None
-                    self.connection.entries_table.update_json_data(id=entry.id, json_data=properties)
+                    table().update_json_data(id=entry.id, json_data=properties)
 
     def delete_invalid_sources(self):
         """
         Removes invalid entries
         """
         ids_to_remove = set()
-        for entry in self.connection.entries_table.get_where():
+
+        table = self.get_table()
+        source_table = self.get_reflected_table("sourcedatamodel")
+
+        for entry in table.get_where():
             if entry.source_id is not None:
-                source = self.connection.sources_table.get(id = entry.source_id)
+                source = source_table.get(id = entry.source_id)
                 if not source:
-                    self.connection.entries_table.delete(id=entry.id)
+                    table.delete(id=entry.id)

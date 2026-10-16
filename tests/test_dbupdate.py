@@ -6,8 +6,8 @@ from linkarchivetools import DbUpdate
 from linkarchivetools.model import (
    DbConnection,
    Entries,
-   EntryTags,
-   SearchView,
+   EntryTagsService,
+   SearchViewService,
    UserConfig,
 )
 from linkarchivetools.utils.reflected import ReflectedGenericTable, ReflectedEntryTable
@@ -146,9 +146,9 @@ class DbUpdateTest(DbTestCase):
             db_connection = DbConnection(engine=engine, connection=connection)
             entries = Entries(connection=db_connection)
             entry_id = entries.add(entry_json={"link" : "https://google.com"})
-            tags = EntryTags(connection=db_connection)
+            tags = EntryTagsService(connection=db_connection)
             tags.set(entry_id = entry_id, tags="tags")
-            view = SearchView(connection=db_connection)
+            view = SearchViewService(connection=db_connection)
             view.add()
 
         #input_browser_count = self.get_row_count("input.db", "browser")
@@ -190,9 +190,9 @@ class DbUpdateTest(DbTestCase):
             db_connection = DbConnection(engine=engine, connection=connection)
             entries = Entries(connection=db_connection)
             entry_id = entries.add(entry_json={"link" : "https://google.com"})
-            tags = EntryTags(connection=db_connection)
+            tags = EntryTagsService(connection=db_connection)
             tags.set(entry_id = entry_id, tags="tags")
-            view = SearchView(connection=db_connection)
+            view = SearchViewService(connection=db_connection)
             view.add()
 
         #input_browser_count = self.get_row_count("input.db", "browser")
@@ -234,9 +234,9 @@ class DbUpdateTest(DbTestCase):
             db_connection = DbConnection(engine=engine, connection=connection)
             entries = Entries(connection=db_connection)
             entry_id = entries.add(entry_json={"link" : "https://google.com"})
-            tags = EntryTags(connection=db_connection)
+            tags = EntryTagsService(connection=db_connection)
             tags.set(entry_id = entry_id, tags="tags")
-            view = SearchView(connection=db_connection)
+            view = SearchViewService(connection=db_connection)
             view.add()
 
         #input_browser_count = self.get_row_count("input.db", "browser")

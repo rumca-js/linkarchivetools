@@ -1,5 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
+   BaseTable,
 )
 
 from .dbtestcase import DbTestCase
@@ -11,5 +12,6 @@ class BackgroundJobHistoryTest(DbTestCase):
         self.clean_out()
 
         connection = DbConnection("input.db")
+        table = BaseTable(connection, "backgroundjobhistory")
 
-        self.assertEqual(connection.backgroundjobhistory.count(), 0)
+        self.assertEqual(table.count(), 0)

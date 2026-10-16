@@ -2,9 +2,8 @@ from pathlib import Path
 
 from linkarchivetools.model import (
    DbConnection,
-   CheckLater,
    Entries,
-   ConfigurationEntry,
+   ConfigurationEntryService,
 )
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -22,7 +21,7 @@ class ConfigurationEntryTest(DbTestCase):
 
     def test_constructor(self):
         # call tested function
-        controller = ConfigurationEntry(connection=self.connection)
+        controller = ConfigurationEntryService(connection=self.connection)
         controller.truncate()
 
         self.assertEqual(controller.count(), 0)
@@ -37,7 +36,7 @@ class ConfigurationEntryTest(DbTestCase):
         self.connection = DbConnection("test.db")
 
         # call tested function
-        controller = ConfigurationEntry(connection=self.connection)
+        controller = ConfigurationEntryService(connection=self.connection)
         controller.truncate()
 
         self.assertEqual(controller.count(), 0)

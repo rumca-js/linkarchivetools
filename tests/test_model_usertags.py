@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   EntryTags,
+   EntryTagsService,
    Entries,
 )
 from linkarchivetools.utils.reflected import (
@@ -32,13 +32,13 @@ class EntryTagsTest(DbTestCase):
 
     def test_constructor(self):
         # call tested function
-        tags = EntryTags(connection=self.connection)
+        tags = EntryTagsService(connection=self.connection)
         tags.truncate()
 
         self.assertEqual(tags.count(), 0)
 
     def test_set(self):
-        tags = EntryTags(connection=self.connection)
+        tags = EntryTagsService(connection=self.connection)
         tags.truncate()
 
         self.assertEqual(tags.count(), 0)
@@ -51,7 +51,7 @@ class EntryTagsTest(DbTestCase):
         self.assertEqual(tags.count(), 1)
 
     def test_get(self):
-        tags = EntryTags(connection=self.connection)
+        tags = EntryTagsService(connection=self.connection)
         tags.truncate()
 
         self.assertEqual(tags.count(), 0)
@@ -64,7 +64,7 @@ class EntryTagsTest(DbTestCase):
         self.assertEqual(tags, "action, comedy")
 
     def test_get_map(self):
-        tags = EntryTags(connection=self.connection)
+        tags = EntryTagsService(connection=self.connection)
         tags.truncate()
 
         self.assertEqual(tags.count(), 0)

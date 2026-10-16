@@ -4,7 +4,7 @@ import json
 from .basetable import BaseTable
 
 
-class BackgroundJob(BaseTable):
+class BackgroundJobService(BaseTable):
     JOB_PROCESS_SOURCE = "process-source"
     JOB_LINK_ADD = "link-add"
     JOB_LINK_SAVE = "link-save"

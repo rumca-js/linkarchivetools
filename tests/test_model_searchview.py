@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   SearchView,
+   SearchViewService,
 )
 from linkarchivetools.utils.reflected import (
    ReflectedEntryTable,
@@ -16,7 +16,7 @@ class SearchViewTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        controller = SearchView(connection=connection)
+        controller = SearchViewService(connection=connection)
         controller.truncate()
 
         self.assertEqual(controller.count(), 0)
@@ -27,7 +27,7 @@ class SearchViewTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        controller = SearchView(connection=connection)
+        controller = SearchViewService(connection=connection)
         controller.truncate()
 
         self.assertEqual(controller.count(), 0)
@@ -41,7 +41,7 @@ class SearchViewTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        controller = SearchView(connection=connection)
+        controller = SearchViewService(connection=connection)
         controller.truncate()
         self.assertEqual(controller.count(), 0)
 

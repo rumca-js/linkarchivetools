@@ -4,14 +4,14 @@ from datetime import datetime, timedelta
 from .basetable import BaseTable
 
 
-class SourceData(BaseTable):
+class SourceDataService(BaseTable):
     def __init__(self, connection, default_fetch_period_s=3600):
         self.connection = connection
         self.set_table("sourceoperationaldata")
         self.default_fetch_period_s = default_fetch_period_s
 
     def get_source_data(self, source):
-        op_datas = self.connection.sourceoperationaldata.get_where({"source_id" : source.id})
+        op_datas = self.get_table().get_where({"source_id" : source.id})
         for op_data in op_datas:
             return op_data
 
@@ -41,9 +41,9 @@ class SourceData(BaseTable):
 
         try:
             if op_data:
-                return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
+                return self.get_table().update_json_data(id=op_data.id, json_data=new_data)
             else:
-                return self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
+                return self.get_table().insert_json_data(json_data=new_data)
         except Exception as E:
             E_str = str(E)
             print(f"Error for data {new_data} {E_str}")
@@ -54,7 +54,7 @@ class SourceData(BaseTable):
         if op_data:
             new_data["page_hash"] = None
             new_data["body_hash"] = None
-            return self.connection.sourceoperationaldata.update_json_data(id=op_data.id, json_data=new_data)
+            return self.get_table().update_json_data(id=op_data.id, json_data=new_data)
 
     def is_update_needed(self, source):
         """
@@ -77,7 +77,7 @@ class SourceData(BaseTable):
                 return True
 
             fetch_period_s = self.default_fetch_period_s
-            if source.fetch_period > 0:
+            if source.fetch_period and source.fetch_period > 0:
                 fetch_period_s = source.fetch_period
 
             min10 = 10*60
@@ -109,10 +109,10 @@ class SourceData(BaseTable):
         new_data["consecutive_errors"] = errors
 
         if source_data:
-            return self.connection.sourceoperationaldata.update_json_data(id=source_data.id, json_data=new_data)
+            return self.get_table().update_json_data(id=source_data.id, json_data=new_data)
         else:
             new_data["source_id"] = source.id
-            return self.connection.sourceoperationaldata.insert_json_data(json_data=new_data)
+            return self.get_table().insert_json_data(json_data=new_data)
 
     def get_update_seconds(self, source):
         this_source_data = self.get_source_data(source)
@@ -124,15 +124,15 @@ class SourceData(BaseTable):
         return 0
 
     def delete(self, source):
-        self.connection.sourceoperationaldata.delete_where({"source_id" : source.id})
+        self.get_table().delete_where({"source_id" : source.id})
 
     def cleanup(self):
         ids_to_remove = []
-        op_datas = self.connection.sourceoperationaldata.get_where()
+        op_datas = self.get_table().get_where()
         for op_data in op_datas:
             source = self.connection.sources_table.get(op_data.source_id)
             if not source:
                 ids_to_remove.append(op_data.id)
 
         for id in ids_to_remove:
-            self.connection.sourceoperationaldata.delete(op_data.id)
+            self.get_table().delete(op_data.id)

@@ -1,7 +1,7 @@
 from .basetable import BaseTable
 
 
-class BlockEntry(BaseTable):
+class BlockEntryService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("blockentry")

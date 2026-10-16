@@ -133,8 +133,8 @@ class ConfigurationEntry(Base):
     __tablename__ = "configurationentry"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    instance_title: Mapped[str] = mapped_column(String(500))
-    instance_description: Mapped[Optional[str]] = mapped_column(String(500))
+    instance_title: Mapped[str] = mapped_column(String(500), server_default="")
+    instance_description: Mapped[Optional[str]] = mapped_column(String(500), server_default="")
     instance_internet_location: Mapped[Optional[str]] = mapped_column(String(200))
     favicon_internet_url: Mapped[Optional[str]] = mapped_column(String(200))
     admin_user: Mapped[Optional[str]] = mapped_column(String(500))

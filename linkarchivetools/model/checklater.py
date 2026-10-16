@@ -2,7 +2,7 @@ from .basetable import BaseTable
 from .entries import Entries
 
 
-class CheckLater(BaseTable):
+class CheckLaterService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("readlater")

@@ -1,5 +1,6 @@
+from .basetable import BaseTable
 
-class ConfigurationEntry(object):
+class ConfigurationEntryService(BaseTable):
     DISPLAY_STYLE_LIGHT = "style-light"
     DISPLAY_STYLE_DARK = "style-dark"
 
@@ -21,16 +22,25 @@ class ConfigurationEntry(object):
 
     def __init__(self, connection):
         self.connection = connection
+        self.set_table("configurationentry")
 
     def get(self):
-        return self.connection.configurationentry.get()
+        table = self.get_table()
+        for row in table.get_where():
+            return row
+
+        json_data = {}
+        table.insert_json_data(json_data)
+
+        for row in table.get_where():
+            return row
 
     def truncate(self):
-        self.connection.configurationentry.truncate()
+        self.get_table().truncate()
 
     def count(self):
-        return self.connection.configurationentry.count()
+        return self.get_table().count()
 
     def update(self, json_data):
         config_entry = self.get()
-        return self.connection.configurationentry.update_json_data(id=config_entry.id, json_data=json_data)
+        return self.get_table().update_json_data(id=config_entry.id, json_data=json_data)

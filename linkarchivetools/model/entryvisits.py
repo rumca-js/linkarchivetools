@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from .configurationentry import ConfigurationEntry
+from .configurationentry import ConfigurationEntryService
 from .basetable import BaseTable
 
 
-class EntryTransitionHistoryTable(BaseTable):
+class EntryTransitionHistoryService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("entrytransitionhistory")
@@ -33,7 +33,7 @@ class EntryTransitionHistoryTable(BaseTable):
             return status
 
 
-class EntryVisitHistoryTable(BaseTable):
+class EntryVisitHistoryService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("entryvisithistory")
@@ -58,7 +58,7 @@ class EntryVisitHistoryTable(BaseTable):
             return entries.get(id=visit.entry_id)
 
     def visited(self, entry):
-        config_row = ConfigurationEntry(connection=self.connection).get()
+        config_row = ConfigurationEntryService(connection=self.connection).get()
         if not config_row.track_user_navigation:
             return
 
@@ -93,7 +93,7 @@ class EntryVisitHistoryTable(BaseTable):
             if last_entry.id == entry.id:
                 return status
 
-            transitions = EntryTransitionHistoryTable(self.connection)
+            transitions = EntryTransitionHistoryService(self.connection)
             transitions.transition(last_entry, entry)
 
         return status

@@ -1,6 +1,6 @@
 from .basetable import BaseTable
 
-class SearchView(BaseTable):
+class SearchViewService(BaseTable):
     def __init__(self, connection):
         self.connection = connection
         self.set_table("searchview")

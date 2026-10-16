@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   AppLogging,
+   AppLoggingService,
 )
 
 from .dbtestcase import DbTestCase
@@ -13,5 +13,5 @@ class AppLoggingTest(DbTestCase):
 
         connection = DbConnection("input.db")
 
-        logs = AppLogging(connection=connection)
+        logs = AppLoggingService(connection=connection)
         self.assertEqual(logs.count(), 0)

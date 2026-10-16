@@ -1,6 +1,6 @@
 from linkarchivetools.model import (
    DbConnection,
-   CheckLater,
+   CheckLaterService,
    Entries,
 )
 from linkarchivetools.utils.reflected import (
@@ -18,7 +18,7 @@ class CheckLaterTest(DbTestCase):
 
     def test_constructor(self):
         # call tested function
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
@@ -39,7 +39,7 @@ class CheckLaterTest(DbTestCase):
     def test_check_later(self):
         connection = DbConnection("input.db")
 
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
@@ -52,7 +52,7 @@ class CheckLaterTest(DbTestCase):
     def test_not_check_later(self):
         connection = DbConnection("input.db")
 
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
@@ -67,7 +67,7 @@ class CheckLaterTest(DbTestCase):
     def test_is_checked__false(self):
         connection = DbConnection("input.db")
 
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
@@ -81,7 +81,7 @@ class CheckLaterTest(DbTestCase):
     def test_is_checked__true(self):
         connection = DbConnection("input.db")
 
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
@@ -97,7 +97,7 @@ class CheckLaterTest(DbTestCase):
     def test_get(self):
         connection = DbConnection("input.db")
 
-        laters = CheckLater(connection=self.connection)
+        laters = CheckLaterService(connection=self.connection)
         laters.truncate()
 
         self.assertEqual(laters.count(), 0)
