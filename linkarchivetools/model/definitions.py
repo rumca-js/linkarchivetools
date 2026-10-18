@@ -290,7 +290,7 @@ class Domains(Base):
     __tablename__ = "domains"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    domain: Mapped[str] = mapped_column(String(1000))
+    domain: Mapped[str] = mapped_column(String(2048), index=True)
     main: Mapped[str] = mapped_column(String(200))
     subdomain: Mapped[str] = mapped_column(String(200))
     suffix: Mapped[str] = mapped_column(String(200))
