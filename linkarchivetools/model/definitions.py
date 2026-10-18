@@ -344,7 +344,7 @@ class LinkDataModel(Base):
     __tablename__ = "linkdatamodel"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    link: Mapped[str] = mapped_column(String(30), unique=True)
+    link: Mapped[str] = mapped_column(String(2048), unique=True, index=True)
     source_url: Mapped[Optional[str]]
 
     title: Mapped[Optional[str]]
