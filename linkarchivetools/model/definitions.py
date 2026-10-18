@@ -354,7 +354,7 @@ class LinkDataModel(Base):
     age: Mapped[int] = mapped_column(server_default='0')
 
     date_created = mapped_column(DateTime(timezone=True), nullable=True)
-    date_published = mapped_column(DateTime(timezone=True), nullable=True)
+    date_published = mapped_column(DateTime(timezone=True), nullable=True, index=True)
     date_update_last = mapped_column(DateTime(timezone=True), nullable=True)
     date_dead_since = mapped_column(DateTime(timezone=True), nullable=True)
     date_last_modified = mapped_column(DateTime(timezone=True), nullable=True)
