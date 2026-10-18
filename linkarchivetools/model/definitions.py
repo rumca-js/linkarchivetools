@@ -400,10 +400,15 @@ class ReadLater(Base):
 
 
 class SearchView(Base):
+    """
+    table - identifies for which 'type' of table it is a view.
+     - for example for linkdatamodel, or for sourcedatamodel, or jobs
+    """
     __tablename__ = "searchview"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(500), unique=True)
+    table: Mapped[str] = mapped_column(String(500), server_default="")
     default: Mapped[bool] = mapped_column(server_default="false")
     hover_text: Mapped[Optional[str]] = mapped_column(String(500))
     priority: Mapped[int] = mapped_column(server_default="0")
