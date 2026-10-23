@@ -8,8 +8,8 @@ from .basetable import BaseTable
 
 class Sources(BaseTable):
     SOURCE_TYPE_RSS = "RSS"
-    SOURCE_TYPE_PARSE = "Parse"
-    SOURCE_TYPE_EMAIL = "Email"
+    SOURCE_TYPE_PARSE = "PARSE"
+    SOURCE_TYPE_EMAIL = "EMAIL"
 
     def __init__(self, connection):
         self.connection = connection
