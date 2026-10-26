@@ -95,14 +95,16 @@ class BlockEntryList(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     url: Mapped[str] = mapped_column(String(1000), unique=True)
-    processed: Mapped[bool] = mapped_column(server_default="0")
+    processed: Mapped[bool] = mapped_column(server_default="false")
+    enabled: Mapped[bool] = mapped_column(server_default="true")
+    errors: Mapped[bool] = mapped_column(server_default="false")
 
 
 class BlockEntry(Base):
     __tablename__ = "blockentry"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    url: Mapped[str] = mapped_column(String(1000), unique=True)
+    url: Mapped[str] = mapped_column(String(1000), unique=True, index=True)
     block_list_id: Mapped[Optional[int]]
 
 
