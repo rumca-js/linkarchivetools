@@ -132,6 +132,9 @@ class Browser(Base):
 
 
 class ConfigurationEntry(Base):
+    """
+    use_internal_scripts - if HTML software, do not use 'remote' scripts, jquery, etc.
+    """
     __tablename__ = "configurationentry"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -184,6 +187,7 @@ class ConfigurationEntry(Base):
     new_entries_fetch_social_data: Mapped[bool] = mapped_column(server_default="false")
     browse_entries_fetch_social_data: Mapped[bool] = mapped_column(server_default="false")
     browse_entry_fetch_social_data: Mapped[bool] = mapped_column(server_default="false")
+    browse_entry_update_data: Mapped[bool] = mapped_column(server_default="false")
     entry_update_fetches_social_data: Mapped[bool] = mapped_column(server_default="false")
     entry_update_via_internet: Mapped[bool] = mapped_column(server_default="false")
     days_inactivity_to_disable_source: Mapped[int] = mapped_column(server_default="0")
