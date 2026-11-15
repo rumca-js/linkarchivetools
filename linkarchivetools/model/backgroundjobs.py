@@ -39,6 +39,7 @@ class BackgroundJobService(BaseTable):
         "initialize-block-list"  # initializes one specific block list
     )
     JOB_REFRESH = "refresh"
+    JOB_WORKER_RESTART = "worker-restart"
 
     def __init__(self, connection):
         self.connection = connection

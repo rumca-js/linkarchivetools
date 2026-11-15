@@ -73,7 +73,8 @@ class BackgroundJob(Base):
 
     priority: Mapped[int] = mapped_column(server_default="0")
     errors: Mapped[int] = mapped_column(server_default="0")
-    enabled: Mapped[bool] = mapped_column(server_default="1")
+    enabled: Mapped[bool] = mapped_column(server_default="true")
+    visited: Mapped[bool] = mapped_column(server_default="false")
 
     user_id: Mapped[Optional[int]]
 
@@ -152,7 +153,6 @@ class ConfigurationEntry(Base):
     logging_level: Mapped[int] = mapped_column(server_default="0")
     initialized: Mapped[bool] = mapped_column(server_default="false")
     initialization_type: Mapped[Optional[str]] = mapped_column(String(100))
-    enable_background_jobs: Mapped[bool] = mapped_column(server_default="true")
     block_job_queue: Mapped[bool] = mapped_column(server_default="false")
     use_internal_scripts: Mapped[bool] = mapped_column(server_default="false")
     cleanup_time = mapped_column(Time(), nullable=True)
@@ -163,6 +163,7 @@ class ConfigurationEntry(Base):
     auto_store_thumbnails: Mapped[bool] = mapped_column(server_default="false")
     thread_memory_threshold: Mapped[int] = mapped_column(server_default="0")
 
+    enable_background_jobs: Mapped[bool] = mapped_column(server_default="true")
     enable_keyword_support: Mapped[bool] = mapped_column(server_default="false")
     enable_domain_support: Mapped[bool] = mapped_column(server_default="false")
     enable_file_support: Mapped[bool] = mapped_column(server_default="false")
@@ -170,6 +171,8 @@ class ConfigurationEntry(Base):
     enable_source_archiving: Mapped[bool] = mapped_column(server_default="false")
     enable_crawling: Mapped[bool] = mapped_column(server_default="false")
     enable_social_data: Mapped[bool] = mapped_column(server_default="false")
+    enable_gateways: Mapped[bool] = mapped_column(server_default="false")
+    enable_search_places: Mapped[bool] = mapped_column(server_default="false")
 
     accept_dead_links: Mapped[bool] = mapped_column(server_default="false")
     accept_ip_links: Mapped[bool] = mapped_column(server_default="false")
@@ -179,8 +182,11 @@ class ConfigurationEntry(Base):
     accept_onion_links: Mapped[bool] = mapped_column(server_default="false")
     accept_same_hashes: Mapped[bool] = mapped_column(server_default="false")
 
+    # enables crawling?
     auto_crawl_sources: Mapped[bool] = mapped_column(server_default="false")
+    # scans new entries for links
     auto_scan_new_entries: Mapped[bool] = mapped_column(server_default="false")
+    # scans updated entries for links
     auto_scan_updated_entries: Mapped[bool] = mapped_column(server_default="false")
     new_entries_merge_data: Mapped[bool] = mapped_column(server_default="false")
     new_entries_use_clean_data: Mapped[bool] = mapped_column(server_default="false")
@@ -189,10 +195,10 @@ class ConfigurationEntry(Base):
     browse_entry_fetch_social_data: Mapped[bool] = mapped_column(server_default="false")
     browse_entry_update_data: Mapped[bool] = mapped_column(server_default="false")
     entry_update_fetches_social_data: Mapped[bool] = mapped_column(server_default="false")
-    entry_update_via_internet: Mapped[bool] = mapped_column(server_default="false")
+    entry_update_via_internet: Mapped[bool] = mapped_column(server_default="false") #depricated
     days_inactivity_to_disable_source: Mapped[int] = mapped_column(server_default="0")
 
-    log_remove_entries: Mapped[bool] = mapped_column(server_default="false")
+    log_remove_entries: Mapped[bool] = mapped_column(server_default="false")  # depricated
     auto_create_sources: Mapped[bool] = mapped_column(server_default="false")
     default_source_state: Mapped[bool] = mapped_column(server_default="false")
     prefer_https_links: Mapped[bool] = mapped_column(server_default="false")

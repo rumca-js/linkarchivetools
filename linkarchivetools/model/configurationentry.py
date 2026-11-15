@@ -15,6 +15,7 @@ class ConfigurationEntryService(BaseTable):
     DISPLAY_TYPE_CONTENT_CENTRIC = "content-centric"
     DISPLAY_TYPE_ACCORDION = "accordion"
     DISPLAY_TYPE_LINKS_ONLY = "links-only"
+    DISPLAY_TYPE_COMPACT = "compact"
 
     CONFIGURATION_NEWS = "News"
     CONFIGURATION_GALLERY = "Gallery"
