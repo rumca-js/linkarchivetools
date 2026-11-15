@@ -195,10 +195,8 @@ class ConfigurationEntry(Base):
     browse_entry_fetch_social_data: Mapped[bool] = mapped_column(server_default="false")
     browse_entry_update_data: Mapped[bool] = mapped_column(server_default="false")
     entry_update_fetches_social_data: Mapped[bool] = mapped_column(server_default="false")
-    entry_update_via_internet: Mapped[bool] = mapped_column(server_default="false") #depricated
     days_inactivity_to_disable_source: Mapped[int] = mapped_column(server_default="0")
 
-    log_remove_entries: Mapped[bool] = mapped_column(server_default="false")  # depricated
     auto_create_sources: Mapped[bool] = mapped_column(server_default="false")
     default_source_state: Mapped[bool] = mapped_column(server_default="false")
     prefer_https_links: Mapped[bool] = mapped_column(server_default="false")
@@ -216,8 +214,9 @@ class ConfigurationEntry(Base):
     days_to_check_std_entries: Mapped[int] = mapped_column(server_default="0")
     days_to_check_stale_entries: Mapped[int] = mapped_column(server_default="0")
     days_to_remove_social_data: Mapped[int] = mapped_column(server_default="0")
-    remove_entry_vote_threshold: Mapped[int] = mapped_column(server_default="1")
-    number_of_update_entries: Mapped[int] = mapped_column(server_default="1")
+    remove_entry_vote_threshold: Mapped[int] = mapped_column(server_default="0")
+    number_of_update_entries: Mapped[int] = mapped_column(server_default="1") # depricated
+    remove_unlisted_entries: Mapped[bool] = mapped_column(server_default="true") # 
 
     remote_webtools_server_location: Mapped[Optional[str]] = mapped_column(String(500), server_default="")
     internet_status_test_url: Mapped[Optional[str]] = mapped_column(
