@@ -214,9 +214,12 @@ class ConfigurationEntry(Base):
     days_to_check_std_entries: Mapped[int] = mapped_column(server_default="0")
     days_to_check_stale_entries: Mapped[int] = mapped_column(server_default="0")
     days_to_remove_social_data: Mapped[int] = mapped_column(server_default="0")
-    remove_entry_vote_threshold: Mapped[int] = mapped_column(server_default="0")
     number_of_update_entries: Mapped[int] = mapped_column(server_default="1") # depricated
-    remove_unlisted_entries: Mapped[bool] = mapped_column(server_default="true") # 
+    remove_unlisted_entries: Mapped[bool] = mapped_column(server_default="true") # remove source entries that are not any longer in feed
+    allow_remove_permanent_entries: Mapped[bool] = mapped_column(server_default="false")
+    allow_remove_bookmarked_entries: Mapped[bool] = mapped_column(server_default="false")
+    allow_remove_votes_entries: Mapped[bool] = mapped_column(server_default="false")
+    remove_entry_vote_threshold: Mapped[int] = mapped_column(server_default="0")
 
     remote_webtools_server_location: Mapped[Optional[str]] = mapped_column(String(500), server_default="")
     internet_status_test_url: Mapped[Optional[str]] = mapped_column(
