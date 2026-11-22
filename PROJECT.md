@@ -1,31 +1,13 @@
 # PROJECT
 
-This project provide link archive tools.
+This file has been synchronized into the markdown/ documentation structure.
 
-This project uses:
- - webtoolkit dependency for BaseUrl, UrlLocation, PageResponseObject, and other classes
-
-Project:
- - Provides database scheme for link storage
- - Provides scripts that can be used to modify databases: search, update, etc.
-
-Scripts:
- - db2json.py - used to convert SQLite to JSON
- - json2db.py - used to convert JSON to SQLite
- - dbanalyzer.py - used to search database
- - dbupdate.py - used to truncate table, or change values
- - db2feeds.py - converts database of links to database of feeds
- - backupy.py - performs backup from postgres table
-
-# Table scheme
- - model/definitions.py - provide table definitions
- - tableconfig.py - provides table names with their meaning
-
-# Business logic
-Tried to implement some business logic in model/ directory, but I don't like it
-
-# Notes
- - this project uses dbconnection that contains engine and connection (I don't like it). I think projects use sessions
- - backup performs from table where instance preceeds table name. It uses django approach, so it does look like a 'custom' script
- - functionality is scattered between scripts. maybe consolidation is needed?
- - I don't like that part of things are using utils/reflected.py and some are in model/ directory
+Please refer to:
+- Project overview, dependencies, commands: [PROJECT.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/PROJECT.md)
+- Database schema: [SCHEMA.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/SCHEMA.md)
+- Backend services and controllers: [BACKEND.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/BACKEND.md)
+- CLI commands and contracts: [URLS.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/URLS.md)
+- Presentation and output formats: [UI.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/UI.md)
+- Architecture backlog and tasks: [TODO.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/TODO.md)
+- Known issues: [BUGS.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/BUGS.md)
+- File inventory: [FILES.md](file:///home/hunter/WorkDir/git/linkarchivetools/markdown/FILES.md)
