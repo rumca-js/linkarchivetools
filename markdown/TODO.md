@@ -2,8 +2,6 @@
 
 ## Architectural Refactoring
 
-- Provide entry to JSON and JSON to entry. there might be different needs: only entry information, entry with tags, entry with social data.
-
 - verify if definitions.py is missing fields, or if any is redundant
 
 - perform code analysis of each conversion classes
